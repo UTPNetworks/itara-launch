@@ -52,8 +52,43 @@
       <!-- Logo -->
       <a href="/" class="nav-logo">
         <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Itara">
-          <rect width="40" height="40" rx="10" fill="var(--accent)"/>
-          <path d="M13 12h14M20 12v16M13 28h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="nav-prism" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7C3AED"/><stop offset="45%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#06B6D4"/></linearGradient>
+            <linearGradient id="nav-h1" x1="10" y1="15" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#06B6D4"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
+            <linearGradient id="nav-vt" x1="20" y1="10" x2="20" y2="30" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset=".5" stop-color="#EC4899"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
+            <linearGradient id="nav-h2" x1="10" y1="25" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#06B6D4"/></linearGradient>
+            <radialGradient id="nav-cn" cx="42%" cy="36%" r="60%"><stop stop-color="#F9A8D4"/><stop offset=".6" stop-color="#EC4899"/><stop offset="1" stop-color="#7C3AED"/></radialGradient>
+            <linearGradient id="nav-d1" x1="20" y1="20" x2="10" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
+            <linearGradient id="nav-d2" x1="20" y1="20" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
+            <linearGradient id="nav-d3" x1="20" y1="20" x2="10" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
+            <linearGradient id="nav-d4" x1="20" y1="20" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
+            <linearGradient id="nav-tf" x1="12" y1="2" x2="28" y2="14" gradientUnits="userSpaceOnUse"><stop stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></linearGradient>
+            <clipPath id="nav-clip"><polygon points="20,2 35,10 35,28 20,36 5,28 5,10"/></clipPath>
+          </defs>
+          <!-- Prism shell -->
+          <polygon points="20,2 35,10 35,28 20,36 5,28 5,10" fill="url(#nav-prism)" opacity="0.92"/>
+          <polygon points="20,2 35,10 20,18 5,10" fill="url(#nav-tf)"/>
+          <polygon points="35,10 35,28 20,36 20,18" fill="rgba(0,0,0,0.14)"/>
+          <!-- Pink accent edge top-right -->
+          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(236,72,153,0.45)" stroke-width="0.8" stroke-linecap="round"/>
+          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(255,255,255,0.2)" stroke-width="0.7" stroke-linecap="round"/>
+          <line x1="20" y1="2" x2="5"  y2="10" stroke="rgba(255,255,255,0.12)" stroke-width="0.6" stroke-linecap="round"/>
+          <!-- Signal Node inside prism -->
+          <g clip-path="url(#nav-clip)">
+            <line x1="10" y1="15" x2="30" y2="15" stroke="url(#nav-h1)" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+            <line x1="20" y1="15" x2="20" y2="25" stroke="url(#nav-vt)" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+            <line x1="10" y1="25" x2="30" y2="25" stroke="url(#nav-h2)" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+            <line x1="20" y1="20" x2="10" y2="15" stroke="url(#nav-d1)" stroke-width="0.8" opacity="0.7"/>
+            <line x1="20" y1="20" x2="30" y2="15" stroke="url(#nav-d2)" stroke-width="0.8" opacity="0.7"/>
+            <line x1="20" y1="20" x2="10" y2="25" stroke="url(#nav-d3)" stroke-width="0.8" opacity="0.7"/>
+            <line x1="20" y1="20" x2="30" y2="25" stroke="url(#nav-d4)" stroke-width="0.8" opacity="0.7"/>
+            <circle cx="10" cy="15" r="2.2" fill="rgba(6,182,212,0.25)"/><circle cx="10" cy="15" r="1.4" fill="#06B6D4"/>
+            <circle cx="30" cy="15" r="2.2" fill="rgba(79,70,229,0.25)"/><circle cx="30" cy="15" r="1.4" fill="#4F46E5"/>
+            <circle cx="10" cy="25" r="2.2" fill="rgba(79,70,229,0.25)"/><circle cx="10" cy="25" r="1.4" fill="#4F46E5"/>
+            <circle cx="30" cy="25" r="2.2" fill="rgba(6,182,212,0.25)"/><circle cx="30" cy="25" r="1.4" fill="#06B6D4"/>
+            <circle cx="20" cy="20" r="8" fill="rgba(236,72,153,0.1)"/>
+            <circle cx="20" cy="20" r="3.5" fill="url(#nav-cn)"/>
+          </g>
         </svg>
         <span class="nav-logo-text">itara</span>
         <span class="nav-beta">BETA</span>
