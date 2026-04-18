@@ -11,6 +11,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
 
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Session Guard: redirect to homepage if not logged in -->
+  <script>
+    (async function() {
+      const SUPA_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+      const SUPA_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+      const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+      const { data: { session } } = await client.auth.getSession();
+      if (!session) {
+        window.location.replace('index.html');
+      }
+    })();
+  </script>
+
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
@@ -137,6 +153,10 @@
         <button class="btn btn-primary db-new-btn" onclick="openNewActionMenu()">
           <i data-lucide="plus"></i>
           New
+        </button>
+        <!-- Sign out -->
+        <button class="db-icon-btn db-signout-btn" onclick="signOut()" aria-label="Sign out" title="Sign out">
+          <i data-lucide="log-out"></i>
         </button>
       </div>
     </header>

@@ -670,3 +670,12 @@
   .db-content { padding: 16px 14px 0; }
   .db-quick-links { grid-template-columns: 1fr 1fr; }
 }
+
+/* Sign out button */
+.db-signout-btn {
+  color: var(--text-muted, #6b7280);
+  transition: color 0.2s;
+}
+.db-signout-btn:hover {
+  color: #dc2626;
+}

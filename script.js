@@ -195,3 +195,92 @@ fadeEls.forEach(el => {
   el.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 180ms cubic-bezier(0.16,1,0.3,1), box-shadow 180ms cubic-bezier(0.16,1,0.3,1)';
   observer.observe(el);
 });
+
+// ============================================================
+//  SUPABASE AUTH
+// ============================================================
+const SUPA_URL  = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+const SUPA_KEY  = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+const { createClient } = supabase;
+const supa = createClient(SUPA_URL, SUPA_KEY);
+
+// --- Modal open / close ---
+function openSignIn() {
+  const overlay = document.getElementById('signin-overlay');
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { overlay.classList.add('modal-visible'); }, 10);
+  document.getElementById('signin-email').focus();
+}
+
+function closeSignIn(e) {
+  if (e && e.target !== document.getElementById('signin-overlay')) return;
+  const overlay = document.getElementById('signin-overlay');
+  overlay.classList.remove('modal-visible');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    // reset form on close
+    document.getElementById('signin-form').reset();
+    document.getElementById('signin-error').style.display = 'none';
+    document.getElementById('signin-form-wrap').style.display = '';
+    document.getElementById('signin-success').style.display = 'none';
+  }, 250);
+}
+
+// ESC key closes modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const overlay = document.getElementById('signin-overlay');
+    if (overlay && overlay.style.display !== 'none') closeSignIn();
+  }
+});
+
+// --- Password visibility toggle ---
+function togglePw() {
+  const input = document.getElementById('signin-password');
+  const icon  = document.getElementById('pw-eye');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+// --- Sign in submit ---
+async function submitSignIn(e) {
+  e.preventDefault();
+  const email    = document.getElementById('signin-email').value.trim();
+  const password = document.getElementById('signin-password').value;
+  const btn      = document.getElementById('signin-btn');
+  const btnText  = document.getElementById('signin-btn-text');
+  const spinner  = document.getElementById('signin-spinner');
+  const errBox   = document.getElementById('signin-error');
+
+  // Loading state
+  btn.disabled   = true;
+  btnText.textContent = 'Signing in…';
+  spinner.style.display = 'block';
+  errBox.style.display  = 'none';
+
+  const { data, error } = await supa.auth.signInWithPassword({ email, password });
+
+  spinner.style.display = 'none';
+  btn.disabled = false;
+  btnText.textContent = 'Sign In';
+
+  if (error) {
+    errBox.textContent = error.message === 'Email not confirmed'
+      ? 'Email not confirmed. Please contact your admin.'
+      : error.message || 'Sign in failed. Check your credentials.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  // Success — show success state then redirect
+  document.getElementById('signin-form-wrap').style.display = 'none';
+  document.getElementById('signin-success').style.display   = 'flex';
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+}

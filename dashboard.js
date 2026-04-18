@@ -190,3 +190,14 @@ function pulseActivity() {
   setTimeout(() => { first.style.background = ''; }, 800);
 }
 setInterval(pulseActivity, 7000);
+
+// ============================================================
+//  SUPABASE SIGN OUT
+// ============================================================
+async function signOut() {
+  const SUPA_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+  const SUPA_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+  const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+  await client.auth.signOut();
+  window.location.replace('index.html');
+}
