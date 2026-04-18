@@ -211,10 +211,13 @@ function togglePw(inputId, iconId) {
 
 // Sign In with Google
 async function signInWithGoogle() {
+  const base = window.location.hostname === 'localhost'
+    ? window.location.origin
+    : 'https://www.itara.ai';
   const { error } = await supa.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin + '/dashboard.html'
+      redirectTo: base + '/dashboard.html'
     }
   });
   if (error) {
@@ -404,11 +407,13 @@ function goSignUpStep(step) {
 // Sign Up with Google
 async function signUpWithGoogle() {
   _signupViaGoogle = true;
+  const base = window.location.hostname === 'localhost'
+    ? window.location.origin
+    : 'https://www.itara.ai';
   const { error } = await supa.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      // After Google auth, redirect to a page that continues the signup flow
-      redirectTo: window.location.origin + '/index.html?signup_step=1'
+      redirectTo: base + '/index.html?signup_step=1'
     }
   });
   if (error) {
