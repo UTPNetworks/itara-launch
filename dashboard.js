@@ -124,6 +124,51 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// === SUPABASE AUTH GUARD + SESSION DISPLAY ===
+(async function() {
+  const client = supabase.createClient(
+    'https://pduogjyvgvpgxdzxdrqx.supabase.co',
+    'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L'
+  );
+
+  const { data: { session } } = await client.auth.getSession();
+  if (!session) {
+    window.location.replace('index.html');
+    return;
+  }
+
+  // Populate user display name from session
+  const user = session.user;
+  const displayName = user.user_metadata?.full_name
+    || user.user_metadata?.username
+    || user.email?.split('@')[0]
+    || 'User';
+  const firstName = displayName.split(' ')[0];
+
+  // Update greeting
+  const greetingName = document.getElementById('greeting-name');
+  if (greetingName) greetingName.textContent = firstName + '.';
+
+  // Update sidebar user info
+  const sidebarName  = document.getElementById('sidebar-user-name');
+  const sidebarEmail = document.getElementById('sidebar-user-email');
+  if (sidebarName)  sidebarName.textContent  = displayName;
+  if (sidebarEmail) sidebarEmail.textContent = user.email || '';
+
+  // Update sidebar avatar with Google profile pic if available
+  const avatarImg = document.getElementById('sidebar-avatar-img');
+  const avatarPic = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+  if (avatarImg && avatarPic) {
+    avatarImg.src = avatarPic;
+    avatarImg.style.display = 'block';
+    const initials = document.getElementById('sidebar-avatar-initials');
+    if (initials) initials.style.display = 'none';
+  } else {
+    const initials = document.getElementById('sidebar-avatar-initials');
+    if (initials) initials.textContent = firstName.charAt(0).toUpperCase();
+  }
+})();
+
 // === SUPABASE SIGN OUT ===
 async function signOut() {
   const client = supabase.createClient(

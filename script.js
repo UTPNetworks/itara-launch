@@ -1,11 +1,22 @@
 /* ============================================================
    Itara — Main Script
+   Auth: Supabase (email/password + Google OAuth)
+   Sign-up: 4-step onboarding flow
    ============================================================ */
 
-// === THEME TOGGLE ===
+// ============================================================
+//  SUPABASE INIT
+// ============================================================
+const SUPA_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+const SUPA_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+const { createClient } = supabase;
+const supa = createClient(SUPA_URL, SUPA_KEY);
+
+// ============================================================
+//  THEME TOGGLE
+// ============================================================
 (function () {
   const html = document.documentElement;
-  const stored = null; // no localStorage in sandboxed iframes — use matchMedia
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   let theme = prefersDark ? 'dark' : 'light';
   html.setAttribute('data-theme', theme);
@@ -31,7 +42,9 @@
   }
 })();
 
-// === NAV SCROLL SHADOW ===
+// ============================================================
+//  NAV SCROLL SHADOW
+// ============================================================
 (function () {
   const nav = document.querySelector('.nav');
   if (!nav) return;
@@ -42,7 +55,9 @@
   }, { passive: true });
 })();
 
-// === SEARCH BAR ===
+// ============================================================
+//  SEARCH BAR
+// ============================================================
 function handleSearch(e) {
   if (e.key === 'Enter') handleSearchClick();
 }
@@ -50,8 +65,7 @@ function handleSearch(e) {
 function handleSearchClick() {
   const val = document.getElementById('search-input').value.trim();
   if (!val) return;
-  // Coming soon — show waitlist modal
-  openModal();
+  openSignUp(); // Prompt sign-up to use search
 }
 
 function fillSearch(text) {
@@ -61,7 +75,9 @@ function fillSearch(text) {
   input.focus();
 }
 
-// === WAITLIST MODAL ===
+// ============================================================
+//  WAITLIST MODAL
+// ============================================================
 function openModal() {
   const overlay = document.getElementById('itara-modal');
   if (!overlay) return;
@@ -76,7 +92,6 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
-// Close on backdrop click
 document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('itara-modal');
   if (overlay) {
@@ -88,25 +103,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ESC to close any modal
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   const waitlist = document.getElementById('itara-modal');
   const signin   = document.getElementById('signin-overlay');
+  const signup   = document.getElementById('signup-overlay');
   if (waitlist && waitlist.style.display !== 'none') closeModal();
   if (signin   && signin.style.display   !== 'none') closeSignIn();
+  if (signup   && signup.style.display   !== 'none') closeSignUp();
 });
 
-// Interest chips
 function toggleChip(btn) {
   btn.classList.toggle('active');
-  const selected = [...document.querySelectorAll('.chip.active')]
-    .map(b => b.dataset.value);
+  const selected = [...document.querySelectorAll('.chip.active')].map(b => b.dataset.value);
   const hidden = document.getElementById('m-interests');
   if (hidden) hidden.value = selected.join(', ');
 }
 
-// Waitlist form submit (Formspree)
 async function submitWaitlist(e) {
   e.preventDefault();
   const form    = document.getElementById('waitlist-form');
@@ -127,7 +140,6 @@ async function submitWaitlist(e) {
       body: data,
       headers: { Accept: 'application/json' },
     });
-
     if (res.ok) {
       document.getElementById('modal-form-wrap').style.display = 'none';
       document.getElementById('modal-success').style.display   = 'flex';
@@ -143,15 +155,19 @@ async function submitWaitlist(e) {
 }
 
 // ============================================================
-//  SUPABASE AUTH
+//  SIGN IN MODAL
 // ============================================================
-const SUPA_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
-const SUPA_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
-const { createClient } = supabase;
-const supa = createClient(SUPA_URL, SUPA_KEY);
-
-// Sign In modal — open
 function openSignIn() {
+  // Reset state
+  const formWrap    = document.getElementById('signin-form-wrap');
+  const successWrap = document.getElementById('signin-success');
+  const form        = document.getElementById('signin-form');
+  const errBox      = document.getElementById('signin-error');
+  if (formWrap)    formWrap.style.display    = '';
+  if (successWrap) successWrap.style.display = 'none';
+  if (form)        form.reset();
+  if (errBox)      errBox.style.display      = 'none';
+
   const overlay = document.getElementById('signin-overlay');
   if (!overlay) return;
   overlay.style.display = 'flex';
@@ -162,39 +178,55 @@ function openSignIn() {
   }, 50);
 }
 
-// Sign In modal — close
-function closeSignIn(e) {
-  if (e && e.target !== document.getElementById('signin-overlay')) return;
+function closeSignIn() {
   const overlay = document.getElementById('signin-overlay');
   if (!overlay) return;
   overlay.style.display = 'none';
   document.body.style.overflow = '';
-  // Reset
-  const form = document.getElementById('signin-form');
-  if (form) form.reset();
-  const errBox = document.getElementById('signin-error');
-  if (errBox) errBox.style.display = 'none';
-  const formWrap = document.getElementById('signin-form-wrap');
-  const successWrap = document.getElementById('signin-success');
-  if (formWrap)   formWrap.style.display   = '';
-  if (successWrap) successWrap.style.display = 'none';
 }
 
-// Password visibility toggle
-function togglePw() {
-  const input = document.getElementById('signin-password');
-  const icon  = document.getElementById('pw-eye');
+function switchToSignUp() {
+  closeSignIn();
+  openSignUp();
+}
+
+function switchToSignIn() {
+  closeSignUp();
+  openSignIn();
+}
+
+// Password toggle — generic, works for any pair
+function togglePw(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById(iconId);
   if (!input) return;
   if (input.type === 'password') {
     input.type = 'text';
-    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    if (icon) icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
   } else {
     input.type = 'password';
-    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    if (icon) icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
   }
 }
 
-// Sign In submit
+// Sign In with Google
+async function signInWithGoogle() {
+  const { error } = await supa.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + '/dashboard.html'
+    }
+  });
+  if (error) {
+    const errBox = document.getElementById('signin-error');
+    if (errBox) {
+      errBox.textContent = error.message || 'Google sign-in failed.';
+      errBox.style.display = 'block';
+    }
+  }
+}
+
+// Sign In with email/password
 async function submitSignIn(e) {
   e.preventDefault();
   const email    = document.getElementById('signin-email').value.trim();
@@ -229,7 +261,328 @@ async function submitSignIn(e) {
   setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
 }
 
-// === FADE IN CARDS ON SCROLL ===
+// ============================================================
+//  SIGN UP MODAL + 4-STEP ONBOARDING
+// ============================================================
+
+// State
+let _signupStep     = 0;
+let _signupViaGoogle = false;
+let _signupUsername = '';
+let _selectedInterests = [];
+let _selectedGender    = '';
+
+// Username generation
+function generateUsername(name) {
+  const base = (name || 'itara_user')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+    .substring(0, 12);
+  const suffix = Math.floor(1000 + Math.random() * 9000);
+  return base + suffix;
+}
+
+function rerollUsername() {
+  const u = generateUsername('user');
+  const input = document.getElementById('su-username');
+  if (input) input.value = u;
+  _signupUsername = u;
+}
+
+function updateUsername(input) {
+  _signupUsername = input.value;
+}
+
+function openSignUp() {
+  // Reset all state
+  _signupStep      = 0;
+  _signupViaGoogle = false;
+  _signupUsername  = generateUsername('user');
+  _selectedInterests = [];
+  _selectedGender    = '';
+
+  // Reset UI
+  resetSignUpUI();
+
+  const overlay = document.getElementById('signup-overlay');
+  if (!overlay) return;
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSignUp() {
+  const overlay = document.getElementById('signup-overlay');
+  if (!overlay) return;
+  overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function resetSignUpUI() {
+  // Hide all steps, show step 0
+  document.querySelectorAll('.signup-step').forEach(s => s.classList.remove('active'));
+  const step0 = document.getElementById('signup-step-0');
+  if (step0) step0.classList.add('active');
+
+  // Reset progress dots
+  updateProgressDots(0);
+
+  // Clear forms
+  const emailInput = document.getElementById('su-email');
+  const pwInput    = document.getElementById('su-password');
+  if (emailInput) emailInput.value = '';
+  if (pwInput)    pwInput.value    = '';
+
+  // Clear error
+  const errBox = document.getElementById('su-email-error');
+  if (errBox) errBox.style.display = 'none';
+
+  // Reset username field
+  const unInput = document.getElementById('su-username');
+  if (unInput) unInput.value = _signupUsername;
+
+  // Reset interests
+  document.querySelectorAll('.interest-btn').forEach(b => b.classList.remove('active'));
+  _selectedInterests = [];
+  updateInterestsCounter();
+
+  // Reset gender
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  _selectedGender = '';
+
+  // Reset T&C
+  const toc = document.getElementById('su-toc');
+  if (toc) toc.checked = false;
+  const launchBtn = document.getElementById('su-launch-btn');
+  if (launchBtn) launchBtn.disabled = true;
+
+  // Reset avatar
+  const avatarEl = document.getElementById('su-avatar-preview');
+  if (avatarEl) {
+    avatarEl.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  }
+}
+
+function updateProgressDots(currentStep) {
+  // Progress dots only shown for steps 1-4 (onboarding steps)
+  const dots = document.querySelectorAll('.prog-dot');
+  const progress = document.getElementById('signup-progress');
+
+  // Show/hide progress bar (not needed on step 0)
+  if (progress) {
+    progress.style.visibility = currentStep === 0 ? 'hidden' : 'visible';
+  }
+
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentStep - 1);
+  });
+}
+
+function goSignUpStep(step) {
+  const current = document.getElementById('signup-step-' + _signupStep);
+  const next    = document.getElementById('signup-step-' + step);
+  if (!next) return;
+
+  if (current) current.classList.remove('active');
+  next.classList.add('active');
+  _signupStep = step;
+
+  updateProgressDots(step);
+
+  // Set username on step 1
+  if (step === 1) {
+    const input = document.getElementById('su-username');
+    if (input && !input.value) input.value = _signupUsername;
+    const googleNote = document.getElementById('su-google-note');
+    if (googleNote) googleNote.style.display = _signupViaGoogle ? 'flex' : 'none';
+  }
+
+  // Scroll card to top
+  const card = document.querySelector('.auth-card-signup');
+  if (card) card.scrollTop = 0;
+}
+
+// Sign Up with Google
+async function signUpWithGoogle() {
+  _signupViaGoogle = true;
+  const { error } = await supa.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      // After Google auth, redirect to a page that continues the signup flow
+      redirectTo: window.location.origin + '/index.html?signup_step=1'
+    }
+  });
+  if (error) {
+    const errBox = document.getElementById('su-email-error');
+    if (errBox) {
+      errBox.textContent = error.message || 'Google sign-up failed.';
+      errBox.style.display = 'block';
+    }
+  }
+}
+
+// Sign Up with email — create account then continue to step 1
+async function submitSignUpEmail(e) {
+  e.preventDefault();
+  const email   = document.getElementById('su-email').value.trim();
+  const pw      = document.getElementById('su-password').value;
+  const btn     = document.getElementById('su-email-btn');
+  const btnText = document.getElementById('su-email-btn-text');
+  const spinner = document.getElementById('su-email-spinner');
+  const errBox  = document.getElementById('su-email-error');
+
+  btn.disabled = true;
+  btnText.textContent = 'Creating account…';
+  spinner.style.display = 'block';
+  errBox.style.display  = 'none';
+
+  const { data, error } = await supa.auth.signUp({ email, password: pw });
+
+  spinner.style.display = 'none';
+  btn.disabled = false;
+  btnText.textContent = 'Continue';
+
+  if (error) {
+    errBox.textContent = error.message || 'Sign-up failed. Please try again.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  // Account created — continue to onboarding step 1
+  goSignUpStep(1);
+}
+
+// Interest selection
+function toggleInterest(btn) {
+  const val = btn.dataset.interest;
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    _selectedInterests = _selectedInterests.filter(i => i !== val);
+  } else {
+    btn.classList.add('active');
+    _selectedInterests.push(val);
+  }
+  updateInterestsCounter();
+}
+
+function updateInterestsCounter() {
+  const count = _selectedInterests.length;
+  const counter = document.getElementById('interests-count');
+  if (counter) counter.textContent = count + '/3';
+
+  const btn = document.getElementById('interests-continue-btn');
+  if (btn) btn.disabled = count < 3;
+}
+
+// Gender selection
+function selectGender(btn) {
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _selectedGender = btn.dataset.gender;
+}
+
+// Avatar preview
+function previewAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const avatarEl = document.getElementById('su-avatar-preview');
+    if (avatarEl) {
+      avatarEl.innerHTML = '<img src="' + e.target.result + '" alt="Avatar" />';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Greeting on step 1
+function updateGreeting(name) {
+  const el = document.getElementById('su-greeting');
+  if (el) el.textContent = 'Hey, ' + (name || 'there') + '! 👋';
+}
+
+// T&C toggle enables launch button
+function updateLaunchBtn() {
+  const toc = document.getElementById('su-toc');
+  const btn = document.getElementById('su-launch-btn');
+  if (btn) btn.disabled = !(toc && toc.checked);
+}
+
+// Final: launch account
+async function launchAccount() {
+  const btn     = document.getElementById('su-launch-btn');
+  const btnText = document.getElementById('su-launch-text');
+  const spinner = document.getElementById('su-launch-spinner');
+  const errBox  = document.getElementById('su-final-error');
+
+  btn.disabled = true;
+  btnText.textContent = 'Launching…';
+  spinner.style.display = 'block';
+  errBox.style.display  = 'none';
+
+  try {
+    // Get current session
+    const { data: { session } } = await supa.auth.getSession();
+
+    if (session) {
+      // Update user metadata with onboarding info
+      await supa.auth.updateUser({
+        data: {
+          username:   _signupUsername || generateUsername('user'),
+          gender:     _selectedGender,
+          interests:  _selectedInterests,
+          onboarding_complete: true
+        }
+      });
+    }
+
+    // Show success
+    spinner.style.display = 'none';
+    goSignUpStep(5);
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+
+  } catch (err) {
+    spinner.style.display = 'none';
+    btn.disabled = false;
+    btnText.textContent = '🚀 Launch my account';
+    errBox.textContent = err.message || 'Something went wrong. Please try again.';
+    errBox.style.display = 'block';
+  }
+}
+
+// ============================================================
+//  CHECK FOR GOOGLE OAUTH RETURN (signup_step=1)
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get('signup_step') === '1') {
+    // Returned from Google OAuth during sign-up flow
+    const { data: { session } } = await supa.auth.getSession();
+    if (session) {
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+
+      // Open signup overlay at step 1 with Google flag
+      _signupViaGoogle = true;
+      _signupUsername  = generateUsername(
+        session.user.user_metadata?.full_name || session.user.email
+      );
+
+      openSignUp();
+      // Immediately jump to step 1 (skip email/password step)
+      setTimeout(() => {
+        goSignUpStep(1);
+        const greeting = document.getElementById('su-greeting');
+        const name = session.user.user_metadata?.full_name?.split(' ')[0] || 'there';
+        if (greeting) greeting.textContent = 'Hey, ' + name + '! 👋';
+      }, 50);
+    }
+  }
+});
+
+// ============================================================
+//  FADE IN CARDS ON SCROLL
+// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   const cards = document.querySelectorAll('.module-card');
   const obs = new IntersectionObserver((entries) => {
