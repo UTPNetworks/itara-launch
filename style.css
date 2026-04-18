@@ -1593,11 +1593,29 @@ header,section,footer,.ticker-bar{position:relative;z-index:1}
 /* ============================================================
    SIGN IN MODAL
    ============================================================ */
+#signin-overlay{
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 .signin-card{
+  position:relative;
+  z-index:1001;
   max-width:420px;
   width:calc(100% - 2rem);
   padding:2.5rem 2rem 2rem;
   text-align:center;
+  background:#FFFFFF;
+  border-radius:1.25rem;
+  border:1px solid rgba(79,70,229,0.15);
+  box-shadow:
+    0 32px 80px rgba(79,70,229,0.2),
+    0 8px 24px rgba(0,0,0,0.12);
+  animation: modal-slide-up 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+[data-theme="dark"] .signin-card{
+  background:#0f0f1a;
+  border-color:rgba(0,212,255,0.18);
 }
 .signin-logo{
   display:flex;
