@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Itara — Mission Control</title>
+
+  <!-- Fonts -->
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800,900&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body class="db-body">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="db-sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="db-sidebar-logo">
+      <div class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="4" y="2" width="3" height="14" fill="currentColor"/>
+          <rect x="11" y="2" width="3" height="14" fill="currentColor"/>
+          <rect x="4" y="7.5" width="10" height="3" fill="currentColor" opacity="0.5"/>
+        </svg>
+      </div>
+      <span class="db-logo-text">itara</span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="db-nav" role="navigation">
+      <div class="db-nav-section">
+        <span class="db-nav-label">CORE</span>
+        <a href="#" class="db-nav-item active" data-section="home">
+          <i data-lucide="layout-dashboard" class="db-nav-icon"></i>
+          <span>Mission Control</span>
+          <span class="db-nav-badge db-badge-live">LIVE</span>
+        </a>
+        <a href="#" class="db-nav-item db-nav-compute" data-section="compute">
+          <i data-lucide="cpu" class="db-nav-icon"></i>
+          <span>Compute</span>
+          <span class="db-nav-dot dot-compute"></span>
+        </a>
+        <a href="#" class="db-nav-item db-nav-neuralwork" data-section="neuralwork">
+          <i data-lucide="brain-circuit" class="db-nav-icon"></i>
+          <span>NeuralWork</span>
+          <span class="db-new-chip">NEW</span>
+        </a>
+        <a href="#" class="db-nav-item db-nav-exchange" data-section="exchange">
+          <i data-lucide="store" class="db-nav-icon"></i>
+          <span>The Exchange</span>
+        </a>
+        <a href="#" class="db-nav-item db-nav-axis" data-section="axis">
+          <i data-lucide="telescope" class="db-nav-icon"></i>
+          <span>AXIS</span>
+        </a>
+      </div>
+
+      <div class="db-nav-section">
+        <span class="db-nav-label">ACCOUNT</span>
+        <a href="#" class="db-nav-item">
+          <i data-lucide="wallet" class="db-nav-icon"></i>
+          <span>Wallet</span>
+        </a>
+        <a href="#" class="db-nav-item">
+          <i data-lucide="bell" class="db-nav-icon"></i>
+          <span>Alerts</span>
+          <span class="db-nav-badge db-badge-count">3</span>
+        </a>
+        <a href="#" class="db-nav-item">
+          <i data-lucide="settings" class="db-nav-icon"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- User -->
+    <div class="db-sidebar-user">
+      <div class="db-user-avatar">S</div>
+      <div class="db-user-info">
+        <span class="db-user-name">Shyam</span>
+        <span class="db-user-role">Founder</span>
+      </div>
+      <button class="db-user-menu" aria-label="User menu">
+        <i data-lucide="chevrons-up-down"></i>
+      </button>
+    </div>
+
+    <!-- Sidebar toggle -->
+    <button class="db-sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+      <i data-lucide="panel-left-close" id="toggle-icon"></i>
+    </button>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="db-main" id="db-main">
+
+    <!-- TOP BAR -->
+    <header class="db-topbar">
+      <div class="db-topbar-left">
+        <div class="db-breadcrumb">
+          <span class="db-breadcrumb-root">Itara</span>
+          <i data-lucide="chevron-right" style="width:14px;height:14px;opacity:0.4"></i>
+          <span class="db-breadcrumb-current">Mission Control</span>
+        </div>
+      </div>
+      <div class="db-topbar-center">
+        <div class="db-search">
+          <i data-lucide="search" class="db-search-icon"></i>
+          <input type="text" placeholder="Search GPUs, models, tasks, agents..." class="db-search-input" />
+          <kbd class="db-search-kbd">⌘K</kbd>
+        </div>
+      </div>
+      <div class="db-topbar-right">
+        <!-- Live indicator -->
+        <div class="db-live-pill">
+          <span class="db-live-dot"></span>
+          <span>Live</span>
+        </div>
+        <!-- Theme toggle -->
+        <button data-theme-toggle aria-label="Toggle theme" class="db-icon-btn">
+          <i data-lucide="moon" id="db-theme-icon"></i>
+        </button>
+        <!-- Notifications -->
+        <button class="db-icon-btn db-notif-btn" aria-label="Notifications">
+          <i data-lucide="bell"></i>
+          <span class="db-notif-badge">3</span>
+        </button>
+        <!-- New action -->
+        <button class="btn btn-primary db-new-btn" onclick="openNewActionMenu()">
+          <i data-lucide="plus"></i>
+          New
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="db-content">
+
+      <!-- GREETING -->
+      <div class="db-greeting">
+        <div>
+          <h1 class="db-greeting-title">Good <span id="greeting-time">morning</span>, Shyam. <span class="db-greeting-wave">👋</span></h1>
+          <p class="db-greeting-sub">The AI economy is moving. Here's your command center.</p>
+        </div>
+        <div class="db-greeting-date" id="db-clock">
+          <span id="db-time">00:00 AM</span>
+          <span id="db-date">Saturday, Apr 18</span>
+        </div>
+      </div>
+
+      <!-- STAT STRIP -->
+      <div class="db-stat-strip">
+        <div class="db-stat-card" data-count="2847" data-suffix=" hrs">
+          <div class="db-stat-icon icon-compute">
+            <i data-lucide="cpu"></i>
+          </div>
+          <div class="db-stat-body">
+            <span class="db-stat-value" id="stat-gpu">—</span>
+            <span class="db-stat-label">GPU Hours Available</span>
+          </div>
+          <span class="db-stat-trend up">↑ 12%</span>
+        </div>
+        <div class="db-stat-card" data-count="1294" data-suffix="">
+          <div class="db-stat-icon icon-exchange">
+            <i data-lucide="store"></i>
+          </div>
+          <div class="db-stat-body">
+            <span class="db-stat-value" id="stat-listings">—</span>
+            <span class="db-stat-label">Active Listings</span>
+          </div>
+          <span class="db-stat-trend up">↑ 8%</span>
+        </div>
+        <div class="db-stat-card" data-count="438" data-suffix="">
+          <div class="db-stat-icon icon-neuralwork">
+            <i data-lucide="brain-circuit"></i>
+          </div>
+          <div class="db-stat-body">
+            <span class="db-stat-value" id="stat-tasks">—</span>
+            <span class="db-stat-label">Tasks Posted Today</span>
+          </div>
+          <span class="db-stat-trend up">↑ 23%</span>
+        </div>
+        <div class="db-stat-card" data-count="4200" data-prefix="$" data-suffix="">
+          <div class="db-stat-icon icon-axis">
+            <i data-lucide="telescope"></i>
+          </div>
+          <div class="db-stat-body">
+            <span class="db-stat-value" id="stat-waitlist">—</span>
+            <span class="db-stat-label">Waitlist Members</span>
+          </div>
+          <span class="db-stat-trend up">↑ 41%</span>
+        </div>
+      </div>
+
+      <!-- MODULE CARDS -->
+      <div class="db-section-header">
+        <h2 class="db-section-title">Your Modules</h2>
+        <p class="db-section-sub">Click any module to enter</p>
+      </div>
+
+      <div class="db-modules-grid">
+
+        <!-- COMPUTE -->
+        <a href="#" class="db-module-card db-module-compute" data-section="compute">
+          <div class="db-module-glow"></div>
+          <div class="db-module-top">
+            <div class="db-module-icon-wrap">
+              <i data-lucide="cpu"></i>
+            </div>
+            <div class="db-module-meta">
+              <span class="db-module-num">01</span>
+              <span class="db-module-status status-live">● LIVE</span>
+            </div>
+          </div>
+          <div class="db-module-body">
+            <h3 class="db-module-name">Compute</h3>
+            <p class="db-module-tagline">GPU Rentals</p>
+            <p class="db-module-desc">Rent H100s, A100s and RTX clusters on-demand. Aggregated from RunPod, Vast.ai, Lambda Labs — one search, lowest live price.</p>
+          </div>
+          <div class="db-module-footer">
+            <div class="db-module-stats">
+              <span><strong>$2.49</strong>/hr from</span>
+              <span class="db-dot-sep">·</span>
+              <span>12 providers</span>
+            </div>
+            <div class="db-module-cta">
+              Enter <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
+            </div>
+          </div>
+          <div class="db-module-tags-row">
+            <span class="db-mtag">H100</span>
+            <span class="db-mtag">A100</span>
+            <span class="db-mtag">RTX 4090</span>
+            <span class="db-mtag">On-demand</span>
+          </div>
+        </a>
+
+        <!-- NEURALWORK -->
+        <a href="#" class="db-module-card db-module-neuralwork" data-section="neuralwork">
+          <div class="db-module-glow"></div>
+          <div class="db-module-top">
+            <div class="db-module-icon-wrap">
+              <i data-lucide="brain-circuit"></i>
+            </div>
+            <div class="db-module-meta">
+              <span class="db-module-num">02</span>
+              <span class="db-module-status status-new">★ NEW</span>
+            </div>
+          </div>
+          <div class="db-module-body">
+            <h3 class="db-module-name">NeuralWork</h3>
+            <p class="db-module-tagline">AI Task Marketplace</p>
+            <p class="db-module-desc">Post AI tasks or get hired. Prompt engineers, ML builders, fine-tuners — milestone-based escrow payments. Built natively for AI work.</p>
+          </div>
+          <div class="db-module-footer">
+            <div class="db-module-stats">
+              <span><strong>438</strong> tasks live</span>
+              <span class="db-dot-sep">·</span>
+              <span>Free to post</span>
+            </div>
+            <div class="db-module-cta">
+              Enter <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
+            </div>
+          </div>
+          <div class="db-module-tags-row">
+            <span class="db-mtag">Prompt Eng.</span>
+            <span class="db-mtag">Fine-tuning</span>
+            <span class="db-mtag">ML Build</span>
+            <span class="db-mtag">Escrow</span>
+          </div>
+        </a>
+
+        <!-- THE EXCHANGE -->
+        <a href="#" class="db-module-card db-module-exchange" data-section="exchange">
+          <div class="db-module-glow"></div>
+          <div class="db-module-top">
+            <div class="db-module-icon-wrap">
+              <i data-lucide="store"></i>
+            </div>
+            <div class="db-module-meta">
+              <span class="db-module-num">03</span>
+              <span class="db-module-status status-hot">🔥 HOT</span>
+            </div>
+          </div>
+          <div class="db-module-body">
+            <h3 class="db-module-name">The Exchange</h3>
+            <p class="db-module-tagline">AI Marketplace</p>
+            <p class="db-module-desc">Buy, sell, trade or auction AI agents, fine-tuned models, datasets, API credits, hardware and SaaS. Every deal escrow-protected.</p>
+          </div>
+          <div class="db-module-footer">
+            <div class="db-module-stats">
+              <span><strong>1,294</strong> listings</span>
+              <span class="db-dot-sep">·</span>
+              <span>5–10% take rate</span>
+            </div>
+            <div class="db-module-cta">
+              Enter <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
+            </div>
+          </div>
+          <div class="db-module-tags-row">
+            <span class="db-mtag">AI Agents</span>
+            <span class="db-mtag">Models</span>
+            <span class="db-mtag">Datasets</span>
+            <span class="db-mtag">Hardware</span>
+          </div>
+        </a>
+
+        <!-- AXIS -->
+        <a href="#" class="db-module-card db-module-axis" data-section="axis">
+          <div class="db-module-glow"></div>
+          <div class="db-module-top">
+            <div class="db-module-icon-wrap">
+              <i data-lucide="telescope"></i>
+            </div>
+            <div class="db-module-meta">
+              <span class="db-module-num">04</span>
+              <span class="db-module-status status-beta">β BETA</span>
+            </div>
+          </div>
+          <div class="db-module-body">
+            <h3 class="db-module-name">AXIS</h3>
+            <p class="db-module-tagline">AI Intelligence Hub</p>
+            <p class="db-module-desc">Compare every AI model side-by-side. Benchmarks, pricing, real-world ratings, courses and guides — your radar for the entire AI landscape.</p>
+          </div>
+          <div class="db-module-footer">
+            <div class="db-module-stats">
+              <span><strong>340+</strong> models</span>
+              <span class="db-dot-sep">·</span>
+              <span>Always free</span>
+            </div>
+            <div class="db-module-cta">
+              Enter <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
+            </div>
+          </div>
+          <div class="db-module-tags-row">
+            <span class="db-mtag">Compare</span>
+            <span class="db-mtag">Benchmarks</span>
+            <span class="db-mtag">Courses</span>
+            <span class="db-mtag">LLMs</span>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- BOTTOM ROW: Activity + Market Pulse -->
+      <div class="db-bottom-row">
+
+        <!-- RECENT ACTIVITY -->
+        <div class="db-panel db-activity-panel">
+          <div class="db-panel-header">
+            <h3 class="db-panel-title">
+              <i data-lucide="activity"></i>
+              Recent Activity
+            </h3>
+            <a href="#" class="db-panel-link">View all</a>
+          </div>
+          <div class="db-activity-list">
+            <div class="db-activity-item">
+              <div class="db-activity-icon act-compute"><i data-lucide="cpu"></i></div>
+              <div class="db-activity-body">
+                <span class="db-activity-title">H100 rental confirmed</span>
+                <span class="db-activity-meta">Compute · 2 min ago</span>
+              </div>
+              <span class="db-activity-amount green-amt">-$12.45</span>
+            </div>
+            <div class="db-activity-item">
+              <div class="db-activity-icon act-exchange"><i data-lucide="store"></i></div>
+              <div class="db-activity-body">
+                <span class="db-activity-title">GPT-4 Fine-tune listed</span>
+                <span class="db-activity-meta">The Exchange · 18 min ago</span>
+              </div>
+              <span class="db-activity-amount">+$0</span>
+            </div>
+            <div class="db-activity-item">
+              <div class="db-activity-icon act-neuralwork"><i data-lucide="brain-circuit"></i></div>
+              <div class="db-activity-body">
+                <span class="db-activity-title">Prompt audit task posted</span>
+                <span class="db-activity-meta">NeuralWork · 42 min ago</span>
+              </div>
+              <span class="db-activity-amount green-amt">-$50.00</span>
+            </div>
+            <div class="db-activity-item">
+              <div class="db-activity-icon act-axis"><i data-lucide="telescope"></i></div>
+              <div class="db-activity-body">
+                <span class="db-activity-title">Claude 4 vs GPT-5 compared</span>
+                <span class="db-activity-meta">AXIS · 1 hr ago</span>
+              </div>
+              <span class="db-activity-amount neutral-amt">Free</span>
+            </div>
+            <div class="db-activity-item">
+              <div class="db-activity-icon act-exchange"><i data-lucide="store"></i></div>
+              <div class="db-activity-body">
+                <span class="db-activity-title">LLaMA 3 dataset bid won</span>
+                <span class="db-activity-meta">The Exchange · 3 hr ago</span>
+              </div>
+              <span class="db-activity-amount green-amt">-$320.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MARKET PULSE -->
+        <div class="db-panel db-pulse-panel">
+          <div class="db-panel-header">
+            <h3 class="db-panel-title">
+              <i data-lucide="radio"></i>
+              Market Pulse
+            </h3>
+            <div class="db-pulse-live">
+              <span class="db-live-dot"></span> Live
+            </div>
+          </div>
+
+          <!-- GPU Prices -->
+          <div class="db-pulse-section">
+            <span class="db-pulse-label">⚡ GPU Spot Prices</span>
+            <div class="db-pulse-rows">
+              <div class="db-pulse-row">
+                <span class="db-pulse-name">H100 SXM5</span>
+                <div class="db-pulse-bar-wrap"><div class="db-pulse-bar" style="width:88%"></div></div>
+                <span class="db-pulse-price">$3.89/hr</span>
+                <span class="db-pulse-delta up">↑2%</span>
+              </div>
+              <div class="db-pulse-row">
+                <span class="db-pulse-name">A100 80GB</span>
+                <div class="db-pulse-bar-wrap"><div class="db-pulse-bar" style="width:65%"></div></div>
+                <span class="db-pulse-price">$2.49/hr</span>
+                <span class="db-pulse-delta down">↓1%</span>
+              </div>
+              <div class="db-pulse-row">
+                <span class="db-pulse-name">RTX 4090</span>
+                <div class="db-pulse-bar-wrap"><div class="db-pulse-bar" style="width:42%"></div></div>
+                <span class="db-pulse-price">$0.74/hr</span>
+                <span class="db-pulse-delta up">↑5%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trending on Exchange -->
+          <div class="db-pulse-section">
+            <span class="db-pulse-label">🔥 Trending on The Exchange</span>
+            <div class="db-trending-chips">
+              <span class="db-trend-chip">Mistral 7B agent</span>
+              <span class="db-trend-chip">Image → Video pipeline</span>
+              <span class="db-trend-chip">RAG starter kit</span>
+              <span class="db-trend-chip">Claude wrapper SaaS</span>
+            </div>
+          </div>
+
+          <!-- Quick links -->
+          <div class="db-quick-links">
+            <a href="#" class="db-quick-link db-ql-compute">
+              <i data-lucide="cpu"></i> Rent GPU
+            </a>
+            <a href="#" class="db-quick-link db-ql-neuralwork">
+              <i data-lucide="brain-circuit"></i> Post Task
+            </a>
+            <a href="#" class="db-quick-link db-ql-exchange">
+              <i data-lucide="store"></i> List Asset
+            </a>
+            <a href="#" class="db-quick-link db-ql-axis">
+              <i data-lucide="telescope"></i> Compare AI
+            </a>
+          </div>
+        </div>
+
+      </div>
+      <!-- END BOTTOM ROW -->
+
+    </div>
+    <!-- END CONTENT -->
+
+    <!-- FOOTER -->
+    <footer class="db-footer">
+      <span>© 2026 Itara. All rights reserved.</span>
+      <span>Mission Control v0.1 — Beta</span>
+    </footer>
+
+  </main>
+
+  <!-- New Action Menu -->
+  <div id="new-action-menu" class="db-action-menu" style="display:none">
+    <div class="db-action-backdrop" onclick="closeNewActionMenu()"></div>
+    <div class="db-action-panel">
+      <div class="db-action-header">Quick Actions</div>
+      <a href="#" class="db-action-item">
+        <div class="db-action-icon act-compute"><i data-lucide="cpu"></i></div>
+        <div><strong>Rent GPU</strong><span>Spin up compute in seconds</span></div>
+      </a>
+      <a href="#" class="db-action-item">
+        <div class="db-action-icon act-neuralwork"><i data-lucide="brain-circuit"></i></div>
+        <div><strong>Post AI Task</strong><span>Hire AI-skilled talent</span></div>
+      </a>
+      <a href="#" class="db-action-item">
+        <div class="db-action-icon act-exchange"><i data-lucide="store"></i></div>
+        <div><strong>List on Exchange</strong><span>Sell a model, agent, or dataset</span></div>
+      </a>
+      <a href="#" class="db-action-item">
+        <div class="db-action-icon act-axis"><i data-lucide="telescope"></i></div>
+        <div><strong>Compare Models</strong><span>Open AXIS intelligence hub</span></div>
+      </a>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
