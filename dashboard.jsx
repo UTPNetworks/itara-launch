@@ -440,7 +440,12 @@ const D = (() => {
         <nav className="dB-nav">
           <div className="dB-nav-l"><Wordmark size={20} /><span className="dB-sep" />MISSION CONTROL</div>
           <div className="dB-nav-m">
-            <a>MISSION</a><a>COMPUTE</a><a>EXCHANGE</a><a>NEURALWORK</a><a>AXIS</a><a>WALLET</a>
+            <a>MISSION</a>
+            <a>COMPUTE</a>
+            <a href="market.html" style={{cursor:'pointer'}}>EXCHANGE</a>
+            <a>NEURALWORK</a>
+            <a>AXIS</a>
+            <a>WALLET</a>
           </div>
           <div className="dB-nav-r">
             <div className="dB-nav-theme" id="mc-theme-btn-nav" aria-label="Toggle theme">
@@ -487,11 +492,16 @@ const D = (() => {
         <section className="dB-rails">
           {[
             { k: '01', lab: 'COMPUTE', title: 'GPU', stat: '2 listed · 1 renting', hot: '$1,840 earned', cls: 'violet', cta: 'Manage fleet →' },
-            { k: '02', lab: 'EXCHANGE', title: 'MARKET', stat: '2 models live · 3,564 sold', hot: '$3,564 earned', cls: 'pink', cta: 'Open shop →' },
+            { k: '02', lab: 'EXCHANGE', title: 'MARKET', stat: '2 models live · 3,564 sold', hot: '$3,564 earned', cls: 'pink', cta: 'Open shop →', href: 'market.html' },
             { k: '03', lab: 'NEURALWORK', title: 'TALENT', stat: '2 tasks · 14 bids in', hot: '$1,555 awarded', cls: 'blue', cta: 'Review bids →' },
             { k: '04', lab: 'AXIS', title: 'INTEL', stat: '6 alerts saved', hot: 'H100 ▲ 4.2%', cls: 'yellow', cta: 'Open Axis →' },
           ].map(r => (
-            <div key={r.k} className={`dB-rail dB-${r.cls}`}>
+            <div
+              key={r.k}
+              className={`dB-rail dB-${r.cls}`}
+              onClick={() => r.href && (window.location.href = r.href)}
+              style={r.href ? { cursor: 'pointer' } : {}}
+            >
               <div className="dB-rail-top">
                 <span className="dB-rail-k">{r.k} · {r.lab}</span>
                 <span className="dB-rail-hot">{r.hot}</span>

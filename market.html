@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Itara — Market Terminal</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><polygon points='22,2 38,11 38,31 22,41 6,31 6,11' fill='%236C5CE7'/></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cabinet+Grotesk:wght@900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="market.css">
+<style>
+  html, body { margin: 0; padding: 0; background: #0A0A0C; }
+  body { font-family: 'Space Grotesk', sans-serif; }
+
+  /* ============================================================
+     ITARA TOP NAV — replaces mkB-top entirely
+  ============================================================ */
+  .it-nav {
+    position: sticky; top: 0; z-index: 400;
+    background: rgba(10,10,12,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(244,242,236,0.10);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    height: 56px;
+    gap: 24px;
+  }
+  .it-nav-l {
+    display: flex; align-items: center; gap: 14px;
+    flex-shrink: 0;
+  }
+  .it-nav-sep {
+    width: 1px; height: 18px;
+    background: rgba(244,242,236,0.22);
+  }
+  .it-nav-section {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+    color: rgba(244,242,236,0.45);
+  }
+  .it-nav-tabs {
+    display: flex; gap: 2px;
+    background: rgba(244,242,236,0.07);
+    border: 1px solid rgba(244,242,236,0.12);
+    border-radius: 10px;
+    padding: 3px;
+  }
+  .it-nav-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: none; background: transparent;
+    color: rgba(244,242,236,0.5);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .it-nav-tab:hover { color: #F4F2EC; background: rgba(244,242,236,0.1); }
+  .it-nav-tab.active {
+    background: #F4F2EC;
+    color: #0A0A0C;
+  }
+  .it-nav-r {
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+  }
+  /* Theme toggle in nav */
+  .it-nav-tgl {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    color: rgba(244,242,236,0.5);
+    cursor: pointer; user-select: none;
+    transition: color .2s;
+  }
+  .it-nav-tgl:hover { color: #F4F2EC; }
+  .it-tgl-track {
+    width: 36px; height: 20px;
+    border-radius: 999px;
+    background: rgba(244,242,236,0.12);
+    border: 1.5px solid rgba(244,242,236,0.2);
+    position: relative;
+    transition: background .22s, border-color .22s;
+    flex-shrink: 0;
+  }
+  .it-nav-tgl.is-light .it-tgl-track { background: #6C5CE7; border-color: #6C5CE7; }
+  .it-tgl-thumb {
+    position: absolute; top: 2px; left: 2px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #F4F2EC;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .it-nav-tgl.is-light .it-tgl-thumb { transform: translateX(16px); }
+  .it-nav-tgl-label { font-size: 10px; }
+  /* Avatar */
+  .it-nav-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--pink, #FF6AC7);
+    color: #0A0A0C;
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 13px;
+    border: 2px solid rgba(244,242,236,0.2);
+    cursor: pointer;
+  }
+  /* Market status badge */
+  .it-mkt-status {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    color: #4ADE80;
+  }
+  .it-mkt-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #4ADE80; box-shadow: 0 0 8px #4ADE80;
+    animation: itPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes itPulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.55; transform:scale(0.85); }
+  }
+
+  /* ============================================================
+     BOOT STATES
+  ============================================================ */
+  .it-loading {
+    position: fixed; inset: 0;
+    display: grid; place-items: center;
+    background: #0A0A0C; z-index: 9999;
+  }
+  .it-loading-inner {
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+  }
+  .it-loading-logo { animation: itPulse 1.6s ease-in-out infinite; }
+  .it-loading-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.25em;
+    color: rgba(244,242,236,0.45);
+  }
+  .it-loading-bar {
+    width: 180px; height: 2px;
+    background: rgba(244,242,236,0.1); border-radius: 1px; overflow: hidden;
+  }
+  .it-loading-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6C5CE7, #FF6AC7);
+    border-radius: 1px;
+    animation: itBar 1.4s ease-in-out infinite;
+  }
+  @keyframes itBar {
+    0%   { width:0%;  margin-left:0%; }
+    50%  { width:60%; margin-left:20%; }
+    100% { width:0%;  margin-left:100%; }
+  }
+
+  /* Auth gate */
+  .it-auth-gate {
+    position: fixed; inset: 0;
+    display: none; place-items: center;
+    background: #0A0A0C; z-index: 9998;
+  }
+  .it-auth-gate.show { display: grid; }
+  .it-auth-card {
+    background: #14151B;
+    border: 1px solid rgba(244,242,236,0.12);
+    border-radius: 20px; padding: 48px;
+    text-align: center; max-width: 400px; width: 90%;
+  }
+  .it-auth-card h2 { font-size: 24px; font-weight: 700; color: #F4F2EC; margin: 20px 0 12px; }
+  .it-auth-card p  { font-size: 14px; color: rgba(244,242,236,0.55); margin: 0 0 28px; line-height: 1.5; }
+  .it-auth-btn {
+    display: block; width: 100%;
+    background: #F4F2EC; color: #0A0A0C;
+    border: 0; border-radius: 12px;
+    padding: 14px; font-size: 14px; font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer; transition: background .15s;
+    text-decoration: none;
+  }
+  .it-auth-btn:hover { background: #6C5CE7; color: #fff; }
+
+  /* Shell */
+  #it-shell { display: none; }
+  #it-shell.show { display: block; }
+
+  /* ============================================================
+     LIGHT MODE — mirrors market.css [data-theme="light"] but
+     triggered by body.mkt-light for seamless toggle
+  ============================================================ */
+  body.mkt-light { background: #FAFAF7; }
+  body.mkt-light .it-nav {
+    background: rgba(250,248,242,0.92);
+    border-bottom-color: rgba(13,13,20,0.10);
+  }
+  body.mkt-light .it-nav-section { color: rgba(13,13,20,0.45); }
+  body.mkt-light .it-nav-tabs { background: rgba(13,13,20,0.06); border-color: rgba(13,13,20,0.12); }
+  body.mkt-light .it-nav-tab { color: rgba(13,13,20,0.5); }
+  body.mkt-light .it-nav-tab:hover { color: #0D0D14; background: rgba(13,13,20,0.1); }
+  body.mkt-light .it-nav-tab.active { background: #0D0D14; color: #F4F2EC; }
+  body.mkt-light .it-nav-tgl { color: rgba(13,13,20,0.5); }
+  body.mkt-light .it-nav-tgl:hover { color: #0D0D14; }
+  body.mkt-light .it-tgl-track { background: rgba(13,13,20,0.1); border-color: rgba(13,13,20,0.2); }
+  body.mkt-light .it-nav-tgl.is-light .it-tgl-track { background: #6C5CE7; border-color: #6C5CE7; }
+  body.mkt-light .it-tgl-thumb { background: #0D0D14; }
+  body.mkt-light .it-nav-tgl.is-light .it-tgl-thumb { background: #fff; }
+  body.mkt-light .it-nav-avatar { border-color: rgba(13,13,20,0.2); }
+
+  /* Patch mkB-root into light theme when body.mkt-light */
+  body.mkt-light .mkB-root { --ink:#FAFAF7; --ink-2:#FFFFFF; --ink-3:#F0EEE6; --bone:#0A0A0C; --bone-2:#1C1C24; --line:rgba(10,10,12,0.10); --line-2:rgba(10,10,12,0.18); --mute:rgba(10,10,12,0.55); --mute-2:rgba(10,10,12,0.35); --green:#16A34A; --red:#DC2626; }
+  body.mkt-light .mkB-hero-editorial { background: linear-gradient(135deg, rgba(108,92,231,0.14), rgba(255,106,199,0.14)) !important; }
+  body.mkt-light .mkB-hero-cta { background: #0A0A0C !important; color: #FFFFFF !important; }
+  body.mkt-light .mkt-card-tag { color: #0A0A0C !important; }
+  body.mkt-light .mkt-card-chart { background: rgba(255,255,255,0.92) !important; }
+  body.mkt-light .it-mkt-status { color: #16A34A; }
+  body.mkt-light .it-mkt-dot { background: #16A34A; box-shadow: 0 0 8px #16A34A; }
+
+  /* Override mkB-root to remove its own header — we use it-nav */
+  .mkB-root { padding-top: 0 !important; }
+  /* Hide the built-in mkB-top header — replaced by it-nav */
+  .mkB-top { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Boot splash -->
+<div id="it-loading" class="it-loading">
+  <div class="it-loading-inner">
+    <svg class="it-loading-logo" width="56" height="56" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lp2" x1="2" y1="2" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#7C3AED"/>
+          <stop offset="50%" stop-color="#4F46E5"/>
+          <stop offset="100%" stop-color="#06B6D4"/>
+        </linearGradient>
+      </defs>
+      <polygon points="22,2 38,11 38,31 22,41 6,31 6,11" fill="url(#lp2)" opacity="0.95"/>
+      <line x1="11" y1="17" x2="33" y2="17" stroke="#06B6D4" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="22" y1="11" x2="22" y2="31" stroke="#EC4899" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="11" y1="27" x2="33" y2="27" stroke="#4F46E5" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="22" cy="22" r="3.5" fill="#F9A8D4"/>
+    </svg>
+    <div class="it-loading-text">OPENING MARKET TERMINAL…</div>
+    <div class="it-loading-bar"><div class="it-loading-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- Auth gate -->
+<div id="it-auth-gate" class="it-auth-gate">
+  <div class="it-auth-card">
+    <svg width="56" height="56" viewBox="0 0 44 44" fill="none">
+      <defs><linearGradient id="ag2" x1="2" y1="2" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#06B6D4"/>
+      </linearGradient></defs>
+      <polygon points="22,2 38,11 38,31 22,41 6,31 6,11" fill="url(#ag2)" opacity="0.9"/>
+    </svg>
+    <h2>Sign in to continue</h2>
+    <p>Itara Market Terminal requires an Itara account. Sign in to access live pricing and trading.</p>
+    <a href="index.html" class="it-auth-btn">← Back to Itara</a>
+  </div>
+</div>
+
+<!-- Shell (shown when authenticated) -->
+<div id="it-shell">
+  <!-- Itara Top Nav — replaces mkB-top -->
+  <nav class="it-nav" id="it-nav">
+    <div class="it-nav-l">
+      <div id="it-wordmark"></div>
+      <span class="it-nav-sep"></span>
+      <span class="it-nav-section">MARKET TERMINAL</span>
+    </div>
+    <div class="it-nav-tabs">
+      <a href="dashboard.html" class="it-nav-tab">MISSION</a>
+      <a href="#" class="it-nav-tab">COMPUTE</a>
+      <a href="market.html" class="it-nav-tab active">EXCHANGE</a>
+      <a href="#" class="it-nav-tab">NEURALWORK</a>
+      <a href="#" class="it-nav-tab">AXIS</a>
+      <a href="#" class="it-nav-tab">WALLET</a>
+    </div>
+    <div class="it-nav-r">
+      <div class="it-mkt-status">
+        <span class="it-mkt-dot"></span>
+        MARKETS OPEN
+      </div>
+      <div class="it-nav-tgl" id="it-theme-tgl" title="Toggle theme">
+        <div class="it-tgl-track"><div class="it-tgl-thumb"></div></div>
+        <span class="it-nav-tgl-label" id="it-tgl-label">DARK</span>
+      </div>
+      <div class="it-nav-avatar" id="it-avatar">A</div>
+    </div>
+  </nav>
+
+  <!-- React mounts the Terminal page here -->
+  <div id="root"></div>
+</div>
+
+<!-- Libraries -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+  integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+  integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+  integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<!-- Market data -->
+<script src="market-data.js"></script>
+
+<!-- Shared hooks from main site (useLiveFeed etc.) -->
+<script type="text/babel" src="shared.jsx"></script>
+
+<!-- Market shared primitives -->
+<script type="text/babel" src="market-shared.jsx"></script>
+
+<!-- Market variants (DiscoveryPage, TerminalPage, IndexPage) -->
+<script type="text/babel" src="market-variants.jsx"></script>
+
+<!-- Boot script -->
+<script type="text/babel">
+const SUPABASE_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const MKT_THEME_KEY = 'itara_mkt_theme';
+
+// ---- Theme toggle ----
+function initTheme() {
+  const tgl = document.getElementById('it-theme-tgl');
+  const lbl = document.getElementById('it-tgl-label');
+  let isLight = localStorage.getItem(MKT_THEME_KEY) === 'light';
+
+  function apply() {
+    document.body.classList.toggle('mkt-light', isLight);
+    tgl.classList.toggle('is-light', isLight);
+    lbl.textContent = isLight ? 'LIGHT' : 'DARK';
+    localStorage.setItem(MKT_THEME_KEY, isLight ? 'light' : 'dark');
+  }
+  apply();
+  tgl.onclick = () => { isLight = !isLight; apply(); };
+}
+
+// ---- Wordmark (Crystal Node) ----
+function mountWordmark() {
+  const el = document.getElementById('it-wordmark');
+  if (!el || !window.Wordmark) return;
+  ReactDOM.createRoot(el).render(React.createElement(window.Wordmark, { size: 20 }));
+}
+
+// ---- Mount Terminal page ----
+function mountMarket(user) {
+  if (!window.MKT_PAGES || !window.MKT || !window.ITARA_MARKET) {
+    return setTimeout(() => mountMarket(user), 80);
+  }
+
+  // Patch avatar
+  const av = document.getElementById('it-avatar');
+  if (av && user) {
+    const name = user.user_metadata?.full_name || user.email || 'U';
+    av.textContent = name[0].toUpperCase();
+  }
+
+  // State: selected item for detail view
+  let selectedItem = null;
+
+  function App() {
+    const [open, setOpen] = React.useState(null);
+
+    // Expose openItem globally (used by DetailView similar cards)
+    React.useEffect(() => {
+      window.MKT.openItem = (it) => setOpen(it);
+    }, []);
+
+    return (
+      <>
+        <window.MKT_PAGES.TerminalPage
+          onOpen={(it) => setOpen(it)}
+          live={true}
+        />
+        {open && (
+          <window.MKT.DetailView
+            item={open}
+            onClose={() => setOpen(null)}
+            live={true}
+          />
+        )}
+      </>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    React.createElement(App)
+  );
+}
+
+// ---- Boot ----
+async function boot() {
+  // Wait for Babel transpilation of all type="text/babel" scripts
+  if (!window.Wordmark || !window.MKT_PAGES) {
+    return setTimeout(boot, 80);
+  }
+
+  const { data: { session } } = await sb.auth.getSession();
+  const loading = document.getElementById('it-loading');
+  const gate = document.getElementById('it-auth-gate');
+  const shell = document.getElementById('it-shell');
+
+  loading.style.display = 'none';
+
+  if (!session) {
+    gate.classList.add('show');
+    return;
+  }
+
+  shell.classList.add('show');
+  initTheme();
+  mountWordmark();
+  mountMarket(session.user);
+}
+
+setTimeout(boot, 300);
+</script>
+</body>
+</html>
