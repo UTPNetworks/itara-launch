@@ -415,99 +415,113 @@
 <script type="text/babel" src="shared.jsx"></script>
 
 <!-- ============================================================
-     V3 CRYSTAL NODE WORDMARK OVERRIDE
-     (replaces ItaraMark isometric cube with Crystal Node SVG)
+     BRAND LOGO — Crystal Node full wordmark from brand package
+     Adaptive: light mode uses dark-text variant, dark mode uses white-text
      ============================================================ -->
 <script type="text/babel">
-// Override Wordmark to use Crystal Node
-function CrystalNode({ size = 32 }) {
-  const s = size;
+// Full Crystal Node brand wordmark (from official brand package)
+// Adapts text colour based on theme
+function BrandLogo({ darkMode = false }) {
+  const textFill   = darkMode ? 'white' : '#0D0D14';
+  const tagFill    = darkMode ? 'rgba(167,163,255,0.65)' : 'rgba(79,70,229,0.55)';
+  const gradPrefix = darkMode ? 'dk' : 'lt';
   return (
-    <svg width={s} height={s} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', flexShrink: 0 }}>
+    <svg width="180" height="48" viewBox="0 0 240 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Itara" style={{ display: 'block', flexShrink: 0 }}>
       <defs>
-        <linearGradient id="cn-top-wm" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`${gradPrefix}-prism`} x1="2" y1="2" x2="46" y2="46" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#7C3AED"/>
           <stop offset="45%" stopColor="#4F46E5"/>
           <stop offset="100%" stopColor="#06B6D4"/>
         </linearGradient>
-        <linearGradient id="cn-left-wm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#4F46E5"/>
-          <stop offset="100%" stopColor="#3730A3"/>
+        <linearGradient id={`${gradPrefix}-h1`} x1="12" y1="18" x2="36" y2="18" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#06B6D4"/><stop offset="1" stopColor="#4F46E5"/>
         </linearGradient>
-        <linearGradient id="cn-right-wm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#06B6D4"/>
-          <stop offset="100%" stopColor="#0284C7"/>
+        <linearGradient id={`${gradPrefix}-vt`} x1="24" y1="12" x2="24" y2="36" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#4F46E5"/><stop offset=".5" stopColor="#EC4899"/><stop offset="1" stopColor="#4F46E5"/>
         </linearGradient>
-        <linearGradient id="cn-shimmer-wm" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0"/>
-          <stop offset="50%" stopColor="#ffffff" stopOpacity="0.35"/>
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
+        <linearGradient id={`${gradPrefix}-h2`} x1="12" y1="30" x2="36" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#4F46E5"/><stop offset="1" stopColor="#06B6D4"/>
         </linearGradient>
-        <clipPath id="cn-clip-wm">
-          <polygon points="28,4 52,17 52,39 28,52 4,39 4,17"/>
+        <radialGradient id={`${gradPrefix}-cn`} cx="42%" cy="36%" r="60%">
+          <stop stopColor="#F9A8D4"/><stop offset=".6" stopColor="#EC4899"/><stop offset="1" stopColor="#7C3AED"/>
+        </radialGradient>
+        <linearGradient id={`${gradPrefix}-d1`} x1="24" y1="24" x2="12" y2="18" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#EC4899" stopOpacity=".9"/><stop offset="1" stopColor="#06B6D4" stopOpacity="0"/>
+        </linearGradient>
+        <linearGradient id={`${gradPrefix}-d2`} x1="24" y1="24" x2="36" y2="18" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#EC4899" stopOpacity=".9"/><stop offset="1" stopColor="#4F46E5" stopOpacity="0"/>
+        </linearGradient>
+        <linearGradient id={`${gradPrefix}-d3`} x1="24" y1="24" x2="12" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#7C3AED" stopOpacity=".9"/><stop offset="1" stopColor="#4F46E5" stopOpacity="0"/>
+        </linearGradient>
+        <linearGradient id={`${gradPrefix}-d4`} x1="24" y1="24" x2="36" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#7C3AED" stopOpacity=".9"/><stop offset="1" stopColor="#06B6D4" stopOpacity="0"/>
+        </linearGradient>
+        <linearGradient id={`${gradPrefix}-tf`} x1="14" y1="2" x2="34" y2="16" gradientUnits="userSpaceOnUse">
+          <stop stopColor="rgba(255,255,255,0.28)"/><stop offset="1" stopColor="rgba(255,255,255,0)"/>
+        </linearGradient>
+        <filter id={`${gradPrefix}-glow`} x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.8" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <clipPath id={`${gradPrefix}-clip`}>
+          <polygon points="24,2 42,12 42,34 24,44 6,34 6,12"/>
         </clipPath>
       </defs>
-      {/* Hex shell faces */}
-      <polygon points="28,4 52,17 52,39 28,52 4,39 4,17" fill="url(#cn-top-wm)" opacity="0.15"/>
-      <polygon points="28,4 52,17 28,28" fill="url(#cn-top-wm)"/>
-      <polygon points="4,17 28,28 28,52 4,39" fill="url(#cn-left-wm)"/>
-      <polygon points="52,17 28,28 28,52 52,39" fill="url(#cn-right-wm)"/>
-      {/* Shimmer edge */}
-      <line x1="28" y1="4" x2="52" y2="17" stroke="url(#cn-shimmer-wm)" strokeWidth="1.5"/>
-      {/* Pink accent edge */}
-      <line x1="50" y1="18" x2="50" y2="38" stroke="#FF6AC7" strokeWidth="1.5" opacity="0.7"/>
-      {/* Signal nodes inside (clipped) */}
-      <g clipPath="url(#cn-clip-wm)">
-        <line x1="28" y1="28" x2="20" y2="22" stroke="#ffffff" strokeWidth="1" strokeOpacity="0.6"/>
-        <line x1="28" y1="28" x2="36" y2="22" stroke="#ffffff" strokeWidth="1" strokeOpacity="0.6"/>
-        <line x1="28" y1="28" x2="28" y2="38" stroke="#ffffff" strokeWidth="1" strokeOpacity="0.6"/>
-        <line x1="20" y1="22" x2="28" y2="16" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.4"/>
-        <line x1="36" y1="22" x2="28" y2="16" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.4"/>
-        <circle cx="28" cy="28" r="3" fill="#ffffff" opacity="0.95"/>
-        <circle cx="20" cy="22" r="2" fill="#ffffff" opacity="0.7"/>
-        <circle cx="36" cy="22" r="2" fill="#ffffff" opacity="0.7"/>
-        <circle cx="28" cy="16" r="1.5" fill="#ffffff" opacity="0.5"/>
-        <circle cx="28" cy="38" r="1.5" fill="#ffffff" opacity="0.5"/>
-        {/* Pulse ring */}
-        <circle cx="28" cy="28" r="6" fill="none" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.3">
-          <animate attributeName="r" values="4;9;4" dur="2s" repeatCount="indefinite"/>
-          <animate attributeName="stroke-opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
-        </circle>
+      <g transform="translate(8,8)">
+        <polygon points="24,2 42,12 42,34 24,44 6,34 6,12" fill={`url(#${gradPrefix}-prism)`} opacity="0.93" filter={`url(#${gradPrefix}-glow)`}/>
+        <polygon points="24,2 42,12 24,22 6,12" fill={`url(#${gradPrefix}-tf)`}/>
+        <polygon points="42,12 42,34 24,44 24,22" fill="rgba(0,0,0,0.16)"/>
+        <line x1="24" y1="2" x2="42" y2="12" stroke="rgba(236,72,153,0.5)" strokeWidth="0.9" strokeLinecap="round"/>
+        <line x1="24" y1="2" x2="42" y2="12" stroke="rgba(255,255,255,0.22)" strokeWidth="0.7" strokeLinecap="round"/>
+        <line x1="24" y1="2" x2="6" y2="12" stroke="rgba(255,255,255,0.13)" strokeWidth="0.6" strokeLinecap="round"/>
+        <g clipPath={`url(#${gradPrefix}-clip)`}>
+          <line x1="12" y1="18" x2="36" y2="18" stroke={`url(#${gradPrefix}-h1)`} strokeWidth="1.4" strokeLinecap="round" opacity="0.95"/>
+          <line x1="24" y1="18" x2="24" y2="30" stroke={`url(#${gradPrefix}-vt)`} strokeWidth="1.4" strokeLinecap="round" opacity="0.95"/>
+          <line x1="12" y1="30" x2="36" y2="30" stroke={`url(#${gradPrefix}-h2)`} strokeWidth="1.4" strokeLinecap="round" opacity="0.95"/>
+          <line x1="24" y1="24" x2="12" y2="18" stroke={`url(#${gradPrefix}-d1)`} strokeWidth="0.9" opacity="0.75"/>
+          <line x1="24" y1="24" x2="36" y2="18" stroke={`url(#${gradPrefix}-d2)`} strokeWidth="0.9" opacity="0.75"/>
+          <line x1="24" y1="24" x2="12" y2="30" stroke={`url(#${gradPrefix}-d3)`} strokeWidth="0.9" opacity="0.75"/>
+          <line x1="24" y1="24" x2="36" y2="30" stroke={`url(#${gradPrefix}-d4)`} strokeWidth="0.9" opacity="0.75"/>
+          <circle cx="12" cy="18" r="2.6" fill="rgba(6,182,212,0.28)"/>
+          <circle cx="12" cy="18" r="1.6" fill="#06B6D4"/>
+          <circle cx="36" cy="18" r="2.6" fill="rgba(79,70,229,0.28)"/>
+          <circle cx="36" cy="18" r="1.6" fill="#4F46E5"/>
+          <circle cx="12" cy="30" r="2.6" fill="rgba(79,70,229,0.28)"/>
+          <circle cx="12" cy="30" r="1.6" fill="#4F46E5"/>
+          <circle cx="36" cy="30" r="2.6" fill="rgba(6,182,212,0.28)"/>
+          <circle cx="36" cy="30" r="1.6" fill="#06B6D4"/>
+          <circle cx="24" cy="24" r="9" fill="rgba(236,72,153,0.1)"/>
+          <circle cx="24" cy="24" r="4.2" fill={`url(#${gradPrefix}-cn)`}/>
+        </g>
       </g>
-      {/* Hex border */}
-      <polygon points="28,4 52,17 52,39 28,52 4,39 4,17" fill="none" stroke="url(#cn-top-wm)" strokeWidth="0.8" opacity="0.5"/>
+      <text x="68" y="34" fontFamily="Cabinet Grotesk, Space Grotesk, system-ui, sans-serif" fontWeight="900" fontSize="28" letterSpacing="-1" fill={textFill}>itara</text>
+      <text x="69" y="50" fontFamily="JetBrains Mono, monospace" fontSize="7" fontWeight="600" letterSpacing="3.5" fill={tagFill}>AI MARKETPLACE</text>
     </svg>
   );
 }
 
-// Override the global Wordmark to use Crystal Node
-window.Wordmark = function({ size = 22, color = 'currentColor' }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-      <CrystalNode size={size + 12} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{
-          fontFamily: 'Space Grotesk, sans-serif',
-          fontWeight: 700,
-          fontSize: size,
-          letterSpacing: '-0.03em',
-          color,
-        }}>itara</span>
-        <span style={{
-          fontFamily: 'JetBrains Mono, monospace',
-          fontSize: Math.max(9, size * 0.52),
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          color: '#6C5CE7',
-          background: 'rgba(108,92,231,0.1)',
-          border: '1px solid rgba(108,92,231,0.25)',
-          borderRadius: 4,
-          padding: '1px 5px',
-          lineHeight: 1.5,
-        }}>BETA</span>
-      </div>
-    </div>
-  );
+// Theme state manager — shared across components
+window.__itaraTheme = window.__itaraTheme || { dark: false, listeners: [] };
+window.__itaraSetTheme = function(dark) {
+  window.__itaraTheme.dark = dark;
+  const root = document.documentElement;
+  root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  // also apply to v3-root for v3 dark overrides
+  const v3root = document.querySelector('.v3-root');
+  if (v3root) v3root.setAttribute('data-theme', dark ? 'dark' : '');
+  window.__itaraTheme.listeners.forEach(fn => fn(dark));
+};
+
+// Wordmark — uses BrandLogo, theme-aware
+window.Wordmark = function({ size = 22 }) {
+  const [dark, setDark] = React.useState(() => window.__itaraTheme.dark);
+  React.useEffect(() => {
+    const cb = d => setDark(d);
+    window.__itaraTheme.listeners.push(cb);
+    return () => { window.__itaraTheme.listeners = window.__itaraTheme.listeners.filter(f => f !== cb); };
+  }, []);
+  return <BrandLogo darkMode={dark} />;
 };
 </script>
 
@@ -520,18 +534,46 @@ const V3 = (() => {
   const { useState, useEffect, useMemo } = React;
 
   function Nav() {
+    const [dark, setDark] = useState(() => window.__itaraTheme.dark);
+    useEffect(() => {
+      const cb = d => setDark(d);
+      window.__itaraTheme.listeners.push(cb);
+      return () => { window.__itaraTheme.listeners = window.__itaraTheme.listeners.filter(f => f !== cb); };
+    }, []);
+    function toggleTheme() { window.__itaraSetTheme(!dark); }
     return (
       <nav className="v3-nav">
         <div className="v3-nav-inner">
-          <Wordmark size={22} />
+          {/* Logo hard-left */}
+          <div className="v3-nav-logo">
+            <Wordmark size={22} />
+          </div>
+          {/* Nav links centered */}
           <div className="v3-nav-mid">
             <a>Marketplace</a>
             <a>How it works</a>
             <a>Sell on Itara</a>
             <a>Intel</a>
           </div>
+          {/* Controls hard-right */}
           <div className="v3-nav-right">
             <span className="v3-trust">◆ Escrow · Money-back</span>
+            {/* Theme toggle */}
+            <button
+              className={`v3-theme-toggle ${dark ? 'dark' : 'light'}`}
+              onClick={toggleTheme}
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              <span className="v3-toggle-track">
+                <span className="v3-toggle-thumb">
+                  {dark
+                    ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                  }
+                </span>
+              </span>
+            </button>
             <button className="v3-btn-ghost" onClick={() => window.openSignIn()}>Sign in</button>
             <button className="v3-btn-solid" onClick={() => window.openSignUp()}>Start free</button>
           </div>
@@ -563,8 +605,8 @@ const V3 = (() => {
             <span className="v3-pulse" /> THE WORLD'S FIRST ALL-IN-ONE AI MARKETPLACE
           </div>
           <h1 className="v3-h1">
-            Everything AI.<br/>
-            <span className="v3-h1-accent">One marketplace.</span>
+            Everything Ai.<span className="v3-h1-dot">.</span> Build<span className="v3-h1-dot">.</span> Sell<span className="v3-h1-dot">.</span> Trade<br/>
+            <span className="v3-h1-dash">—</span> <span className="v3-h1-accent">One Marketplace.</span>
           </h1>
           <p className="v3-sub">
             Rent GPUs. Buy models. Post tasks. Hire specialists. Escrow-backed, money-back guaranteed.
