@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Itara — AXIS Intel Hub</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><polygon points='22,2 38,11 38,31 22,41 6,31 6,11' fill='%23FFD84D'/></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cabinet+Grotesk:wght@900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+:root {
+  --ink: #0A0A0C; --ink-2: #14151A; --ink-3: #1C1C24;
+  --bone: #F4F2EC; --bone-2: #E8E5DC;
+  --line: rgba(244,242,236,0.12); --line-2: rgba(244,242,236,0.22);
+  --mute: rgba(244,242,236,0.55); --mute-2: rgba(244,242,236,0.38);
+  --yellow: #FFD84D; --yellow-2: #FFE880;
+  --violet: #6C5CE7; --blue: #4A7BFF; --pink: #FF6AC7;
+  --green: #4ADE80; --red: #FF5C5C;
+}
+html, body { margin: 0; padding: 0; background: #0A0A0C; }
+body { font-family: 'Space Grotesk', sans-serif; color: #F4F2EC; }
+
+/* ============================================================
+   ITARA TOP NAV
+============================================================ */
+.it-nav {
+  position: sticky; top: 0; z-index: 400;
+  background: rgba(10,10,12,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(244,242,236,0.10);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 56px; gap: 24px;
+}
+.it-nav-l { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.it-nav-sep { width: 1px; height: 18px; background: rgba(244,242,236,0.22); }
+.it-nav-section {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+  color: rgba(244,242,236,0.45);
+}
+.it-nav-tabs {
+  display: flex; gap: 2px;
+  background: rgba(244,242,236,0.07);
+  border: 1px solid rgba(244,242,236,0.12);
+  border-radius: 10px; padding: 3px;
+}
+.it-nav-tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  padding: 6px 14px; border-radius: 7px;
+  border: none; background: transparent;
+  color: rgba(244,242,236,0.5); cursor: pointer;
+  transition: background .15s, color .15s;
+  text-decoration: none; display: inline-block;
+}
+.it-nav-tab:hover { color: #F4F2EC; background: rgba(244,242,236,0.1); }
+.it-nav-tab.active { background: #F4F2EC; color: #0A0A0C; }
+.it-nav-r { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.it-nav-tgl {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  color: rgba(244,242,236,0.5); cursor: pointer; user-select: none; transition: color .2s;
+}
+.it-nav-tgl:hover { color: #F4F2EC; }
+.it-tgl-track {
+  width: 36px; height: 20px; border-radius: 999px;
+  background: rgba(244,242,236,0.12); border: 1.5px solid rgba(244,242,236,0.2);
+  position: relative; transition: background .22s, border-color .22s; flex-shrink: 0;
+}
+.it-nav-tgl.is-light .it-tgl-track { background: #B8960A; border-color: #B8960A; }
+.it-tgl-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #F4F2EC; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+.it-nav-tgl.is-light .it-tgl-thumb { transform: translateX(16px); }
+.it-nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--yellow); color: #0A0A0C;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px;
+  border: 2px solid rgba(244,242,236,0.2); cursor: pointer;
+}
+.it-status-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: #4ADE80;
+}
+.it-status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4ADE80; box-shadow: 0 0 8px #4ADE80;
+  animation: itPulse 1.6s ease-in-out infinite;
+}
+@keyframes itPulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.55; transform:scale(0.85); }
+}
+
+/* ============================================================
+   BOOT / AUTH
+============================================================ */
+.it-loading {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  background: #0A0A0C; z-index: 9999;
+}
+.it-loading-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.it-loading-logo { animation: itPulse 1.6s ease-in-out infinite; }
+.it-loading-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.25em; color: rgba(244,242,236,0.45);
+}
+.it-loading-bar { width: 180px; height: 2px; background: rgba(244,242,236,0.1); border-radius: 1px; overflow: hidden; }
+.it-loading-bar-fill {
+  height: 100%; border-radius: 1px;
+  background: linear-gradient(90deg, #FFD84D, #FFE880);
+  animation: itBar 1.4s ease-in-out infinite;
+}
+@keyframes itBar {
+  0% { width:0%; margin-left:0%; }
+  50% { width:60%; margin-left:20%; }
+  100% { width:0%; margin-left:100%; }
+}
+.it-auth-gate { position: fixed; inset: 0; display: none; place-items: center; background: #0A0A0C; z-index: 9998; }
+.it-auth-gate.show { display: grid; }
+.it-auth-card {
+  background: #14151B; border: 1px solid rgba(244,242,236,0.12);
+  border-radius: 20px; padding: 48px; text-align: center; max-width: 400px; width: 90%;
+}
+.it-auth-card h2 { font-size: 24px; font-weight: 700; color: #F4F2EC; margin: 20px 0 12px; }
+.it-auth-card p { font-size: 14px; color: rgba(244,242,236,0.55); margin: 0 0 28px; line-height: 1.5; }
+.it-auth-btn {
+  display: block; width: 100%; background: #F4F2EC; color: #0A0A0C;
+  border: 0; border-radius: 12px; padding: 14px;
+  font-size: 14px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer; transition: background .15s; text-decoration: none;
+}
+.it-auth-btn:hover { background: #FFD84D; color: #0A0A0C; }
+#it-shell { display: none; }
+#it-shell.show { display: block; }
+
+/* ============================================================
+   LIGHT MODE
+============================================================ */
+body.mkt-light { background: #FAFAF7; color: #0A0A0C; }
+body.mkt-light .it-nav { background: rgba(250,248,242,0.92); border-bottom-color: rgba(13,13,20,0.10); }
+body.mkt-light .it-nav-section { color: rgba(13,13,20,0.45); }
+body.mkt-light .it-nav-tabs { background: rgba(13,13,20,0.06); border-color: rgba(13,13,20,0.12); }
+body.mkt-light .it-nav-tab { color: rgba(13,13,20,0.5); }
+body.mkt-light .it-nav-tab:hover { color: #0D0D14; background: rgba(13,13,20,0.1); }
+body.mkt-light .it-nav-tab.active { background: #0D0D14; color: #F4F2EC; }
+body.mkt-light .it-nav-tgl { color: rgba(13,13,20,0.5); }
+body.mkt-light .it-nav-tgl:hover { color: #0D0D14; }
+body.mkt-light .it-tgl-track { background: rgba(13,13,20,0.1); border-color: rgba(13,13,20,0.2); }
+body.mkt-light .it-nav-tgl.is-light .it-tgl-track { background: #B8960A; border-color: #B8960A; }
+body.mkt-light .it-tgl-thumb { background: #0D0D14; }
+body.mkt-light .it-nav-tgl.is-light .it-tgl-thumb { background: #fff; }
+body.mkt-light .it-status-badge { color: #16A34A; }
+body.mkt-light .it-status-dot { background: #16A34A; box-shadow: 0 0 8px #16A34A; }
+body.mkt-light .ax-root { --ink:#FAFAF7; --ink-2:#FFFFFF; --ink-3:#F0EEE6; --bone:#0A0A0C; --bone-2:#1C1C24; --line:rgba(10,10,12,0.10); --line-2:rgba(10,10,12,0.18); --mute:rgba(10,10,12,0.55); --mute-2:rgba(10,10,12,0.35); }
+body.mkt-light .ax-hero { background: linear-gradient(135deg, rgba(255,216,77,0.12), rgba(255,232,128,0.08)) !important; }
+body.mkt-light .ax-panel { background: #fff !important; border-color: rgba(10,10,12,0.10) !important; }
+body.mkt-light .ax-signal-row:hover { background: rgba(255,216,77,0.06) !important; }
+body.mkt-light .ax-alert-card { background: #fff !important; border-color: rgba(10,10,12,0.10) !important; }
+body.mkt-light .ax-headline-card { background: #fff !important; border-color: rgba(10,10,12,0.10) !important; }
+
+/* ============================================================
+   AXIS PAGE STYLES
+============================================================ */
+.ax-root { min-height: 100vh; background: var(--ink, #0A0A0C); padding: 0 0 80px; }
+
+/* Hero */
+.ax-hero {
+  background: linear-gradient(135deg, rgba(255,216,77,0.15), rgba(255,232,128,0.06));
+  border-bottom: 1px solid rgba(255,216,77,0.22);
+  padding: 36px 48px 32px; position: relative; overflow: hidden;
+}
+.ax-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(255,216,77,0.14), transparent 60%);
+  pointer-events: none;
+}
+.ax-hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.28em; color: #FFD84D; margin-bottom: 10px;
+}
+.ax-hero-h1 {
+  font-size: 46px; font-weight: 700; line-height: 1.05;
+  letter-spacing: -0.03em; margin: 0 0 14px; color: #F4F2EC;
+}
+.ax-hero-h1 span { color: #FFD84D; }
+.ax-hero-sub {
+  font-size: 15px; color: rgba(244,242,236,0.55);
+  margin: 0 0 28px; max-width: 520px; line-height: 1.6;
+}
+.ax-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.ax-btn-primary {
+  background: #FFD84D; color: #0A0A0C; border: none;
+  padding: 12px 24px; border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+  cursor: pointer; transition: background .18s;
+}
+.ax-btn-primary:hover { background: #FFE880; }
+.ax-btn-ghost {
+  background: transparent; color: rgba(244,242,236,0.7);
+  border: 1px solid rgba(244,242,236,0.22);
+  padding: 12px 24px; border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+  cursor: pointer; transition: border-color .18s, color .18s;
+}
+.ax-btn-ghost:hover { border-color: #FFD84D; color: #FFD84D; }
+.ax-hero-kpis { display: flex; gap: 32px; margin-top: 32px; }
+.ax-hero-kpi { display: flex; flex-direction: column; gap: 4px; }
+.ax-kpi-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.22em; color: rgba(244,242,236,0.4);
+}
+.ax-kpi-v { font-size: 26px; font-weight: 700; color: #F4F2EC; line-height: 1; }
+.ax-kpi-v.yel { color: #FFD84D; }
+.ax-kpi-d { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4ADE80; }
+.ax-kpi-d.dn { color: #FF5C5C; }
+
+/* Body */
+.ax-body { padding: 32px 48px; display: flex; flex-direction: column; gap: 28px; }
+.ax-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.ax-section-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.24em; color: rgba(244,242,236,0.4);
+}
+.ax-section-title { font-size: 18px; font-weight: 700; color: #F4F2EC; margin: 4px 0 0; }
+.ax-section-cta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+  color: #FFD84D; background: none; border: none; cursor: pointer;
+}
+.ax-section-cta:hover { color: #FFE880; }
+
+/* Two/Three col layouts */
+.ax-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.ax-three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.ax-panel {
+  background: var(--ink-2, #14151A);
+  border: 1px solid rgba(244,242,236,0.10);
+  border-radius: 16px; padding: 24px;
+}
+
+/* Live Market Signals table */
+.ax-signal-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(244,242,236,0.08);
+  background: rgba(255,216,77,0.05);
+  border-radius: 12px 12px 0 0;
+}
+.ax-signal-col {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.2em;
+  color: rgba(244,242,236,0.35);
+}
+.ax-signal-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 90px;
+  padding: 13px 16px; align-items: center;
+  border-bottom: 1px solid rgba(244,242,236,0.04);
+  transition: background .15s; cursor: pointer;
+}
+.ax-signal-row:last-child { border-bottom: none; }
+.ax-signal-row:hover { background: rgba(255,216,77,0.05); }
+.ax-signal-row.flash-up { background: rgba(74,222,128,0.05) !important; }
+.ax-signal-row.flash-down { background: rgba(255,92,92,0.05) !important; }
+.ax-signal-wrap {
+  background: var(--ink-2, #14151A);
+  border: 1px solid rgba(244,242,236,0.10);
+  border-radius: 14px; overflow: hidden;
+}
+.ax-sig-name { font-size: 14px; font-weight: 600; color: #F4F2EC; }
+.ax-sig-cat {
+  display: inline-flex; align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 0.14em;
+  background: rgba(255,216,77,0.12); color: #FFD84D;
+  border-radius: 4px; padding: 2px 6px; margin-left: 8px;
+}
+.ax-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: rgba(244,242,236,0.65);
+}
+.ax-cell.price { font-size: 14px; font-weight: 700; color: #F4F2EC; }
+.ax-cell.up { color: #4ADE80; }
+.ax-cell.down { color: #FF5C5C; }
+.ax-alert-btn {
+  background: rgba(255,216,77,0.1); color: #FFD84D;
+  border: 1px solid rgba(255,216,77,0.28); border-radius: 7px;
+  padding: 6px 12px; font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+  cursor: pointer; transition: background .18s;
+}
+.ax-alert-btn:hover { background: rgba(255,216,77,0.22); }
+
+/* Price Alert Feed */
+.ax-alert-card {
+  background: rgba(244,242,236,0.04);
+  border: 1px solid rgba(244,242,236,0.08);
+  border-radius: 10px; padding: 14px;
+  margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start;
+  transition: border-color .18s;
+}
+.ax-alert-card:hover { border-color: rgba(255,216,77,0.3); }
+.ax-alert-icon {
+  width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+  display: grid; place-items: center; font-size: 14px;
+}
+.ax-alert-icon.triggered { background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.25); }
+.ax-alert-icon.watching  { background: rgba(255,216,77,0.12); border: 1px solid rgba(255,216,77,0.25); }
+.ax-alert-body { flex: 1; }
+.ax-alert-title { font-size: 13px; font-weight: 600; color: #F4F2EC; margin-bottom: 4px; }
+.ax-alert-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: rgba(244,242,236,0.45); line-height: 1.4;
+}
+.ax-alert-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+  padding: 3px 8px; border-radius: 5px; flex-shrink: 0; margin-top: 2px;
+}
+.ax-alert-status.triggered { background: rgba(74,222,128,0.12); color: #4ADE80; border: 1px solid rgba(74,222,128,0.25); }
+.ax-alert-status.watching  { background: rgba(255,216,77,0.12); color: #FFD84D; border: 1px solid rgba(255,216,77,0.25); }
+
+/* Trending model radar */
+.ax-radar-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 0; border-bottom: 1px solid rgba(244,242,236,0.06);
+}
+.ax-radar-item:last-child { border-bottom: none; }
+.ax-radar-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 700; color: rgba(244,242,236,0.12);
+  width: 28px; flex-shrink: 0; text-align: right;
+}
+.ax-radar-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 700;
+}
+.ax-radar-body { flex: 1; }
+.ax-radar-name { font-size: 13px; font-weight: 600; color: #F4F2EC; }
+.ax-radar-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: rgba(244,242,236,0.4); margin-top: 2px;
+}
+.ax-radar-delta {
+  font-size: 14px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ax-radar-delta.up { color: #4ADE80; }
+.ax-radar-delta.dn { color: #FF5C5C; }
+
+/* Sparkline */
+.ax-spark { margin-top: 8px; }
+
+/* Headlines */
+.ax-headline-card {
+  background: rgba(244,242,236,0.03);
+  border: 1px solid rgba(244,242,236,0.08);
+  border-radius: 10px; padding: 16px;
+  margin-bottom: 10px; cursor: pointer;
+  transition: border-color .18s;
+}
+.ax-headline-card:hover { border-color: rgba(255,216,77,0.3); }
+.ax-headline-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.18em;
+  padding: 2px 7px; border-radius: 4px; margin-bottom: 8px; display: inline-block;
+}
+.ax-headline-tag.bull { background: rgba(74,222,128,0.12); color: #4ADE80; }
+.ax-headline-tag.bear { background: rgba(255,92,92,0.12); color: #FF5C5C; }
+.ax-headline-tag.neut { background: rgba(255,216,77,0.12); color: #FFD84D; }
+.ax-headline-title { font-size: 13px; font-weight: 600; color: #F4F2EC; line-height: 1.4; margin-bottom: 6px; }
+.ax-headline-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: rgba(244,242,236,0.35); letter-spacing: 0.12em;
+}
+
+/* Live badge */
+.ax-live {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em; color: #4ADE80;
+}
+.ax-pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4ADE80; box-shadow: 0 0 8px #4ADE80;
+  animation: itPulse 1.6s ease-in-out infinite;
+}
+
+/* Quick actions */
+.ax-quick { display: flex; gap: 10px; flex-wrap: wrap; }
+.ax-quick-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+  padding: 10px 18px; border-radius: 8px; cursor: pointer; transition: all .18s;
+}
+.ax-q-yellow {
+  background: rgba(255,216,77,0.14); color: #FFD84D;
+  border: 1px solid rgba(255,216,77,0.3);
+}
+.ax-q-yellow:hover { background: #FFD84D; color: #0A0A0C; border-color: #FFD84D; }
+.ax-q-ghost {
+  background: transparent; color: rgba(244,242,236,0.55);
+  border: 1px solid rgba(244,242,236,0.14);
+}
+.ax-q-ghost:hover { border-color: rgba(244,242,236,0.4); color: #F4F2EC; }
+
+/* GPU spot chart (canvas-based) */
+.ax-chart-wrap {
+  margin-top: 12px;
+  position: relative;
+}
+
+/* Sentiment bar */
+.ax-sentiment {
+  display: flex; height: 10px; border-radius: 5px; overflow: hidden;
+  margin: 10px 0; gap: 2px;
+}
+.ax-sentiment-bull { background: #4ADE80; transition: flex .4s; }
+.ax-sentiment-neut { background: rgba(244,242,236,0.2); flex: 1; }
+.ax-sentiment-bear { background: #FF5C5C; transition: flex .4s; }
+.ax-sentiment-labels {
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: rgba(244,242,236,0.4); letter-spacing: 0.12em;
+}
+</style>
+</head>
+<body>
+
+<!-- Boot splash -->
+<div id="it-loading" class="it-loading">
+  <div class="it-loading-inner">
+    <svg class="it-loading-logo" width="56" height="56" viewBox="0 0 44 44" fill="none">
+      <defs>
+        <linearGradient id="lpA" x1="2" y1="2" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#FFD84D"/>
+          <stop offset="50%" stop-color="#FFE880"/>
+          <stop offset="100%" stop-color="#FF6AC7"/>
+        </linearGradient>
+      </defs>
+      <polygon points="22,2 38,11 38,31 22,41 6,31 6,11" fill="url(#lpA)" opacity="0.95"/>
+      <line x1="11" y1="17" x2="33" y2="17" stroke="#FFE880" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="22" y1="11" x2="22" y2="31" stroke="#FFD84D" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="11" y1="27" x2="33" y2="27" stroke="#FF6AC7" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="22" cy="22" r="3.5" fill="#FFF5C0"/>
+    </svg>
+    <div class="it-loading-text">CALIBRATING AXIS INTEL…</div>
+    <div class="it-loading-bar"><div class="it-loading-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- Auth gate -->
+<div id="it-auth-gate" class="it-auth-gate">
+  <div class="it-auth-card">
+    <svg width="56" height="56" viewBox="0 0 44 44" fill="none">
+      <defs><linearGradient id="agA" x1="2" y1="2" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#FFD84D"/><stop offset="100%" stop-color="#FFE880"/>
+      </linearGradient></defs>
+      <polygon points="22,2 38,11 38,31 22,41 6,31 6,11" fill="url(#agA)" opacity="0.9"/>
+    </svg>
+    <h2>Sign in to continue</h2>
+    <p>Itara AXIS Intel Hub requires an Itara account. Access live AI market intelligence, price alerts, and trend radar.</p>
+    <a href="index.html" class="it-auth-btn">← Back to Itara</a>
+  </div>
+</div>
+
+<!-- Shell -->
+<div id="it-shell">
+  <nav class="it-nav" id="it-nav">
+    <div class="it-nav-l">
+      <div id="it-wordmark"></div>
+      <span class="it-nav-sep"></span>
+      <span class="it-nav-section">AXIS INTEL HUB</span>
+    </div>
+    <div class="it-nav-tabs">
+      <a href="dashboard.html" class="it-nav-tab">MISSION</a>
+      <a href="compute.html" class="it-nav-tab">COMPUTE</a>
+      <a href="market.html" class="it-nav-tab">EXCHANGE</a>
+      <a href="neuralwork.html" class="it-nav-tab">NEURALWORK</a>
+      <a href="axis.html" class="it-nav-tab active">AXIS</a>
+      <a href="#" class="it-nav-tab">WALLET</a>
+    </div>
+    <div class="it-nav-r">
+      <div class="it-status-badge">
+        <span class="it-status-dot"></span>
+        6 ALERTS ACTIVE
+      </div>
+      <div class="it-nav-tgl" id="it-theme-tgl" title="Toggle theme">
+        <div class="it-tgl-track"><div class="it-tgl-thumb"></div></div>
+        <span id="it-tgl-label">DARK</span>
+      </div>
+      <div class="it-nav-avatar" id="it-avatar">A</div>
+    </div>
+  </nav>
+  <div id="root"></div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+  integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+  integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+  integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="data.js"></script>
+<script type="text/babel" src="shared.jsx"></script>
+
+<script type="text/babel">
+const SUPABASE_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const THEME_KEY = 'itara_mkt_theme';
+const { useState, useEffect, useRef } = React;
+
+/* ── Signal data ── */
+const SIGNALS = [
+  { name: 'H100 SXM5 80GB',    cat: 'GPU',    price: 3.29, vol: '48.2K',  chg24: +4.2,  chg7d: +11.3 },
+  { name: 'GPT-4o',            cat: 'LLM',    price: 0.0050, vol: '2.1M', chg24: +1.8,  chg7d: -3.2 },
+  { name: 'Claude 3.5 Sonnet', cat: 'LLM',    price: 0.0030, vol: '1.8M', chg24: +2.4,  chg7d: +6.7 },
+  { name: 'Stable Diffusion XL',cat: 'IMAGE', price: 0.0012, vol: '920K', chg24: -1.3,  chg7d: +4.1 },
+  { name: 'Whisper v3',        cat: 'AUDIO',  price: 0.0006, vol: '410K', chg24: +0.4,  chg7d: +1.9 },
+  { name: 'A100 SXM4 80GB',    cat: 'GPU',    price: 1.89,   vol: '31.4K', chg24: -2.1,  chg7d: -5.8 },
+  { name: 'Llama 3 70B',       cat: 'LLM',    price: 0.0009, vol: '3.4M', chg24: +6.2,  chg7d: +24.1 },
+  { name: 'SDXL-Turbo',        cat: 'IMAGE',  price: 0.0008, vol: '650K', chg24: -0.8,  chg7d: -2.4 },
+];
+
+const ALERTS = [
+  { title: 'H100 SXM5 crossed $3.25/hr', sub: 'Target: $3.25 · Actual: $3.29/hr · SET 2D AGO', status: 'triggered', icon: '▲' },
+  { title: 'GPT-4o usage below $5/day',  sub: 'Budget cap alert · Current: $4.82/day', status: 'triggered', icon: '✓' },
+  { title: 'Llama 3 70B price target',   sub: 'Alert when < $0.0007/token · Currently $0.0009', status: 'watching', icon: '◉' },
+  { title: 'A100 PCIe below $1.20/hr',   sub: 'Target: $1.20 · Actual: $1.29/hr · CLOSE', status: 'watching', icon: '◉' },
+  { title: 'Claude 3.5 Sonnet volume',   sub: 'Alert at 2M+ daily tokens · Currently 1.8M', status: 'watching', icon: '◉' },
+  { title: 'SD XL compute burst alert',  sub: 'Peak GPU usage > 80% on image tasks', status: 'watching', icon: '◉' },
+];
+
+const TRENDING = [
+  { name: 'Llama 3 70B',       kind: 'Open-source LLM', delta: +24.1, color: '#6C5CE7', icon: 'L3' },
+  { name: 'Mistral 7B Instruct',kind: 'Efficient LLM',  delta: +18.3, color: '#4A7BFF', icon: 'M7' },
+  { name: 'H100 SXM5',         kind: 'GPU Compute',     delta: +11.3, color: '#FFD84D', icon: 'H1' },
+  { name: 'Stable Diffusion 3',kind: 'Image Gen Model', delta: +9.7,  color: '#FF6AC7', icon: 'S3' },
+  { name: 'Whisper Large v3',  kind: 'Audio ASR model', delta: +6.4,  color: '#4ADE80', icon: 'WL' },
+  { name: 'GPT-4o mini',       kind: 'Efficient LLM',   delta: -3.2,  color: '#FF5C5C', icon: 'GM' },
+];
+
+const HEADLINES = [
+  { tag: 'bull', title: 'Llama 3 70B sees record volume — 3.4M daily inference calls as open-source adoption surges', time: '14 MIN AGO · AI MODELS' },
+  { tag: 'bear', title: 'H100 availability tightens globally — lead times extend to 6-8 weeks for new datacenter orders', time: '47 MIN AGO · GPU MARKET' },
+  { tag: 'bull', title: 'Claude 3.5 Sonnet benchmark performance leads on coding tasks, driving enterprise demand', time: '2H AGO · LLM BENCHMARKS' },
+  { tag: 'neut', title: 'New FP8 quantization method reduces inference costs by 40% without accuracy degradation', time: '3H AGO · ML RESEARCH' },
+  { tag: 'bear', title: 'A100 spot prices fall 5.8% as enterprise cloud providers release reserved capacity', time: '5H AGO · GPU MARKET' },
+];
+
+/* ── Live price simulation ── */
+function useLiveSignals() {
+  const [rows, setRows] = useState(() => SIGNALS.map(s => ({ ...s, livePrice: s.price, flash: null })));
+  useEffect(() => {
+    const t = setInterval(() => {
+      setRows(prev => prev.map(r => {
+        if (Math.random() > 0.38) return { ...r, flash: null };
+        const d = (Math.random() - 0.48) * r.price * 0.015;
+        const p = Math.max(0.00001, +(r.livePrice + d));
+        return { ...r, livePrice: p, flash: d > 0 ? 'up' : 'down' };
+      }));
+    }, 2200);
+    return () => clearInterval(t);
+  }, []);
+  return rows;
+}
+
+/* ── Sparkline ── */
+function Spark({ data, color = '#FFD84D', h = 40 }) {
+  const max = Math.max(...data), min = Math.min(...data);
+  const w = 200;
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((v - min) / ((max - min) || 1)) * (h - 6) - 3;
+    return `${x},${y}`;
+  }).join(' ');
+  const area = `M 0,${h} L ${pts.split(' ').join(' L ')} L ${w},${h} Z`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="axsg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={color} stopOpacity="0.3"/>
+          <stop offset="1" stopColor={color} stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d={area} fill="url(#axsg)"/>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+/* ── AnimNum ── */
+function AnimNum({ value, fmt = n => n.toFixed(2) }) {
+  const [v, setV] = useState(0);
+  const ref = useRef(false);
+  useEffect(() => {
+    if (ref.current) { setV(value); return; }
+    ref.current = true;
+    const s = performance.now();
+    const tick = t => {
+      const prog = Math.min(1, (t - s) / 1200);
+      const e = 1 - Math.pow(1 - prog, 3);
+      setV(value * e);
+      if (prog < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [value]);
+  return <>{fmt(v)}</>;
+}
+
+/* ── Format price intelligently ── */
+function fmtPrice(p) {
+  if (p >= 0.01) return `$${p.toFixed(2)}`;
+  return `$${p.toFixed(5)}`;
+}
+
+/* ── GPU spot chart data ── */
+const SPOT_DATA = Array.from({ length: 30 }, (_, i) => 3.1 + Math.sin(i * 0.4) * 0.3 + Math.sin(i * 0.9) * 0.15 + Math.random() * 0.12);
+
+/* ── Main page ── */
+function AxisPage({ user }) {
+  const rows = useLiveSignals();
+  const [alertFilter, setAlertFilter] = useState('ALL');
+
+  const filteredAlerts = alertFilter === 'ALL'
+    ? ALERTS
+    : alertFilter === 'TRIGGERED'
+      ? ALERTS.filter(a => a.status === 'triggered')
+      : ALERTS.filter(a => a.status === 'watching');
+
+  return (
+    <div className="ax-root">
+      {/* Hero */}
+      <div className="ax-hero">
+        <div className="ax-hero-eyebrow">✦ AXIS INTEL HUB · AI MARKET INTELLIGENCE</div>
+        <h1 className="ax-hero-h1">Read the AI market<br/><span>before it moves.</span></h1>
+        <p className="ax-hero-sub">Live signals on GPU spot prices, model adoption curves, trending inference calls, and price alerts — all in one intelligence terminal.</p>
+        <div className="ax-hero-actions">
+          <button className="ax-btn-primary">+ SET AN ALERT</button>
+          <button className="ax-btn-ghost">EXPLORE SIGNALS →</button>
+        </div>
+        <div className="ax-hero-kpis">
+          <div className="ax-hero-kpi">
+            <span className="ax-kpi-k">SIGNALS TRACKED</span>
+            <span className="ax-kpi-v yel"><AnimNum value={2840} fmt={n => Math.round(n).toLocaleString()} /></span>
+            <span className="ax-kpi-d">▲ 124 new today</span>
+          </div>
+          <div className="ax-hero-kpi">
+            <span className="ax-kpi-k">ALERTS TRIGGERED</span>
+            <span className="ax-kpi-v">2<small style={{fontSize:'14px',opacity:0.6}}> today</small></span>
+            <span className="ax-kpi-d">▲ On target</span>
+          </div>
+          <div className="ax-hero-kpi">
+            <span className="ax-kpi-k">H100 SPOT (NOW)</span>
+            <span className="ax-kpi-v">$3.29<small style={{fontSize:'14px',opacity:0.6}}>/hr</small></span>
+            <span className="ax-kpi-d">▲ 4.2% today</span>
+          </div>
+          <div className="ax-hero-kpi">
+            <span className="ax-kpi-k">MARKET SENTIMENT</span>
+            <span className="ax-kpi-v yel">BULLISH</span>
+            <span className="ax-kpi-d">64% bull · 36% bear</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="ax-body">
+        {/* Live Market Signals */}
+        <div>
+          <div className="ax-section-head">
+            <div>
+              <div className="ax-section-k">§ 01 · LIVE SIGNALS</div>
+              <div className="ax-section-title">Market pulse — AI & GPU.</div>
+            </div>
+            <span className="ax-live"><span className="ax-pulse"></span>LIVE</span>
+          </div>
+          <div className="ax-signal-wrap">
+            <div className="ax-signal-header">
+              <span className="ax-signal-col">ASSET</span>
+              <span className="ax-signal-col">VOLUME</span>
+              <span className="ax-signal-col">PRICE</span>
+              <span className="ax-signal-col">24H</span>
+              <span className="ax-signal-col">7D</span>
+              <span className="ax-signal-col"></span>
+            </div>
+            {rows.map((r, i) => (
+              <div key={i} className={`ax-signal-row${r.flash ? ' flash-' + r.flash : ''}`}>
+                <span>
+                  <span className="ax-sig-name">{r.name}</span>
+                  <span className="ax-sig-cat">{r.cat}</span>
+                </span>
+                <span className="ax-cell">{r.vol}</span>
+                <span className="ax-cell price">{fmtPrice(r.livePrice)}</span>
+                <span className={`ax-cell ${r.chg24 >= 0 ? 'up' : 'down'}`}>
+                  {r.chg24 >= 0 ? '▲' : '▼'} {Math.abs(r.chg24).toFixed(1)}%
+                </span>
+                <span className={`ax-cell ${r.chg7d >= 0 ? 'up' : 'down'}`}>
+                  {r.chg7d >= 0 ? '▲' : '▼'} {Math.abs(r.chg7d).toFixed(1)}%
+                </span>
+                <button className="ax-alert-btn" onClick={e => e.stopPropagation()}>+ ALERT</button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* GPU Spot Chart + Sentiment */}
+        <div className="ax-two">
+          <div className="ax-panel">
+            <div className="ax-section-head" style={{marginBottom:'8px'}}>
+              <div>
+                <div className="ax-section-k">§ 02 · GPU SPOT CHART</div>
+                <div className="ax-section-title">H100 SXM5 — 30 days.</div>
+              </div>
+              <span className="ax-live"><span className="ax-pulse"></span>LIVE</span>
+            </div>
+            <div className="ax-chart-wrap">
+              <Spark data={SPOT_DATA} color="#FFD84D" h={120} />
+            </div>
+            <div style={{display:'flex', justifyContent:'space-between', marginTop:'10px'}}>
+              <div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'9px', letterSpacing:'0.18em', color:'rgba(244,242,236,0.35)'}}>30D LOW</div>
+                <div style={{fontSize:'18px', fontWeight:700, color:'#FF5C5C'}}>$2.84</div>
+              </div>
+              <div style={{textAlign:'center'}}>
+                <div style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'9px', letterSpacing:'0.18em', color:'rgba(244,242,236,0.35)'}}>AVG</div>
+                <div style={{fontSize:'18px', fontWeight:700, color:'#F4F2EC'}}>$3.12</div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'9px', letterSpacing:'0.18em', color:'rgba(244,242,236,0.35)'}}>30D HIGH</div>
+                <div style={{fontSize:'18px', fontWeight:700, color:'#4ADE80'}}>$3.44</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="ax-panel">
+            <div className="ax-section-head" style={{marginBottom:'12px'}}>
+              <div>
+                <div className="ax-section-k">§ 03 · MARKET SENTIMENT</div>
+                <div className="ax-section-title">AI market mood.</div>
+              </div>
+            </div>
+            <div style={{marginBottom:'20px'}}>
+              <div style={{display:'flex', justifyContent:'space-between', marginBottom:'6px'}}>
+                <div style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'9px', letterSpacing:'0.16em', color:'rgba(244,242,236,0.4)'}}>OVERALL</div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'11px', fontWeight:700, color:'#4ADE80'}}>BULLISH</div>
+              </div>
+              <div className="ax-sentiment">
+                <div className="ax-sentiment-bull" style={{flex: 64}}></div>
+                <div className="ax-sentiment-neut" style={{flex: 0}}></div>
+                <div className="ax-sentiment-bear" style={{flex: 36}}></div>
+              </div>
+              <div className="ax-sentiment-labels"><span>64% BULL</span><span>36% BEAR</span></div>
+            </div>
+            {[
+              { label: 'GPU Compute',  bull: 72, bear: 28 },
+              { label: 'LLMs',         bull: 68, bear: 32 },
+              { label: 'Image Models', bull: 58, bear: 42 },
+              { label: 'Audio / ASR',  bull: 61, bear: 39 },
+            ].map(s => (
+              <div key={s.label} style={{marginBottom:'12px'}}>
+                <div style={{display:'flex', justifyContent:'space-between', marginBottom:'4px'}}>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'10px', color:'rgba(244,242,236,0.5)'}}>{s.label}</span>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'10px', color: s.bull > 60 ? '#4ADE80' : '#FF5C5C'}}>
+                    {s.bull}% BULL
+                  </span>
+                </div>
+                <div className="ax-sentiment" style={{height:'6px', borderRadius:'3px'}}>
+                  <div className="ax-sentiment-bull" style={{flex: s.bull, borderRadius:'3px 0 0 3px'}}></div>
+                  <div className="ax-sentiment-bear" style={{flex: s.bear, borderRadius:'0 3px 3px 0'}}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Two columns: Trending Radar + Alert Feed */}
+        <div className="ax-two">
+          {/* Trending Radar */}
+          <div className="ax-panel">
+            <div className="ax-section-head" style={{marginBottom:'4px'}}>
+              <div>
+                <div className="ax-section-k">§ 04 · TRENDING RADAR</div>
+                <div className="ax-section-title">Top movers · 7 days.</div>
+              </div>
+              <button className="ax-section-cta">SEE ALL →</button>
+            </div>
+            {TRENDING.map((t, i) => (
+              <div key={t.name} className="ax-radar-item">
+                <span className="ax-radar-rank">0{i+1}</span>
+                <div className="ax-radar-icon" style={{ background: t.color, color: t.color === '#FFD84D' ? '#0A0A0C' : '#fff' }}>
+                  {t.icon}
+                </div>
+                <div className="ax-radar-body">
+                  <div className="ax-radar-name">{t.name}</div>
+                  <div className="ax-radar-sub">{t.kind}</div>
+                </div>
+                <span className={`ax-radar-delta ${t.delta >= 0 ? 'up' : 'dn'}`}>
+                  {t.delta >= 0 ? '▲' : '▼'} {Math.abs(t.delta).toFixed(1)}%
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Alert Feed */}
+          <div className="ax-panel">
+            <div className="ax-section-head" style={{marginBottom:'14px'}}>
+              <div>
+                <div className="ax-section-k">§ 05 · PRICE ALERTS</div>
+                <div className="ax-section-title">Your saved alerts.</div>
+              </div>
+              <button className="ax-btn-primary" style={{padding:'7px 14px', fontSize:'9px'}}>+ ADD</button>
+            </div>
+            <div style={{display:'flex', gap:'6px', marginBottom:'14px'}}>
+              {['ALL', 'TRIGGERED', 'WATCHING'].map(f => (
+                <button key={f} onClick={() => setAlertFilter(f)}
+                  style={{
+                    fontFamily:"'JetBrains Mono',monospace", fontSize:'9px', fontWeight:700,
+                    letterSpacing:'0.14em', padding:'5px 10px', borderRadius:'6px', cursor:'pointer',
+                    background: alertFilter === f ? 'rgba(255,216,77,0.18)' : 'rgba(244,242,236,0.05)',
+                    border: alertFilter === f ? '1px solid rgba(255,216,77,0.35)' : '1px solid rgba(244,242,236,0.1)',
+                    color: alertFilter === f ? '#FFD84D' : 'rgba(244,242,236,0.45)',
+                  }}>{f}</button>
+              ))}
+            </div>
+            {filteredAlerts.map((a, i) => (
+              <div key={i} className="ax-alert-card">
+                <div className={`ax-alert-icon ${a.status}`}>{a.icon}</div>
+                <div className="ax-alert-body">
+                  <div className="ax-alert-title">{a.title}</div>
+                  <div className="ax-alert-sub">{a.sub}</div>
+                </div>
+                <span className={`ax-alert-status ${a.status}`}>
+                  {a.status === 'triggered' ? 'TRIGGERED' : 'WATCHING'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Headlines */}
+        <div>
+          <div className="ax-section-head">
+            <div>
+              <div className="ax-section-k">§ 06 · AI MARKET HEADLINES</div>
+              <div className="ax-section-title">Signal from the noise.</div>
+            </div>
+            <span className="ax-live"><span className="ax-pulse"></span>UPDATING</span>
+          </div>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+            {HEADLINES.map((h, i) => (
+              <div key={i} className="ax-headline-card">
+                <div className={`ax-headline-tag ${h.tag}`}>
+                  {h.tag === 'bull' ? '▲ BULLISH' : h.tag === 'bear' ? '▼ BEARISH' : '◆ NEUTRAL'}
+                </div>
+                <div className="ax-headline-title">{h.title}</div>
+                <div className="ax-headline-meta">{h.time}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick actions */}
+        <div>
+          <div className="ax-section-k" style={{marginBottom:'12px'}}>§ QUICK ACTIONS</div>
+          <div className="ax-quick">
+            {[
+              ['+ SET PRICE ALERT', 'yellow'], ['+ SAVE SIGNAL', 'yellow'],
+              ['VIEW FULL CHART →', 'ghost'], ['EXPORT REPORT →', 'ghost'], ['MARKET HISTORY →', 'ghost'],
+            ].map(([t, c]) => (
+              <button key={t} className={`ax-quick-btn ax-q-${c}`}>{t}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Boot ── */
+function initTheme() {
+  const tgl = document.getElementById('it-theme-tgl');
+  const lbl = document.getElementById('it-tgl-label');
+  let isLight = localStorage.getItem(THEME_KEY) === 'light';
+  function apply() {
+    document.body.classList.toggle('mkt-light', isLight);
+    tgl.classList.toggle('is-light', isLight);
+    lbl.textContent = isLight ? 'LIGHT' : 'DARK';
+    localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+  }
+  apply();
+  tgl.onclick = () => { isLight = !isLight; apply(); };
+}
+function mountWordmark() {
+  const el = document.getElementById('it-wordmark');
+  if (!el || !window.Wordmark) return;
+  ReactDOM.createRoot(el).render(React.createElement(window.Wordmark, { size: 20 }));
+}
+function mountPage(user) {
+  const av = document.getElementById('it-avatar');
+  if (av && user) {
+    const name = user.user_metadata?.full_name || user.email || 'U';
+    av.textContent = name[0].toUpperCase();
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    React.createElement(AxisPage, { user })
+  );
+}
+async function boot() {
+  if (!window.Wordmark) return setTimeout(boot, 80);
+  const { data: { session } } = await sb.auth.getSession();
+  document.getElementById('it-loading').style.display = 'none';
+  if (!session) { document.getElementById('it-auth-gate').classList.add('show'); return; }
+  document.getElementById('it-shell').classList.add('show');
+  initTheme();
+  mountWordmark();
+  mountPage(session.user);
+}
+setTimeout(boot, 300);
+</script>
+</body>
+</html>

@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Itara — Compute Terminal</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><polygon points='22,2 38,11 38,31 22,41 6,31 6,11' fill='%236C5CE7'/></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cabinet+Grotesk:wght@900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+:root {
+  --ink: #0A0A0C; --ink-2: #14151A; --ink-3: #1C1C24;
+  --bone: #F4F2EC; --bone-2: #E8E5DC;
+  --line: rgba(244,242,236,0.12); --line-2: rgba(244,242,236,0.22);
+  --mute: rgba(244,242,236,0.55); --mute-2: rgba(244,242,236,0.38);
+  --violet: #6C5CE7; --violet-2: #8C7DFF;
+  --blue: #4A7BFF; --pink: #FF6AC7; --yellow: #FFD84D;
+  --green: #4ADE80; --red: #FF5C5C;
+}
+html, body { margin: 0; padding: 0; background: #0A0A0C; }
+body { font-family: 'Space Grotesk', sans-serif; color: #F4F2EC; }
+
+/* ============================================================
+   ITARA TOP NAV (identical across all pages)
+============================================================ */
+.it-nav {
+  position: sticky; top: 0; z-index: 400;
+  background: rgba(10,10,12,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(244,242,236,0.10);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 56px; gap: 24px;
+}
+.it-nav-l { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.it-nav-sep { width: 1px; height: 18px; background: rgba(244,242,236,0.22); }
+.it-nav-section {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+  color: rgba(244,242,236,0.45);
+}
+.it-nav-tabs {
+  display: flex; gap: 2px;
+  background: rgba(244,242,236,0.07);
+  border: 1px solid rgba(244,242,236,0.12);
+  border-radius: 10px; padding: 3px;
+}
+.it-nav-tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  padding: 6px 14px; border-radius: 7px;
+  border: none; background: transparent;
+  color: rgba(244,242,236,0.5);
+  cursor: pointer; transition: background .15s, color .15s;
+  text-decoration: none; display: inline-block;
+}
+.it-nav-tab:hover { color: #F4F2EC; background: rgba(244,242,236,0.1); }
+.it-nav-tab.active { background: #F4F2EC; color: #0A0A0C; }
+.it-nav-r { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.it-nav-tgl {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  color: rgba(244,242,236,0.5); cursor: pointer; user-select: none;
+  transition: color .2s;
+}
+.it-nav-tgl:hover { color: #F4F2EC; }
+.it-tgl-track {
+  width: 36px; height: 20px; border-radius: 999px;
+  background: rgba(244,242,236,0.12);
+  border: 1.5px solid rgba(244,242,236,0.2);
+  position: relative; transition: background .22s, border-color .22s; flex-shrink: 0;
+}
+.it-nav-tgl.is-light .it-tgl-track { background: #6C5CE7; border-color: #6C5CE7; }
+.it-tgl-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #F4F2EC; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+.it-nav-tgl.is-light .it-tgl-thumb { transform: translateX(16px); }
+.it-nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--violet); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px;
+  border: 2px solid rgba(244,242,236,0.2); cursor: pointer;
+}
+.it-status-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  color: #4ADE80;
+}
+.it-status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4ADE80; box-shadow: 0 0 8px #4ADE80;
+  animation: itPulse 1.6s ease-in-out infinite;
+}
+@keyframes itPulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.55; transform:scale(0.85); }
+}
+
+/* ============================================================
+   BOOT / AUTH
+============================================================ */
+.it-loading {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  background: #0A0A0C; z-index: 9999;
+}
+.it-loading-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.it-loading-logo { animation: itPulse 1.6s ease-in-out infinite; }
+.it-loading-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.25em; color: rgba(244,242,236,0.45);
+}
+.it-loading-bar { width: 180px; height: 2px; background: rgba(244,242,236,0.1); border-radius: 1px; overflow: hidden; }
+.it-loading-bar-fill {
+  height: 100%; border-radius: 1px;
+  background: linear-gradient(90deg, #6C5CE7, #8C7DFF);
+  animation: itBar 1.4s ease-in-out infinite;
+}
+@keyframes itBar {
+  0% { width:0%; margin-left:0%; }
+  50% { width:60%; margin-left:20%; }
+  100% { width:0%; margin-left:100%; }
+}
+.it-auth-gate { position: fixed; inset: 0; display: none; place-items: center; background: #0A0A0C; z-index: 9998; }
+.it-auth-gate.show { display: grid; }
+.it-auth-card {
+  background: #14151B; border: 1px solid rgba(244,242,236,0.12);
+  border-radius: 20px; padding: 48px; text-align: center; max-width: 400px; width: 90%;
+}
+.it-auth-card h2 { font-size: 24px; font-weight: 700; color: #F4F2EC; margin: 20px 0 12px; }
+.it-auth-card p { font-size: 14px; color: rgba(244,242,236,0.55); margin: 0 0 28px; line-height: 1.5; }
+.it-auth-btn {
+  display: block; width: 100%; background: #F4F2EC; color: #0A0A0C;
+  border: 0; border-radius: 12px; padding: 14px;
+  font-size: 14px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer; transition: background .15s; text-decoration: none;
+}
+.it-auth-btn:hover { background: #6C5CE7; color: #fff; }
+#it-shell { display: none; }
+#it-shell.show { display: block; }
+
+/* ============================================================
+   LIGHT MODE
+============================================================ */
+body.mkt-light { background: #FAFAF7; color: #0A0A0C; }
+body.mkt-light .it-nav { background: rgba(250,248,242,0.92); border-bottom-color: rgba(13,13,20,0.10); }
+body.mkt-light .it-nav-section { color: rgba(13,13,20,0.45); }
+body.mkt-light .it-nav-tabs { background: rgba(13,13,20,0.06); border-color: rgba(13,13,20,0.12); }
+body.mkt-light .it-nav-tab { color: rgba(13,13,20,0.5); }
+body.mkt-light .it-nav-tab:hover { color: #0D0D14; background: rgba(13,13,20,0.1); }
+body.mkt-light .it-nav-tab.active { background: #0D0D14; color: #F4F2EC; }
+body.mkt-light .it-nav-tgl { color: rgba(13,13,20,0.5); }
+body.mkt-light .it-nav-tgl:hover { color: #0D0D14; }
+body.mkt-light .it-tgl-track { background: rgba(13,13,20,0.1); border-color: rgba(13,13,20,0.2); }
+body.mkt-light .it-nav-tgl.is-light .it-tgl-track { background: #6C5CE7; border-color: #6C5CE7; }
+body.mkt-light .it-tgl-thumb { background: #0D0D14; }
+body.mkt-light .it-nav-tgl.is-light .it-tgl-thumb { background: #fff; }
+body.mkt-light .it-status-badge { color: #16A34A; }
+body.mkt-light .it-status-dot { background: #16A34A; box-shadow: 0 0 8px #16A34A; }
+/* Light patches for compute page */
+body.mkt-light .cp-root { --ink:#FAFAF7; --ink-2:#FFFFFF; --ink-3:#F0EEE6; --bone:#0A0A0C; --bone-2:#1C1C24; --line:rgba(10,10,12,0.10); --line-2:rgba(10,10,12,0.18); --mute:rgba(10,10,12,0.55); --mute-2:rgba(10,10,12,0.35); }
+body.mkt-light .cp-hero { background: linear-gradient(135deg, rgba(108,92,231,0.10), rgba(140,125,255,0.10)) !important; }
+body.mkt-light .cp-card { background: #fff !important; border-color: rgba(10,10,12,0.10) !important; }
+body.mkt-light .cp-table-row:hover { background: rgba(108,92,231,0.06) !important; }
+body.mkt-light .cp-panel { background: #fff !important; border-color: rgba(10,10,12,0.10) !important; }
+body.mkt-light .cp-heatmap-cell { filter: invert(0.92) hue-rotate(180deg); }
+
+/* ============================================================
+   COMPUTE PAGE STYLES
+============================================================ */
+.cp-root {
+  min-height: 100vh;
+  background: var(--ink, #0A0A0C);
+  padding: 0 0 80px;
+}
+
+/* Hero strip */
+.cp-hero {
+  background: linear-gradient(135deg, rgba(108,92,231,0.18), rgba(140,125,255,0.08));
+  border-bottom: 1px solid rgba(108,92,231,0.25);
+  padding: 36px 48px 32px;
+  position: relative; overflow: hidden;
+}
+.cp-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(108,92,231,0.22), transparent 60%);
+  pointer-events: none;
+}
+.cp-hero-top {
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.22em; color: rgba(244,242,236,0.45);
+  margin-bottom: 18px;
+}
+.cp-hero-top span { display: flex; align-items: center; gap: 6px; }
+.cp-hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.28em; color: #8C7DFF;
+  margin-bottom: 10px;
+}
+.cp-hero-h1 {
+  font-size: 46px; font-weight: 700; line-height: 1.05;
+  letter-spacing: -0.03em; margin: 0 0 14px;
+  color: #F4F2EC;
+}
+.cp-hero-h1 span { color: #6C5CE7; }
+.cp-hero-sub {
+  font-size: 15px; color: rgba(244,242,236,0.55); margin: 0 0 28px;
+  max-width: 520px; line-height: 1.6;
+}
+.cp-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.cp-btn-primary {
+  background: #6C5CE7; color: #fff; border: none;
+  padding: 12px 24px; border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+  cursor: pointer; transition: background .18s;
+}
+.cp-btn-primary:hover { background: #8C7DFF; }
+.cp-btn-ghost {
+  background: transparent; color: rgba(244,242,236,0.7);
+  border: 1px solid rgba(244,242,236,0.22);
+  padding: 12px 24px; border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+  cursor: pointer; transition: border-color .18s, color .18s;
+}
+.cp-btn-ghost:hover { border-color: #6C5CE7; color: #8C7DFF; }
+.cp-hero-kpis {
+  display: flex; gap: 32px; margin-top: 32px;
+}
+.cp-hero-kpi { display: flex; flex-direction: column; gap: 4px; }
+.cp-hero-kpi-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.22em; color: rgba(244,242,236,0.4);
+}
+.cp-hero-kpi-v {
+  font-size: 26px; font-weight: 700; color: #F4F2EC; line-height: 1;
+}
+.cp-hero-kpi-v.vio { color: #6C5CE7; }
+.cp-hero-kpi-d {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: #4ADE80;
+}
+
+/* Content grid */
+.cp-body { padding: 32px 48px; display: flex; flex-direction: column; gap: 28px; }
+
+/* Section headers */
+.cp-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cp-section-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.24em; color: rgba(244,242,236,0.4);
+}
+.cp-section-title {
+  font-size: 18px; font-weight: 700; color: #F4F2EC; margin: 4px 0 0;
+}
+.cp-section-cta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+  color: #6C5CE7; background: none; border: none;
+  cursor: pointer; transition: color .15s; text-decoration: none;
+}
+.cp-section-cta:hover { color: #8C7DFF; }
+
+/* Live GPU Spot Pricing Table */
+.cp-table-wrap {
+  background: var(--ink-2, #14151A);
+  border: 1px solid rgba(244,242,236,0.10);
+  border-radius: 16px; overflow: hidden;
+}
+.cp-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 120px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(244,242,236,0.08);
+  background: rgba(108,92,231,0.06);
+}
+.cp-table-col {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.2em;
+  color: rgba(244,242,236,0.35);
+}
+.cp-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 120px;
+  padding: 14px 20px; align-items: center;
+  border-bottom: 1px solid rgba(244,242,236,0.05);
+  transition: background .15s; cursor: pointer;
+}
+.cp-table-row:last-child { border-bottom: none; }
+.cp-table-row:hover { background: rgba(108,92,231,0.08); }
+.cp-table-row.flash-up { background: rgba(74,222,128,0.06) !important; }
+.cp-table-row.flash-down { background: rgba(255,92,92,0.06) !important; }
+.cp-gpu-name { font-weight: 600; font-size: 14px; color: #F4F2EC; }
+.cp-gpu-badge {
+  display: inline-flex; align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 0.16em;
+  background: rgba(108,92,231,0.18); color: #8C7DFF;
+  border-radius: 4px; padding: 2px 6px; margin-left: 8px;
+}
+.cp-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: rgba(244,242,236,0.7);
+}
+.cp-cell.price {
+  font-size: 14px; font-weight: 700; color: #F4F2EC;
+}
+.cp-cell.price.up { color: #4ADE80; }
+.cp-cell.price.down { color: #FF5C5C; }
+.cp-cell .arrow { font-size: 10px; margin-left: 4px; }
+.cp-util-wrap { display: flex; align-items: center; gap: 8px; }
+.cp-util-bar-bg {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: rgba(244,242,236,0.1);
+}
+.cp-util-bar-fill { height: 100%; border-radius: 2px; background: #6C5CE7; }
+.cp-cell.util-pct {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: rgba(244,242,236,0.6); min-width: 36px;
+}
+.cp-rent-btn {
+  background: rgba(108,92,231,0.15); color: #8C7DFF;
+  border: 1px solid rgba(108,92,231,0.35); border-radius: 8px;
+  padding: 7px 14px; font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  cursor: pointer; transition: background .18s, border-color .18s;
+}
+.cp-rent-btn:hover { background: #6C5CE7; color: #fff; border-color: #6C5CE7; }
+
+/* Two-column panels */
+.cp-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.cp-three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.cp-panel {
+  background: var(--ink-2, #14151A);
+  border: 1px solid rgba(244,242,236,0.10);
+  border-radius: 16px; padding: 24px;
+}
+
+/* Cluster Builder */
+.cp-cluster-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.2em; color: rgba(244,242,236,0.4);
+  margin-bottom: 6px; display: block;
+}
+.cp-cluster-select {
+  width: 100%; background: rgba(244,242,236,0.05);
+  border: 1px solid rgba(244,242,236,0.14);
+  border-radius: 8px; padding: 10px 14px;
+  color: #F4F2EC; font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; outline: none; margin-bottom: 14px;
+  cursor: pointer;
+}
+.cp-cluster-select:focus { border-color: #6C5CE7; }
+.cp-cluster-nodes {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.cp-node-btn {
+  width: 40px; height: 40px; border-radius: 8px;
+  background: rgba(244,242,236,0.06); border: 1.5px solid rgba(244,242,236,0.14);
+  color: rgba(244,242,236,0.6); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: background .15s, border-color .15s;
+  display: grid; place-items: center;
+}
+.cp-node-btn.active { background: rgba(108,92,231,0.25); border-color: #6C5CE7; color: #8C7DFF; }
+.cp-cluster-cost {
+  border-top: 1px solid rgba(244,242,236,0.08); padding-top: 14px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.cp-cluster-cost-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; color: rgba(244,242,236,0.4);
+}
+.cp-cluster-cost-val {
+  font-size: 22px; font-weight: 700; color: #6C5CE7;
+}
+
+/* Heatmap */
+.cp-heatmap {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px;
+  margin-top: 12px;
+}
+.cp-heatmap-cell {
+  aspect-ratio: 1; border-radius: 4px;
+  transition: opacity .2s;
+}
+.cp-heatmap-legend {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px; font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.14em; color: rgba(244,242,236,0.35);
+}
+
+/* Active Rentals */
+.cp-rental {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid rgba(244,242,236,0.06);
+}
+.cp-rental:last-child { border-bottom: none; }
+.cp-rental-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(108,92,231,0.2); border: 1px solid rgba(108,92,231,0.35);
+  display: grid; place-items: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8C7DFF;
+}
+.cp-rental-body { flex: 1; }
+.cp-rental-name { font-size: 13px; font-weight: 600; color: #F4F2EC; }
+.cp-rental-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: rgba(244,242,236,0.45); margin-top: 2px;
+}
+.cp-rental-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+  padding: 4px 8px; border-radius: 6px;
+}
+.cp-rental-status.running {
+  background: rgba(74,222,128,0.12); color: #4ADE80;
+  border: 1px solid rgba(74,222,128,0.25);
+}
+.cp-rental-status.queued {
+  background: rgba(255,216,77,0.12); color: #FFD84D;
+  border: 1px solid rgba(255,216,77,0.25);
+}
+.cp-rental-earn {
+  font-size: 16px; font-weight: 700; color: #6C5CE7;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Provider Leaderboard */
+.cp-provider {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid rgba(244,242,236,0.06);
+}
+.cp-provider:last-child { border-bottom: none; }
+.cp-provider-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 700; color: rgba(244,242,236,0.15);
+  width: 28px; flex-shrink: 0; text-align: right;
+}
+.cp-provider-avatar {
+  width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px; color: #0A0A0C;
+}
+.cp-provider-body { flex: 1; }
+.cp-provider-name { font-size: 13px; font-weight: 600; color: #F4F2EC; }
+.cp-provider-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: rgba(244,242,236,0.4); margin-top: 2px;
+}
+.cp-provider-score {
+  font-size: 15px; font-weight: 700; color: #F4F2EC;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sparkline SVG */
+.cp-spark-wrap { margin-top: 8px; }
+
+/* Quick actions */
+.cp-quick {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.cp-quick-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+  padding: 10px 18px; border-radius: 8px;
+  cursor: pointer; transition: all .18s;
+}
+.cp-q-violet {
+  background: rgba(108,92,231,0.18); color: #8C7DFF;
+  border: 1px solid rgba(108,92,231,0.35);
+}
+.cp-q-violet:hover { background: #6C5CE7; color: #fff; border-color: #6C5CE7; }
+.cp-q-ghost {
+  background: transparent; color: rgba(244,242,236,0.55);
+  border: 1px solid rgba(244,242,236,0.14);
+}
+.cp-q-ghost:hover { border-color: rgba(244,242,236,0.4); color: #F4F2EC; }
+
+/* Live badge */
+.cp-live {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+  color: #4ADE80;
+}
+.cp-pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4ADE80; box-shadow: 0 0 8px #4ADE80;
+  animation: itPulse 1.6s ease-in-out infinite;
+}
+
+/* Ticker bar */
+.cp-ticker-wrap {
+  overflow: hidden; border-bottom: 1px solid rgba(244,242,236,0.06);
+  height: 36px; display: flex; align-items: center;
+  background: rgba(108,92,231,0.05);
+}
+.cp-ticker-track {
+  display: flex; gap: 0; white-space: nowrap;
+  animation: cpTick 38s linear infinite;
+}
+@keyframes cpTick { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.cp-ticker-item {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 0 28px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  border-right: 1px solid rgba(244,242,236,0.08); height: 36px;
+}
+.cp-ticker-model { color: rgba(244,242,236,0.6); }
+.cp-ticker-price { font-weight: 700; color: #F4F2EC; }
+.cp-ticker-delta.up { color: #4ADE80; }
+.cp-ticker-delta.dn { color: #FF5C5C; }
+</style>
+</head>
+<body>
+
+<!-- Boot splash -->
+<div id="it-loading" class="it-loading">
+  <div class="it-loading-inner">
+    <svg class="it-loading-logo" width="56" height="56" viewBox="0 0 44 44" fill="none">
+      <defs>
+        <linearGradient id="lpC" x1="2" y1="2" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#6C5CE7"/>
+          <stop offset="50%" stop-color="#8C7DFF"/>
+          <stop offset="100%" stop-color="#4A7BFF"/>
+        </linearGradient>
+      </defs>
+      <polygon points="22,2 38,11 38,31 22,41 6,31 6,11" fill="url(#lpC)" opacity="0.95"/>
+      <line x1="11" y1="17" x2="33" y2="17" stroke="#8C7DFF" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="22" y1="11" x2="22" y2="31" stroke="#6C5CE7" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="11" y1="27" x2="33" y2="27" stroke="#4A7BFF" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="22" cy="22" r="3.5" fill="#C4BEFF"/>
+    </svg>
+    <div class="it-loading-text">BOOTING COMPUTE TERMINAL…</div>
+    <div class="it-loading-bar"><div class="it-loading-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- Auth gate -->
+<div id="it-auth-gate" class="it-auth-gate">
+  <div class="it-auth-card">
+    <svg width="56" height="56" viewBox="0 0 44 44" fill="none">
+      <defs><linearGradient id="agC" x1="2" y1="2" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#6C5CE7"/><stop offset="100%" stop-color="#8C7DFF"/>
+      </linearGradient></defs>
+      <polygon points="22,2 38,11 38,31 22,41 6,31 6,11" fill="url(#agC)" opacity="0.9"/>
+    </svg>
+    <h2>Sign in to continue</h2>
+    <p>Itara Compute Terminal requires an Itara account. Sign in to access live GPU pricing and cluster management.</p>
+    <a href="index.html" class="it-auth-btn">← Back to Itara</a>
+  </div>
+</div>
+
+<!-- Shell -->
+<div id="it-shell">
+  <!-- Itara Top Nav -->
+  <nav class="it-nav" id="it-nav">
+    <div class="it-nav-l">
+      <div id="it-wordmark"></div>
+      <span class="it-nav-sep"></span>
+      <span class="it-nav-section">COMPUTE TERMINAL</span>
+    </div>
+    <div class="it-nav-tabs">
+      <a href="dashboard.html" class="it-nav-tab">MISSION</a>
+      <a href="compute.html" class="it-nav-tab active">COMPUTE</a>
+      <a href="market.html" class="it-nav-tab">EXCHANGE</a>
+      <a href="neuralwork.html" class="it-nav-tab">NEURALWORK</a>
+      <a href="axis.html" class="it-nav-tab">AXIS</a>
+      <a href="#" class="it-nav-tab">WALLET</a>
+    </div>
+    <div class="it-nav-r">
+      <div class="it-status-badge">
+        <span class="it-status-dot"></span>
+        COMPUTE LIVE
+      </div>
+      <div class="it-nav-tgl" id="it-theme-tgl" title="Toggle theme">
+        <div class="it-tgl-track"><div class="it-tgl-thumb"></div></div>
+        <span id="it-tgl-label">DARK</span>
+      </div>
+      <div class="it-nav-avatar" id="it-avatar">A</div>
+    </div>
+  </nav>
+
+  <!-- React mounts here -->
+  <div id="root"></div>
+</div>
+
+<!-- Libraries -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+  integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+  integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+  integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="data.js"></script>
+<script type="text/babel" src="shared.jsx"></script>
+
+<script type="text/babel">
+const SUPABASE_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const THEME_KEY = 'itara_mkt_theme';
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ── GPU data ── */
+const GPU_DATA = [
+  { model: 'H100 SXM5 80GB', provider: 'CoreWeave',  region: 'US-EAST', mem: '80GB', vram: 'SXM5', util: 94, price: 3.29, avail: 12 },
+  { model: 'H100 PCIe 80GB', provider: 'Lambda Labs', region: 'US-WEST', mem: '80GB', vram: 'PCIe', util: 81, price: 2.49, avail: 28 },
+  { model: 'A100 SXM4 80GB', provider: 'Vast.ai',    region: 'EU-WEST', mem: '80GB', vram: 'SXM4', util: 76, price: 1.89, avail: 44 },
+  { model: 'A100 PCIe 40GB', provider: 'RunPod',     region: 'US-CENT', mem: '40GB', vram: 'PCIe', util: 62, price: 1.29, avail: 87 },
+  { model: 'RTX 4090 24GB',  provider: 'Vast.ai',    region: 'APAC',    mem: '24GB', vram: 'PCIe', util: 55, price: 0.74, avail: 203 },
+  { model: 'A10G 24GB',      provider: 'AWS',         region: 'US-EAST', mem: '24GB', vram: 'PCIe', util: 48, price: 0.69, avail: 512 },
+  { model: 'L40S 48GB',      provider: 'CoreWeave',  region: 'US-WEST', mem: '48GB', vram: 'PCIe', util: 71, price: 1.44, avail: 64 },
+  { model: 'RTX 3090 24GB',  provider: 'Vast.ai',    region: 'EU-CENT', mem: '24GB', vram: 'PCIe', util: 39, price: 0.39, avail: 440 },
+];
+
+const PROVIDERS = [
+  { name: 'CoreWeave',   tag: 'CW', color: '#6C5CE7', uptime: 99.97, gpus: 4800,  score: 9.8 },
+  { name: 'Lambda Labs', tag: 'LL', color: '#FF6AC7', uptime: 99.94, gpus: 3100,  score: 9.6 },
+  { name: 'RunPod',      tag: 'RP', color: '#4ADE80', uptime: 99.91, gpus: 7200,  score: 9.3 },
+  { name: 'Vast.ai',     tag: 'VA', color: '#FFD84D', uptime: 99.88, gpus: 12400, score: 9.1 },
+  { name: 'AWS',         tag: 'AW', color: '#4A7BFF', uptime: 99.99, gpus: 28000, score: 9.0 },
+];
+
+const RENTALS = [
+  { id: 'R-001', model: 'H100 SXM5 80GB', nodes: 4, status: 'running', elapsed: '14h 22m', earn: 188.78, task: 'LLM Fine-tune — Orion-7B' },
+  { id: 'R-002', model: 'A100 PCIe 40GB', nodes: 2, status: 'running', elapsed: '6h 07m',  earn: 31.55, task: 'Stable Diffusion XL batch' },
+  { id: 'R-003', model: 'RTX 4090 24GB',  nodes: 1, status: 'queued',  elapsed: '—',       earn: 0,     task: 'VoxSuno inference test' },
+];
+
+/* ── Live price simulation ── */
+function useLiveGPUs() {
+  const [rows, setRows] = useState(() => GPU_DATA.map(g => ({ ...g, livePrice: g.price, flash: null })));
+  useEffect(() => {
+    const t = setInterval(() => {
+      setRows(prev => prev.map(r => {
+        if (Math.random() > 0.4) return { ...r, flash: null };
+        const d = (Math.random() - 0.48) * 0.04;
+        const p = Math.max(0.1, +(r.livePrice + d).toFixed(2));
+        return { ...r, livePrice: p, flash: d > 0 ? 'up' : 'down' };
+      }));
+    }, 1800);
+    return () => clearInterval(t);
+  }, []);
+  return rows;
+}
+
+/* ── Sparkline ── */
+function Spark({ data, color = '#6C5CE7', h = 40 }) {
+  const max = Math.max(...data), min = Math.min(...data);
+  const w = 200;
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((v - min) / ((max - min) || 1)) * (h - 6) - 3;
+    return `${x},${y}`;
+  }).join(' ');
+  const area = `M 0,${h} L ${pts.split(' ').join(' L ')} L ${w},${h} Z`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none">
+      <defs>
+        <linearGradient id={`sg-${color.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={color} stopOpacity="0.35"/>
+          <stop offset="1" stopColor={color} stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#sg-${color.replace('#','')})`}/>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+/* ── AnimatedNum ── */
+function AnimNum({ value, fmt = n => n.toFixed(2) }) {
+  const [v, setV] = useState(0);
+  const ref = useRef(false);
+  useEffect(() => {
+    if (ref.current) { setV(value); return; }
+    ref.current = true;
+    const s = performance.now();
+    const tick = t => {
+      const prog = Math.min(1, (t - s) / 1200);
+      const e = 1 - Math.pow(1 - prog, 3);
+      setV(value * e);
+      if (prog < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [value]);
+  return <>{fmt(v)}</>;
+}
+
+/* ── Heatmap data ── */
+const HEATMAP = Array.from({ length: 48 }, (_, i) => {
+  const h = i % 24;
+  const base = h >= 8 && h <= 22 ? 0.55 : 0.22;
+  return Math.min(1, base + Math.random() * 0.45);
+});
+function heatColor(v) {
+  const r = Math.round(108 + (255 - 108) * (1 - v));
+  const g = Math.round(92 + (80 - 92) * v);
+  const b = Math.round(231 + (30 - 231) * v);
+  return `rgb(${r},${g},${b})`;
+}
+
+/* ── Cluster wizard state ── */
+const GPU_OPTIONS = ['H100 SXM5', 'H100 PCIe', 'A100 SXM4', 'A100 PCIe', 'L40S'];
+const DURATION_OPTIONS = ['1H', '6H', '12H', '24H', '7D', '30D'];
+const NODE_COUNTS = [1, 2, 4, 8, 16, 32];
+const GPU_PRICES = { 'H100 SXM5': 3.29, 'H100 PCIe': 2.49, 'A100 SXM4': 1.89, 'A100 PCIe': 1.29, 'L40S': 1.44 };
+const DURATION_HOURS = { '1H': 1, '6H': 6, '12H': 12, '24H': 24, '7D': 168, '30D': 720 };
+
+/* ── Ticker data ── */
+const TICKER_ITEMS = GPU_DATA.flatMap(g => [
+  { model: g.model, price: g.price, delta: (Math.random() > 0.5 ? '+' : '-') + (Math.random() * 4).toFixed(1) + '%', dir: Math.random() > 0.5 ? 'up' : 'dn' }
+]);
+
+/* ── Main page component ── */
+function ComputePage({ user }) {
+  const rows = useLiveGPUs();
+  const [gpu, setGpu] = useState('H100 SXM5');
+  const [duration, setDuration] = useState('6H');
+  const [nodes, setNodes] = useState(4);
+
+  const totalCost = (GPU_PRICES[gpu] || 3.29) * nodes * (DURATION_HOURS[duration] || 6);
+  const sparkData = Array.from({ length: 24 }, (_, i) => 3.1 + Math.sin(i * 0.5) * 0.4 + Math.random() * 0.2);
+
+  return (
+    <div className="cp-root">
+      {/* ── Ticker bar ── */}
+      <div className="cp-ticker-wrap">
+        <div className="cp-ticker-track">
+          {[...TICKER_ITEMS, ...TICKER_ITEMS].map((t, i) => (
+            <span key={i} className="cp-ticker-item">
+              <span className="cp-ticker-model">{t.model}</span>
+              <span className="cp-ticker-price">${t.price.toFixed(2)}/hr</span>
+              <span className={`cp-ticker-delta ${t.dir}`}>{t.delta}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Hero ── */}
+      <div className="cp-hero">
+        <div className="cp-hero-eyebrow">▣ COMPUTE TERMINAL · GPU MARKETPLACE</div>
+        <h1 className="cp-hero-h1">Rent the world's<br/><span>fastest GPUs.</span></h1>
+        <p className="cp-hero-sub">Spot pricing, bare-metal performance. Spin up an H100 cluster in under 60 seconds. Pay by the hour, cancel anytime.</p>
+        <div className="cp-hero-actions">
+          <button className="cp-btn-primary">+ RENT A GPU NOW</button>
+          <button className="cp-btn-ghost">LIST MY HARDWARE →</button>
+        </div>
+        <div className="cp-hero-kpis">
+          <div className="cp-hero-kpi">
+            <span className="cp-hero-kpi-k">LIVE GPU LISTINGS</span>
+            <span className="cp-hero-kpi-v vio"><AnimNum value={1349} fmt={n => Math.round(n).toLocaleString()} /></span>
+            <span className="cp-hero-kpi-d">▲ 12.4% vs 7d</span>
+          </div>
+          <div className="cp-hero-kpi">
+            <span className="cp-hero-kpi-k">SPOT PRICE · H100</span>
+            <span className="cp-hero-kpi-v">$3.29<small style={{fontSize:'14px',opacity:0.6}}>/hr</small></span>
+            <span className="cp-hero-kpi-d">▼ 2.1% vs yesterday</span>
+          </div>
+          <div className="cp-hero-kpi">
+            <span className="cp-hero-kpi-k">CLUSTERS RUNNING</span>
+            <span className="cp-hero-kpi-v"><AnimNum value={284} fmt={n => Math.round(n)} /></span>
+            <span className="cp-hero-kpi-d">▲ 8 added today</span>
+          </div>
+          <div className="cp-hero-kpi">
+            <span className="cp-hero-kpi-k">YOUR EARNINGS</span>
+            <span className="cp-hero-kpi-v vio">$<AnimNum value={1840} fmt={n => Math.round(n).toLocaleString()} /></span>
+            <span className="cp-hero-kpi-d">▲ 34% vs prior 30d</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="cp-body">
+        {/* ── Live GPU Spot Pricing ── */}
+        <div>
+          <div className="cp-section-head">
+            <div>
+              <div className="cp-section-k">§ 01 · SPOT MARKET</div>
+              <div className="cp-section-title">Live GPU pricing.</div>
+            </div>
+            <span className="cp-live"><span className="cp-pulse"></span>LIVE</span>
+          </div>
+          <div className="cp-table-wrap">
+            <div className="cp-table-header">
+              <span className="cp-table-col">MODEL</span>
+              <span className="cp-table-col">PROVIDER</span>
+              <span className="cp-table-col">REGION</span>
+              <span className="cp-table-col">UTILISATION</span>
+              <span className="cp-table-col">AVAIL</span>
+              <span className="cp-table-col">$/HR</span>
+              <span className="cp-table-col"></span>
+            </div>
+            {rows.map((r, i) => (
+              <div key={i} className={`cp-table-row${r.flash ? ' flash-' + r.flash : ''}`}>
+                <span>
+                  <span className="cp-gpu-name">{r.model}</span>
+                  <span className="cp-gpu-badge">{r.vram}</span>
+                </span>
+                <span className="cp-cell">{r.provider}</span>
+                <span className="cp-cell">{r.region}</span>
+                <div className="cp-util-wrap">
+                  <div className="cp-util-bar-bg">
+                    <div className="cp-util-bar-fill" style={{ width: `${r.util}%` }}></div>
+                  </div>
+                  <span className="cp-cell util-pct">{r.util}%</span>
+                </div>
+                <span className="cp-cell">{r.avail}</span>
+                <span className={`cp-cell price${r.flash ? ' ' + r.flash : ''}`}>
+                  ${r.livePrice.toFixed(2)}
+                  {r.flash === 'up' && <span className="arrow" style={{color:'#4ADE80'}}>▲</span>}
+                  {r.flash === 'down' && <span className="arrow" style={{color:'#FF5C5C'}}>▼</span>}
+                </span>
+                <button className="cp-rent-btn">RENT →</button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Two columns: Cluster Builder + Heatmap ── */}
+        <div className="cp-two">
+          {/* Cluster Builder */}
+          <div className="cp-panel">
+            <div className="cp-section-head" style={{marginBottom: '20px'}}>
+              <div>
+                <div className="cp-section-k">§ 02 · CLUSTER BUILDER</div>
+                <div className="cp-section-title">Configure your cluster.</div>
+              </div>
+            </div>
+            <label className="cp-cluster-label">GPU TYPE</label>
+            <select className="cp-cluster-select" value={gpu} onChange={e => setGpu(e.target.value)}>
+              {GPU_OPTIONS.map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <label className="cp-cluster-label">DURATION</label>
+            <div className="cp-cluster-nodes" style={{marginBottom:'14px'}}>
+              {DURATION_OPTIONS.map(d => (
+                <button key={d} className={`cp-node-btn${duration === d ? ' active' : ''}`}
+                  style={{width:'auto', padding:'0 12px', fontSize:'11px'}}
+                  onClick={() => setDuration(d)}>{d}</button>
+              ))}
+            </div>
+            <label className="cp-cluster-label">NODES</label>
+            <div className="cp-cluster-nodes">
+              {NODE_COUNTS.map(n => (
+                <button key={n} className={`cp-node-btn${nodes === n ? ' active' : ''}`}
+                  onClick={() => setNodes(n)}>{n}</button>
+              ))}
+            </div>
+            <div className="cp-cluster-cost">
+              <div>
+                <div className="cp-cluster-cost-label">ESTIMATED COST</div>
+                <div className="cp-cluster-cost-val">${totalCost.toFixed(2)}</div>
+              </div>
+              <button className="cp-btn-primary" style={{padding:'10px 20px'}}>DEPLOY →</button>
+            </div>
+            <div style={{marginTop:'12px'}}>
+              <Spark data={sparkData} color="#6C5CE7" h={48} />
+              <div style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'9px', color:'rgba(244,242,236,0.3)', letterSpacing:'0.14em', marginTop:'4px'}}>H100 SPOT PRICE · 24H</div>
+            </div>
+          </div>
+
+          {/* Utilisation Heatmap */}
+          <div className="cp-panel">
+            <div className="cp-section-head" style={{marginBottom: '16px'}}>
+              <div>
+                <div className="cp-section-k">§ 03 · UTILISATION HEATMAP</div>
+                <div className="cp-section-title">Demand by hour · 2 days.</div>
+              </div>
+            </div>
+            <div className="cp-heatmap">
+              {HEATMAP.map((v, i) => (
+                <div key={i} className="cp-heatmap-cell"
+                  style={{ background: heatColor(v), opacity: 0.82 }}
+                  title={`${Math.round(v * 100)}% utilised`}
+                ></div>
+              ))}
+            </div>
+            <div className="cp-heatmap-legend">
+              <span>MON 00:00</span><span>LOW</span><span style={{color:'#6C5CE7'}}>■■■■■</span><span>HIGH</span><span>TUE 23:59</span>
+            </div>
+            <div style={{marginTop:'20px'}}>
+              <div className="cp-section-k" style={{marginBottom:'10px'}}>PEAK DEMAND WINDOWS</div>
+              {[
+                { label: 'Mon–Fri 09–18 UTC', bar: 92 },
+                { label: 'Sat–Sun 14–22 UTC', bar: 67 },
+                { label: 'Overnight 00–07 UTC', bar: 31 },
+              ].map((p, i) => (
+                <div key={i} style={{marginBottom:'10px'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:'4px'}}>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'10px', color:'rgba(244,242,236,0.55)'}}>{p.label}</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace", fontSize:'10px', color:'#8C7DFF'}}>{p.bar}%</span>
+                  </div>
+                  <div className="cp-util-bar-bg" style={{height:'6px',borderRadius:'3px'}}>
+                    <div className="cp-util-bar-fill" style={{width:`${p.bar}%`,height:'100%',borderRadius:'3px'}}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Two columns: Active Rentals + Provider Leaderboard ── */}
+        <div className="cp-two">
+          {/* Active Rentals */}
+          <div className="cp-panel">
+            <div className="cp-section-head" style={{marginBottom:'4px'}}>
+              <div>
+                <div className="cp-section-k">§ 04 · ACTIVE RENTALS</div>
+                <div className="cp-section-title">Your running jobs.</div>
+              </div>
+              <span className="cp-live"><span className="cp-pulse"></span>LIVE</span>
+            </div>
+            {RENTALS.map(r => (
+              <div key={r.id} className="cp-rental">
+                <div className="cp-rental-icon">▣</div>
+                <div className="cp-rental-body">
+                  <div className="cp-rental-name">{r.model} ×{r.nodes}</div>
+                  <div className="cp-rental-sub">{r.task} · {r.elapsed}</div>
+                </div>
+                <span className={`cp-rental-status ${r.status}`}>{r.status.toUpperCase()}</span>
+                {r.status === 'running' && (
+                  <span className="cp-rental-earn">${r.earn.toFixed(2)}</span>
+                )}
+              </div>
+            ))}
+            <div style={{marginTop:'16px', display:'flex', gap:'10px'}}>
+              <button className="cp-btn-primary" style={{flex:1, padding:'10px'}}>+ NEW RENTAL</button>
+              <button className="cp-btn-ghost" style={{flex:1, padding:'10px'}}>VIEW ALL →</button>
+            </div>
+          </div>
+
+          {/* Provider Leaderboard */}
+          <div className="cp-panel">
+            <div className="cp-section-head" style={{marginBottom:'4px'}}>
+              <div>
+                <div className="cp-section-k">§ 05 · PROVIDER RANK</div>
+                <div className="cp-section-title">Top compute providers.</div>
+              </div>
+            </div>
+            {PROVIDERS.map((p, i) => (
+              <div key={p.name} className="cp-provider">
+                <span className="cp-provider-rank">0{i+1}</span>
+                <div className="cp-provider-avatar" style={{ background: p.color }}>
+                  {p.tag}
+                </div>
+                <div className="cp-provider-body">
+                  <div className="cp-provider-name">{p.name}</div>
+                  <div className="cp-provider-sub">{p.gpus.toLocaleString()} GPUs · {p.uptime}% uptime</div>
+                </div>
+                <span className="cp-provider-score">{p.score}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Quick actions ── */}
+        <div>
+          <div className="cp-section-k" style={{marginBottom:'12px'}}>§ QUICK ACTIONS</div>
+          <div className="cp-quick">
+            {[
+              ['+ LIST A GPU', 'violet'], ['+ LIST A CLUSTER', 'violet'],
+              ['RENT H100 →', 'ghost'], ['COMPARE PROVIDERS →', 'ghost'],
+              ['VIEW MY EARNINGS →', 'ghost'],
+            ].map(([t, c]) => (
+              <button key={t} className={`cp-quick-btn cp-q-${c}`}>{t}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Theme toggle ── */
+function initTheme() {
+  const tgl = document.getElementById('it-theme-tgl');
+  const lbl = document.getElementById('it-tgl-label');
+  let isLight = localStorage.getItem(THEME_KEY) === 'light';
+  function apply() {
+    document.body.classList.toggle('mkt-light', isLight);
+    tgl.classList.toggle('is-light', isLight);
+    lbl.textContent = isLight ? 'LIGHT' : 'DARK';
+    localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+  }
+  apply();
+  tgl.onclick = () => { isLight = !isLight; apply(); };
+}
+
+function mountWordmark() {
+  const el = document.getElementById('it-wordmark');
+  if (!el || !window.Wordmark) return;
+  ReactDOM.createRoot(el).render(React.createElement(window.Wordmark, { size: 20 }));
+}
+
+function mountPage(user) {
+  const av = document.getElementById('it-avatar');
+  if (av && user) {
+    const name = user.user_metadata?.full_name || user.email || 'U';
+    av.textContent = name[0].toUpperCase();
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    React.createElement(ComputePage, { user })
+  );
+}
+
+async function boot() {
+  if (!window.Wordmark) return setTimeout(boot, 80);
+  const { data: { session } } = await sb.auth.getSession();
+  document.getElementById('it-loading').style.display = 'none';
+  if (!session) { document.getElementById('it-auth-gate').classList.add('show'); return; }
+  document.getElementById('it-shell').classList.add('show');
+  initTheme();
+  mountWordmark();
+  mountPage(session.user);
+}
+setTimeout(boot, 300);
+</script>
+</body>
+</html>

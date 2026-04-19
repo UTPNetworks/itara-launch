@@ -441,10 +441,10 @@ const D = (() => {
           <div className="dB-nav-l"><Wordmark size={20} /><span className="dB-sep" />MISSION CONTROL</div>
           <div className="dB-nav-m">
             <a>MISSION</a>
-            <a>COMPUTE</a>
+            <a href="compute.html" style={{cursor:'pointer'}}>COMPUTE</a>
             <a href="market.html" style={{cursor:'pointer'}}>EXCHANGE</a>
-            <a>NEURALWORK</a>
-            <a>AXIS</a>
+            <a href="neuralwork.html" style={{cursor:'pointer'}}>NEURALWORK</a>
+            <a href="axis.html" style={{cursor:'pointer'}}>AXIS</a>
             <a>WALLET</a>
           </div>
           <div className="dB-nav-r">
@@ -491,10 +491,10 @@ const D = (() => {
         {/* Four pillar modules — the four rails as interactive tiles */}
         <section className="dB-rails">
           {[
-            { k: '01', lab: 'COMPUTE', title: 'GPU', stat: '2 listed · 1 renting', hot: '$1,840 earned', cls: 'violet', cta: 'Manage fleet →' },
+            { k: '01', lab: 'COMPUTE', title: 'GPU', stat: '2 listed · 1 renting', hot: '$1,840 earned', cls: 'violet', cta: 'Manage fleet →', href: 'compute.html' },
             { k: '02', lab: 'EXCHANGE', title: 'MARKET', stat: '2 models live · 3,564 sold', hot: '$3,564 earned', cls: 'pink', cta: 'Open shop →', href: 'market.html' },
-            { k: '03', lab: 'NEURALWORK', title: 'TALENT', stat: '2 tasks · 14 bids in', hot: '$1,555 awarded', cls: 'blue', cta: 'Review bids →' },
-            { k: '04', lab: 'AXIS', title: 'INTEL', stat: '6 alerts saved', hot: 'H100 ▲ 4.2%', cls: 'yellow', cta: 'Open Axis →' },
+            { k: '03', lab: 'NEURALWORK', title: 'TALENT', stat: '2 tasks · 14 bids in', hot: '$1,555 awarded', cls: 'blue', cta: 'Review bids →', href: 'neuralwork.html' },
+            { k: '04', lab: 'AXIS', title: 'INTEL', stat: '6 alerts saved', hot: 'H100 ▲ 4.2%', cls: 'yellow', cta: 'Open Axis →', href: 'axis.html' },
           ].map(r => (
             <div
               key={r.k}
