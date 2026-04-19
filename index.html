@@ -533,6 +533,78 @@ window.Wordmark = function({ size = 22 }) {
 const V3 = (() => {
   const { useState, useEffect, useMemo } = React;
 
+  // Hero-size logo — large Crystal Node mark + wordmark, theme-aware
+  function HeroLogo() {
+    const [dark, setDark] = useState(() => window.__itaraTheme.dark);
+    useEffect(() => {
+      const cb = d => setDark(d);
+      window.__itaraTheme.listeners.push(cb);
+      return () => { window.__itaraTheme.listeners = window.__itaraTheme.listeners.filter(f => f !== cb); };
+    }, []);
+    const textFill = dark ? '#FFFFFF' : '#0D0D14';
+    const tagFill  = dark ? 'rgba(167,163,255,0.7)' : 'rgba(79,70,229,0.6)';
+    const pfx = dark ? 'hlt' : 'llt';
+    return (
+      <svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Itara">
+        <defs>
+          <linearGradient id={`${pfx}-prism`} x1="2" y1="2" x2="43" y2="43" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#7C3AED"/>
+            <stop offset="45%" stopColor="#4F46E5"/>
+            <stop offset="100%" stopColor="#06B6D4"/>
+          </linearGradient>
+          <linearGradient id={`${pfx}-h1`} x1="11" y1="17" x2="33" y2="17" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#06B6D4"/><stop offset="1" stopColor="#4F46E5"/>
+          </linearGradient>
+          <linearGradient id={`${pfx}-vt`} x1="22" y1="11" x2="22" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#4F46E5"/><stop offset=".5" stopColor="#EC4899"/><stop offset="1" stopColor="#4F46E5"/>
+          </linearGradient>
+          <linearGradient id={`${pfx}-h2`} x1="11" y1="29" x2="33" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#4F46E5"/><stop offset="1" stopColor="#06B6D4"/>
+          </linearGradient>
+          <radialGradient id={`${pfx}-cn`} cx="42%" cy="36%" r="60%">
+            <stop stopColor="#F9A8D4"/><stop offset=".6" stopColor="#EC4899"/><stop offset="1" stopColor="#7C3AED"/>
+          </radialGradient>
+          <linearGradient id={`${pfx}-tf`} x1="13" y1="2" x2="31" y2="15" gradientUnits="userSpaceOnUse">
+            <stop stopColor="rgba(255,255,255,0.3)"/><stop offset="1" stopColor="rgba(255,255,255,0)"/>
+          </linearGradient>
+          <filter id={`${pfx}-glow`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id={`${pfx}-clip`}>
+            <polygon points="22,2 38,11 38,31 22,41 6,31 6,11"/>
+          </clipPath>
+        </defs>
+        {/* Crystal Node mark */}
+        <g transform="translate(6,8)">
+          <polygon points="22,2 38,11 38,31 22,41 6,31 6,11" fill={`url(#${pfx}-prism)`} opacity="0.93" filter={`url(#${pfx}-glow)`}/>
+          <polygon points="22,2 38,11 22,21 6,11" fill={`url(#${pfx}-tf)`}/>
+          <polygon points="38,11 38,31 22,41 22,21" fill="rgba(0,0,0,0.14)"/>
+          <line x1="22" y1="2" x2="38" y2="11" stroke="rgba(236,72,153,0.5)" strokeWidth="0.9" strokeLinecap="round"/>
+          <line x1="22" y1="2" x2="6"  y2="11" stroke="rgba(255,255,255,0.13)" strokeWidth="0.6" strokeLinecap="round"/>
+          <g clipPath={`url(#${pfx}-clip)`}>
+            <line x1="11" y1="17" x2="33" y2="17" stroke={`url(#${pfx}-h1)`} strokeWidth="1.3" strokeLinecap="round" opacity="0.95"/>
+            <line x1="22" y1="17" x2="22" y2="29" stroke={`url(#${pfx}-vt)`} strokeWidth="1.3" strokeLinecap="round" opacity="0.95"/>
+            <line x1="11" y1="29" x2="33" y2="29" stroke={`url(#${pfx}-h2)`} strokeWidth="1.3" strokeLinecap="round" opacity="0.95"/>
+            <circle cx="11" cy="17" r="2.4" fill="rgba(6,182,212,0.28)"/>
+            <circle cx="11" cy="17" r="1.5" fill="#06B6D4"/>
+            <circle cx="33" cy="17" r="2.4" fill="rgba(79,70,229,0.28)"/>
+            <circle cx="33" cy="17" r="1.5" fill="#4F46E5"/>
+            <circle cx="11" cy="29" r="2.4" fill="rgba(79,70,229,0.28)"/>
+            <circle cx="11" cy="29" r="1.5" fill="#4F46E5"/>
+            <circle cx="33" cy="29" r="2.4" fill="rgba(6,182,212,0.28)"/>
+            <circle cx="33" cy="29" r="1.5" fill="#06B6D4"/>
+            <circle cx="22" cy="23" r="8" fill="rgba(236,72,153,0.1)"/>
+            <circle cx="22" cy="23" r="3.8" fill={`url(#${pfx}-cn)`}/>
+          </g>
+        </g>
+        {/* Wordmark */}
+        <text x="64" y="34" fontFamily="Cabinet Grotesk, system-ui, sans-serif" fontWeight="900" fontSize="30" letterSpacing="-1" fill={textFill}>itara</text>
+        <text x="65" y="48" fontFamily="JetBrains Mono, monospace" fontSize="7" fontWeight="600" letterSpacing="3" fill={tagFill}>AI MARKETPLACE</text>
+      </svg>
+    );
+  }
+
   function Nav() {
     const [dark, setDark] = useState(() => window.__itaraTheme.dark);
     useEffect(() => {
@@ -601,15 +673,22 @@ const V3 = (() => {
     return (
       <section className="v3-hero">
         <div className="v3-hero-inner">
+          {/* Task 4: Logo above badge */}
+          <div className="v3-hero-logo">
+            <HeroLogo />
+          </div>
           <div className="v3-badge">
             <span className="v3-pulse" /> THE WORLD'S FIRST ALL-IN-ONE AI MARKETPLACE
           </div>
+          {/* Task 2: Simplified hero headline */}
           <h1 className="v3-h1">
-            Everything Ai.<span className="v3-h1-dot">.</span> Build<span className="v3-h1-dot">.</span> Sell<span className="v3-h1-dot">.</span> Trade<br/>
-            <span className="v3-h1-dash">—</span> <span className="v3-h1-accent">One Marketplace.</span>
+            Everything Ai
+            <span className="v3-h1-dash"> — </span>
+            <span className="v3-h1-accent">One Marketplace.</span>
           </h1>
+          {/* Task 3: Updated sub text */}
           <p className="v3-sub">
-            Rent GPUs. Buy models. Post tasks. Hire specialists. Escrow-backed, money-back guaranteed.
+            <span className="v3-sub-lead">Build, Buy, Sell, Trade.</span> Rent GPUs. Buy models. Post tasks. Hire specialists. Escrow-backed, money-back guaranteed.
           </p>
 
           <div className="v3-search">

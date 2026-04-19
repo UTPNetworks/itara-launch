@@ -30,15 +30,15 @@
   border-bottom: 1px solid var(--line);
 }
 .v3-nav-inner {
-  max-width: 1360px; margin: 0 auto;
-  padding: 14px 32px;
+  width: 100%;
+  padding: 14px 28px;
   display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;
 }
 .v3-nav-logo { flex-shrink: 0; display: flex; align-items: center; }
 .v3-nav-mid { display: flex; gap: 24px; justify-content: center; }
 .v3-nav-mid a { font-size: 14px; color: var(--ink); cursor: pointer; font-weight: 500; }
 .v3-nav-mid a:hover { color: var(--violet); }
-.v3-nav-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.v3-nav-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; justify-content: flex-end; }
 .v3-trust { font-size: 12px; color: var(--muted); margin-right: 6px; }
 
 /* ---- Theme Toggle ---- */
@@ -110,6 +110,17 @@
   pointer-events: none;
 }
 .v3-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; text-align: center; }
+
+/* Hero logo block */
+.v3-hero-logo {
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: 20px;
+}
+.v3-hero-logo svg {
+  width: 180px; height: auto;
+  filter: drop-shadow(0 4px 18px rgba(108,92,231,0.22));
+}
+
 .v3-badge {
   display: inline-flex; align-items: center; gap: 10px;
   padding: 8px 14px;
@@ -129,8 +140,8 @@
 @keyframes v3-pulse-anim { 0%,100% { box-shadow: 0 0 0 0 rgba(25,208,142,0.5); } 50% { box-shadow: 0 0 0 8px rgba(25,208,142,0); } }
 
 .v3-h1 {
-  font-size: clamp(56px, 7vw, 104px);
-  font-weight: 700; letter-spacing: -0.04em; line-height: 0.95;
+  font-size: clamp(48px, 6vw, 92px);
+  font-weight: 700; letter-spacing: -0.04em; line-height: 1.0;
   margin: 0 0 20px;
 }
 .v3-h1-accent {
@@ -147,7 +158,14 @@
   -webkit-background-clip: text; background-clip: text; color: transparent;
   font-weight: 700;
 }
-.v3-sub { font-size: 20px; color: var(--muted); max-width: 640px; margin: 0 auto 40px; line-height: 1.5; }
+.v3-sub { font-size: 18px; color: var(--muted); max-width: 680px; margin: 0 auto 40px; line-height: 1.6; }
+.v3-sub-lead {
+  font-weight: 700;
+  background: linear-gradient(120deg, var(--violet), var(--blue), var(--pink));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+}
 
 /* ---- Search Block (25% smaller) ---- */
 .v3-search {
