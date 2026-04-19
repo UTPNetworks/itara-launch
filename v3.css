@@ -140,8 +140,8 @@
 @keyframes v3-pulse-anim { 0%,100% { box-shadow: 0 0 0 0 rgba(25,208,142,0.5); } 50% { box-shadow: 0 0 0 8px rgba(25,208,142,0); } }
 
 .v3-h1 {
-  font-size: clamp(48px, 6vw, 92px);
-  font-weight: 700; letter-spacing: -0.04em; line-height: 1.0;
+  font-size: clamp(43px, 5.4vw, 83px);
+  font-weight: 800; letter-spacing: -0.04em; line-height: 1.02;
   margin: 0 0 20px;
 }
 .v3-h1-accent {
