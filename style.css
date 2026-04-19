@@ -191,9 +191,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .nav-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+  width: 100%;
+  padding: 0 2rem;
   height: 64px;
   display: flex;
   align-items: center;
@@ -258,9 +257,6 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
-}
-
-.nav-actions-right {
   margin-left: auto;
 }
 
@@ -363,15 +359,35 @@ a { color: inherit; text-decoration: none; }
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 5.6vw, 4.55rem);
+  font-size: clamp(1.9rem, 4.8vw, 3.8rem);
   font-weight: 900;
-  line-height: 1.0;
-  letter-spacing: -0.04em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   color: var(--text);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
+  gap: 0.05em;
+  white-space: nowrap;
+}
+
+/* Smaller full-stops */
+.hero-dot {
+  font-size: 0.45em;
+  vertical-align: 0.3em;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.hero-dot-accent {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-image: linear-gradient(135deg, var(--accent) 0%, var(--violet) 60%, #EC4899 100%);
+}
+
+[data-theme="dark"] .hero-dot-accent {
+  background-image: linear-gradient(135deg, #00D4FF 0%, #A78BFA 60%, #F472B6 100%);
 }
 
 /* === HERO LOGO MARK === */
@@ -1759,5 +1775,6 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 480px) {
   .modules-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
   .hero { padding: 2.5rem 1rem 2rem; }
-  .hero-title { font-size: 2.25rem; }
+  .hero-title { font-size: clamp(1.1rem, 5vw, 1.8rem); white-space: normal; }
+  .hero-dot { font-size: 0.4em; }
 }

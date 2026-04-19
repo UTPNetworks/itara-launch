@@ -1,742 +1,874 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Itara — The World's First All-in-One AI Marketplace</title>
-  <meta name="description" content="The global marketplace for GPU compute, AI agents, fine-tuned models, datasets, and AI-skilled talent." />
-  <meta property="og:title" content="Itara — The World's First All-in-One AI Marketplace" />
-  <meta property="og:description" content="GPU rentals, AI asset marketplace, and AI-skilled freelancers. Built for builders, by builders." />
-  <meta property="og:image" content="https://itara.ai/og.png" />
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="description" content="Rent GPUs. Buy AI models. Post tasks. Hire AI specialists. Escrow-backed, money-back guaranteed. The AWS of AI Commerce." />
 
   <!-- Fonts -->
-  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800,900&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- React + Babel (no build step) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="v3.css" />
 </head>
 <body>
 
-  <!-- ============================================================
-       TICKER BAR
-       ============================================================ -->
-  <div class="ticker-wrap">
-    <div class="ticker-label">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="6"/></svg>
-      GLOBAL AI PULSE
-    </div>
-    <div class="ticker-track">
-      <div class="ticker-inner">
-        <span class="tick-item"><span class="tick-tag gpu">⚡ GPU</span> H100s available from $2.49/hr — no waitlist</span>
-        <span class="tick-item"><span class="tick-tag market">🛒 AI MARKET</span> AI agents market hitting $52.6B by 2030</span>
-        <span class="tick-item"><span class="tick-tag talent">💼 TALENT</span> AI freelance demand up 109% — find verified AI builders</span>
-        <span class="tick-item"><span class="tick-tag launch">🚀 LAUNCHING</span> Itara — the world's first all-in-one AI marketplace</span>
-        <span class="tick-item"><span class="tick-tag gpu">⚡ GPU</span> H100s available from $2.49/hr — no waitlist</span>
-        <span class="tick-item"><span class="tick-tag market">🛒 AI MARKET</span> AI agents market hitting $52.6B by 2030</span>
-        <span class="tick-item"><span class="tick-tag talent">💼 TALENT</span> AI freelance demand up 109% — find verified AI builders</span>
-        <span class="tick-item"><span class="tick-tag launch">🚀 LAUNCHING</span> Itara — the world's first all-in-one AI marketplace</span>
-      </div>
+<!-- ============================================================
+     TICKER BAR
+     ============================================================ -->
+<div class="ticker-wrap">
+  <div class="ticker-label">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="6"/></svg>
+    GLOBAL AI PULSE
+  </div>
+  <div class="ticker-track">
+    <div class="ticker-inner">
+      <span class="tick-item"><span class="tick-tag gpu">⚡ GPU</span> H100s available from $2.49/hr — no waitlist</span>
+      <span class="tick-item"><span class="tick-tag market">🛒 AI MARKET</span> AI agents market hitting $52.6B by 2030</span>
+      <span class="tick-item"><span class="tick-tag talent">💼 TALENT</span> AI freelance demand up 109% — find verified AI builders</span>
+      <span class="tick-item"><span class="tick-tag launch">🚀 LAUNCHING</span> Itara — the world's first all-in-one AI marketplace</span>
+      <span class="tick-item"><span class="tick-tag gpu">⚡ GPU</span> H100s available from $2.49/hr — no waitlist</span>
+      <span class="tick-item"><span class="tick-tag market">🛒 AI MARKET</span> AI agents market hitting $52.6B by 2030</span>
+      <span class="tick-item"><span class="tick-tag talent">💼 TALENT</span> AI freelance demand up 109% — find verified AI builders</span>
+      <span class="tick-item"><span class="tick-tag launch">🚀 LAUNCHING</span> Itara — the world's first all-in-one AI marketplace</span>
     </div>
   </div>
+</div>
 
-  <!-- ============================================================
-       NAV
-       ============================================================ -->
-  <header class="nav">
-    <div class="nav-inner">
-      <!-- Logo -->
-      <a href="/" class="nav-logo">
-        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Itara">
+<!-- ============================================================
+     REACT ROOT — V3 Homepage
+     ============================================================ -->
+<div id="root"><div id="loading" style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;color:#6B6F7A;font-size:14px;letter-spacing:.08em">LOADING…</div></div>
+
+<!-- ============================================================
+     SIGN IN MODAL
+     ============================================================ -->
+<div id="signin-overlay" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="signin-title">
+  <div class="auth-backdrop" onclick="closeSignIn()"></div>
+  <div class="auth-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeSignIn()" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div id="signin-form-wrap">
+      <div class="auth-logo">
+        <!-- Crystal Node mini mark -->
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="nav-prism" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7C3AED"/><stop offset="45%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#06B6D4"/></linearGradient>
-            <linearGradient id="nav-h1" x1="10" y1="15" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#06B6D4"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
-            <linearGradient id="nav-vt" x1="20" y1="10" x2="20" y2="30" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset=".5" stop-color="#EC4899"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
-            <linearGradient id="nav-h2" x1="10" y1="25" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#06B6D4"/></linearGradient>
-            <radialGradient id="nav-cn" cx="42%" cy="36%" r="60%"><stop stop-color="#F9A8D4"/><stop offset=".6" stop-color="#EC4899"/><stop offset="1" stop-color="#7C3AED"/></radialGradient>
-            <linearGradient id="nav-d1" x1="20" y1="20" x2="10" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
-            <linearGradient id="nav-d2" x1="20" y1="20" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
-            <linearGradient id="nav-d3" x1="20" y1="20" x2="10" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
-            <linearGradient id="nav-d4" x1="20" y1="20" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
-            <linearGradient id="nav-tf" x1="12" y1="2" x2="28" y2="14" gradientUnits="userSpaceOnUse"><stop stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></linearGradient>
-            <clipPath id="nav-clip"><polygon points="20,2 35,10 35,28 20,36 5,28 5,10"/></clipPath>
+            <linearGradient id="si-prism-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7C3AED"/><stop offset="50%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#06B6D4"/></linearGradient>
+            <linearGradient id="si-prism-left" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#3730A3"/></linearGradient>
+            <linearGradient id="si-prism-right" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#06B6D4"/><stop offset="100%" stop-color="#0284C7"/></linearGradient>
           </defs>
-          <!-- Prism shell -->
-          <polygon points="20,2 35,10 35,28 20,36 5,28 5,10" fill="url(#nav-prism)" opacity="0.92"/>
-          <polygon points="20,2 35,10 20,18 5,10" fill="url(#nav-tf)"/>
-          <polygon points="35,10 35,28 20,36 20,18" fill="rgba(0,0,0,0.14)"/>
-          <!-- Pink accent edge top-right -->
-          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(236,72,153,0.45)" stroke-width="0.8" stroke-linecap="round"/>
-          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(255,255,255,0.2)" stroke-width="0.7" stroke-linecap="round"/>
-          <line x1="20" y1="2" x2="5"  y2="10" stroke="rgba(255,255,255,0.12)" stroke-width="0.6" stroke-linecap="round"/>
-          <!-- Signal Node inside prism -->
-          <g clip-path="url(#nav-clip)">
-            <line x1="10" y1="15" x2="30" y2="15" stroke="url(#nav-h1)" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
-            <line x1="20" y1="15" x2="20" y2="25" stroke="url(#nav-vt)" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
-            <line x1="10" y1="25" x2="30" y2="25" stroke="url(#nav-h2)" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
-            <line x1="20" y1="20" x2="10" y2="15" stroke="url(#nav-d1)" stroke-width="0.8" opacity="0.7"/>
-            <line x1="20" y1="20" x2="30" y2="15" stroke="url(#nav-d2)" stroke-width="0.8" opacity="0.7"/>
-            <line x1="20" y1="20" x2="10" y2="25" stroke="url(#nav-d3)" stroke-width="0.8" opacity="0.7"/>
-            <line x1="20" y1="20" x2="30" y2="25" stroke="url(#nav-d4)" stroke-width="0.8" opacity="0.7"/>
-            <circle cx="10" cy="15" r="2.2" fill="rgba(6,182,212,0.25)"/><circle cx="10" cy="15" r="1.4" fill="#06B6D4"/>
-            <circle cx="30" cy="15" r="2.2" fill="rgba(79,70,229,0.25)"/><circle cx="30" cy="15" r="1.4" fill="#4F46E5"/>
-            <circle cx="10" cy="25" r="2.2" fill="rgba(79,70,229,0.25)"/><circle cx="10" cy="25" r="1.4" fill="#4F46E5"/>
-            <circle cx="30" cy="25" r="2.2" fill="rgba(6,182,212,0.25)"/><circle cx="30" cy="25" r="1.4" fill="#06B6D4"/>
-            <circle cx="20" cy="20" r="8" fill="rgba(236,72,153,0.1)"/>
-            <circle cx="20" cy="20" r="3.5" fill="url(#nav-cn)"/>
-          </g>
+          <path d="M20 4L36 13V27L20 36L4 27V13Z" fill="url(#si-prism-top)" opacity="0.9"/>
+          <path d="M4 13L20 22V36L4 27Z" fill="url(#si-prism-left)"/>
+          <path d="M36 13L20 22V36L36 27Z" fill="url(#si-prism-right)"/>
+          <circle cx="20" cy="18" r="2" fill="#fff" opacity="0.95"/>
+          <line x1="20" y1="18" x2="14" y2="22" stroke="#fff" stroke-width="1" stroke-opacity="0.7"/>
+          <line x1="20" y1="18" x2="26" y2="22" stroke="#fff" stroke-width="1" stroke-opacity="0.7"/>
+          <line x1="20" y1="18" x2="20" y2="26" stroke="#fff" stroke-width="1" stroke-opacity="0.7"/>
         </svg>
-        <span class="nav-logo-text">itara</span>
-        <span class="nav-beta">BETA</span>
-      </a>
-
-      <!-- Links -->
-      <nav class="nav-links" aria-label="Main navigation">
-        <a href="#platform">Platform</a>
-        <a href="#market">Market</a>
-        <a href="#community">Community</a>
-      </nav>
-
-      <!-- Actions (far right) -->
-      <div class="nav-actions nav-actions-right">
-        <button data-theme-toggle aria-label="Toggle dark mode" class="nav-icon-btn">
-          <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-        <div class="nav-auth-divider"></div>
-        <button onclick="openSignIn()" class="btn btn-ghost">Sign In</button>
-        <button onclick="openSignUp()" class="btn btn-primary">Sign Up</button>
       </div>
-    </div>
-  </header>
+      <h2 id="signin-title" class="auth-heading">Welcome back</h2>
+      <p class="auth-sub">Sign in to Itara Mission Control</p>
 
-  <!-- ============================================================
-       HERO
-       ============================================================ -->
-  <main class="hero">
-    <div class="hero-inner">
-
-      <!-- Crystal Node Logo above headline -->
-      <div class="hero-logo-mark" aria-label="Itara">
-        <svg width="80" height="80" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="hl-prism" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7C3AED"/><stop offset="45%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#06B6D4"/></linearGradient>
-            <linearGradient id="hl-h1" x1="10" y1="15" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#06B6D4"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
-            <linearGradient id="hl-vt" x1="20" y1="10" x2="20" y2="30" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset=".5" stop-color="#EC4899"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
-            <linearGradient id="hl-h2" x1="10" y1="25" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#06B6D4"/></linearGradient>
-            <radialGradient id="hl-cn" cx="42%" cy="36%" r="60%"><stop stop-color="#F9A8D4"/><stop offset=".6" stop-color="#EC4899"/><stop offset="1" stop-color="#7C3AED"/></radialGradient>
-            <linearGradient id="hl-d1" x1="20" y1="20" x2="10" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
-            <linearGradient id="hl-d2" x1="20" y1="20" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
-            <linearGradient id="hl-d3" x1="20" y1="20" x2="10" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
-            <linearGradient id="hl-d4" x1="20" y1="20" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
-            <linearGradient id="hl-tf" x1="12" y1="2" x2="28" y2="14" gradientUnits="userSpaceOnUse"><stop stop-color="rgba(255,255,255,0.25)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></linearGradient>
-            <filter id="hl-glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <clipPath id="hl-clip"><polygon points="20,2 35,10 35,28 20,36 5,28 5,10"/></clipPath>
-          </defs>
-          <polygon points="20,2 35,10 35,28 20,36 5,28 5,10" fill="url(#hl-prism)" opacity="0.95" filter="url(#hl-glow)"/>
-          <polygon points="20,2 35,10 20,18 5,10" fill="url(#hl-tf)"/>
-          <polygon points="35,10 35,28 20,36 20,18" fill="rgba(0,0,0,0.14)"/>
-          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(236,72,153,0.5)" stroke-width="0.9" stroke-linecap="round"/>
-          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(255,255,255,0.22)" stroke-width="0.7" stroke-linecap="round"/>
-          <line x1="20" y1="2" x2="5" y2="10" stroke="rgba(255,255,255,0.14)" stroke-width="0.6" stroke-linecap="round"/>
-          <g clip-path="url(#hl-clip)">
-            <line x1="10" y1="15" x2="30" y2="15" stroke="url(#hl-h1)" stroke-width="1.3" stroke-linecap="round" opacity="0.95"/>
-            <line x1="20" y1="15" x2="20" y2="25" stroke="url(#hl-vt)" stroke-width="1.3" stroke-linecap="round" opacity="0.95"/>
-            <line x1="10" y1="25" x2="30" y2="25" stroke="url(#hl-h2)" stroke-width="1.3" stroke-linecap="round" opacity="0.95"/>
-            <line x1="20" y1="20" x2="10" y2="15" stroke="url(#hl-d1)" stroke-width="0.9" opacity="0.75"/>
-            <line x1="20" y1="20" x2="30" y2="15" stroke="url(#hl-d2)" stroke-width="0.9" opacity="0.75"/>
-            <line x1="20" y1="20" x2="10" y2="25" stroke="url(#hl-d3)" stroke-width="0.9" opacity="0.75"/>
-            <line x1="20" y1="20" x2="30" y2="25" stroke="url(#hl-d4)" stroke-width="0.9" opacity="0.75"/>
-            <circle cx="10" cy="15" r="2.4" fill="rgba(6,182,212,0.3)"/><circle cx="10" cy="15" r="1.5" fill="#06B6D4"/>
-            <circle cx="30" cy="15" r="2.4" fill="rgba(79,70,229,0.3)"/><circle cx="30" cy="15" r="1.5" fill="#4F46E5"/>
-            <circle cx="10" cy="25" r="2.4" fill="rgba(79,70,229,0.3)"/><circle cx="10" cy="25" r="1.5" fill="#4F46E5"/>
-            <circle cx="30" cy="25" r="2.4" fill="rgba(6,182,212,0.3)"/><circle cx="30" cy="25" r="1.5" fill="#06B6D4"/>
-            <circle cx="20" cy="20" r="9" fill="rgba(236,72,153,0.1)"/>
-            <circle cx="20" cy="20" r="4" fill="url(#hl-cn)"/>
-          </g>
-        </svg>
-        <div class="hero-logo-pulse"></div>
-      </div>
-
-      <!-- Headline -->
-      <h1 class="hero-title">
-        <span class="hero-line-main">BUY. SELL. TRADE.</span>
-        <span class="hero-line-main">BUILD THE</span>
-        <span class="hero-line-accent">FUTURE OF Ai.</span>
-      </h1>
-      <p class="hero-sub">The global marketplace for GPU compute, AI agents, fine-tuned models, datasets, and AI-skilled talent — built for builders, startups &amp; enterprises.</p>
-
-      <!-- Universal Search bar -->
-      <div class="search-wrap" id="search-wrap">
-        <div class="search-bar" id="search-bar">
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input
-            type="text"
-            id="search-input"
-            class="search-input"
-            placeholder="Search models, GPUs, talent, datasets, builders…"
-            autocomplete="off"
-            oninput="handleSearchInput(event)"
-            onkeydown="handleSearch(event)"
-            onfocus="showSearchDropdown()"
-          />
-          <button class="search-btn" onclick="handleSearchClick()">Search</button>
-        </div>
-        <!-- Live results dropdown -->
-        <div class="search-dropdown" id="search-dropdown" style="display:none">
-          <div class="search-popular" id="search-popular">
-            <span class="search-pop-label">Popular</span>
-            <div class="search-pop-tags">
-              <button onclick="fillSearch('ChatGPT API')" class="pop-tag">ChatGPT API</button>
-              <button onclick="fillSearch('GPU Rentals')" class="pop-tag">GPU Rentals</button>
-              <button onclick="fillSearch('AI Prompts')" class="pop-tag">AI Prompts</button>
-              <button onclick="fillSearch('H100')" class="pop-tag">H100</button>
-              <button onclick="fillSearch('Fine-tuned Models')" class="pop-tag">Fine-tuned Models</button>
-            </div>
-          </div>
-          <div class="search-results" id="search-results"></div>
-        </div>
-        <p class="search-hint">Try: <span onclick="fillSearch('H100 GPU rental')">H100 GPU rental</span> · <span onclick="fillSearch('fine-tuned LLaMA model')">fine-tuned LLaMA model</span> · <span onclick="fillSearch('AI developer for hire')">AI developer for hire</span></p>
-      </div>
-
-      <!-- Module cards -->
-      <div class="modules-grid" id="platform">
-        <!-- Compute -->
-        <div class="module-card" data-color="cyan" onclick="openSignUp()">
-          <div class="module-badge">GPU</div>
-          <div class="module-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg>
-          </div>
-          <span class="module-label">COMPUTE</span>
-          <p class="module-desc">Rent H100, A100 &amp; RTX clusters on demand</p>
-          <div class="module-stats">
-            <span class="module-stat-pill">$2.49<span>/hr</span></span>
-            <span class="module-stat-pill">No waitlist</span>
-          </div>
-          <div class="module-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </div>
-
-        <!-- The Exchange -->
-        <div class="module-card" data-color="violet" onclick="openSignUp()">
-          <div class="module-badge">MARKET</div>
-          <div class="module-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
-          </div>
-          <span class="module-label">THE EXCHANGE</span>
-          <p class="module-desc">Buy &amp; sell AI models, agents, datasets &amp; prompts</p>
-          <div class="module-stats">
-            <span class="module-stat-pill">10K+ Assets</span>
-            <span class="module-stat-pill">Escrow</span>
-          </div>
-          <div class="module-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </div>
-
-        <!-- NeuralWork -->
-        <div class="module-card" data-color="emerald" onclick="openSignUp()">
-          <div class="module-badge">TALENT</div>
-          <div class="module-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <span class="module-label">NEURALWORK</span>
-          <p class="module-desc">Hire verified AI specialists for any task</p>
-          <div class="module-stats">
-            <span class="module-stat-pill">Verified</span>
-            <span class="module-stat-pill">+109%</span>
-          </div>
-          <div class="module-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </div>
-
-        <!-- AXIS -->
-        <div class="module-card" data-color="amber" onclick="openSignUp()">
-          <div class="module-badge">INTEL</div>
-          <div class="module-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-          </div>
-          <span class="module-label">AXIS</span>
-          <p class="module-desc">Discover, compare &amp; track every AI model</p>
-          <div class="module-stats">
-            <span class="module-stat-pill">Live Data</span>
-            <span class="module-stat-pill">$52.6B mkt</span>
-          </div>
-          <div class="module-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Nexus root label -->
-      <div class="nexus-root">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        ITARA ROOT
-      </div>
-
-    </div>
-  </main>
-
-  <!-- ============================================================
-       STATS STRIP
-       ============================================================ -->
-  <section class="stats-strip">
-    <div class="stats-inner">
-      <div class="stat-item">
-        <span class="stat-num">$52.6B</span>
-        <span class="stat-label">AI agents market by 2030</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">109%</span>
-        <span class="stat-label">Growth in AI freelance demand</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">$2.49</span>
-        <span class="stat-label">Per hour — H100 GPU rental</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">1</span>
-        <span class="stat-label">Platform. Every AI transaction.</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       SIGN IN MODAL
-       Layout: Logo → heading → Google button → divider → email/pw form
-       ============================================================ -->
-  <div id="signin-overlay" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="signin-title">
-    <div class="auth-backdrop" onclick="closeSignIn()"></div>
-    <div class="auth-card" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="closeSignIn()" aria-label="Close">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <button class="btn-oauth btn-oauth-google" onclick="signInWithGoogle()" type="button">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+        Continue with Google
       </button>
 
-      <div id="signin-form-wrap">
-        <div class="auth-logo">
-          <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="10" fill="var(--accent)"/>
-            <path d="M13 12h14M20 12v16M13 28h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <h2 id="signin-title" class="auth-heading">Welcome back</h2>
-        <p class="auth-sub">Sign in to Itara Mission Control</p>
+      <div class="auth-divider"><span>or continue with email</span></div>
 
-        <!-- Google OAuth button -->
-        <button class="btn-oauth btn-oauth-google" onclick="signInWithGoogle()" type="button">
-          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-          Continue with Google
-        </button>
-
-        <div class="auth-divider"><span>or continue with email</span></div>
-
-        <form id="signin-form" onsubmit="submitSignIn(event)" novalidate>
-          <div class="auth-field">
-            <label for="signin-email">Email</label>
-            <div class="auth-input-wrap">
-              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="signin-email" name="email" placeholder="you@example.com" autocomplete="email" required />
-            </div>
-          </div>
-          <div class="auth-field">
-            <label for="signin-password">Password</label>
-            <div class="auth-pw-wrap">
-              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="signin-password" name="password" placeholder="Your password" autocomplete="current-password" required />
-              <button type="button" class="pw-toggle" onclick="togglePw('signin-password','pw-eye')" aria-label="Show password">
-                <svg id="pw-eye" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-          </div>
-          <div id="signin-error" class="auth-error" style="display:none"></div>
-          <button type="submit" class="btn btn-primary btn-full auth-submit" id="signin-btn">
-            <span id="signin-btn-text">Sign In</span>
-            <svg id="signin-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-          </button>
-        </form>
-
-        <p class="auth-switch">Don't have an account? <button onclick="switchToSignUp()" class="link-btn">Sign up</button></p>
-      </div>
-
-      <div id="signin-success" style="display:none" class="modal-success-wrap">
-        <div class="success-check">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-        </div>
-        <h3>Signed in!</h3>
-        <p>Taking you to Mission Control…</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       SIGN UP MODAL — 4-step onboarding flow
-       Step 1: Profile (avatar + username)
-       Step 2: About you (DOB + gender)
-       Step 3: Interests
-       Step 4: Launch (notifications + T&C)
-       ============================================================ -->
-  <div id="signup-overlay" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="signup-title">
-    <div class="auth-backdrop" onclick="closeSignUp()"></div>
-    <div class="auth-card auth-card-signup" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="closeSignUp()" aria-label="Close">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
-
-      <!-- Progress dots -->
-      <div class="signup-progress" id="signup-progress">
-        <span class="prog-dot active" data-step="0"></span>
-        <span class="prog-dot" data-step="1"></span>
-        <span class="prog-dot" data-step="2"></span>
-        <span class="prog-dot" data-step="3"></span>
-      </div>
-
-      <!-- ---- STEP 0: Auth method (Google or Email) ---- -->
-      <div class="signup-step active" id="signup-step-0">
-        <div class="auth-logo">
-          <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="10" fill="var(--accent)"/>
-            <path d="M13 12h14M20 12v16M13 28h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <h2 id="signup-title" class="auth-heading">Create your account</h2>
-        <p class="auth-sub">Join the world's first AI marketplace</p>
-
-        <button class="btn-oauth btn-oauth-google" onclick="signUpWithGoogle()" type="button">
-          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-          Sign up with Google
-        </button>
-
-        <div class="auth-divider"><span>or sign up with email</span></div>
-
-        <form id="signup-email-form" onsubmit="submitSignUpEmail(event)" novalidate>
-          <div class="auth-field">
-            <label for="su-email">Email</label>
-            <div class="auth-input-wrap">
-              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="su-email" placeholder="you@example.com" autocomplete="email" required />
-            </div>
-          </div>
-          <div class="auth-field">
-            <label for="su-password">Password</label>
-            <div class="auth-pw-wrap">
-              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="su-password" placeholder="Create a password" autocomplete="new-password" required />
-              <button type="button" class="pw-toggle" onclick="togglePw('su-password','su-pw-eye')" aria-label="Show password">
-                <svg id="su-pw-eye" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-          </div>
-          <div id="su-email-error" class="auth-error" style="display:none"></div>
-          <button type="submit" class="btn btn-primary btn-full auth-submit" id="su-email-btn">
-            <span id="su-email-btn-text">Continue</span>
-            <svg id="su-email-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-          </button>
-        </form>
-
-        <p class="auth-switch">Already have an account? <button onclick="switchToSignIn()" class="link-btn">Sign in</button></p>
-      </div>
-
-      <!-- ---- STEP 1: Profile (avatar + username) ---- -->
-      <div class="signup-step" id="signup-step-1">
-        <div class="su-avatar-wrap">
-          <div class="su-avatar" id="su-avatar-preview">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <label class="su-avatar-btn" for="su-avatar-input" title="Upload photo">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          </label>
-          <input type="file" id="su-avatar-input" accept="image/*" style="display:none" onchange="previewAvatar(this)" />
-        </div>
-
-        <h2 class="auth-heading" id="su-greeting">Hey there! 👋</h2>
-        <p class="auth-sub">Let's set up your Itara identity</p>
-
+      <form id="signin-form" onsubmit="submitSignIn(event)" novalidate>
         <div class="auth-field">
-          <label for="su-username">Username</label>
-          <div class="auth-input-wrap su-username-wrap">
-            <span class="auth-at-prefix">@</span>
-            <input type="text" id="su-username" placeholder="yourhandle" autocomplete="off" oninput="updateUsername(this)" />
-            <button type="button" class="su-reroll-btn" onclick="rerollUsername()" title="Suggest another">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          <label for="signin-email">Email</label>
+          <div class="auth-input-wrap">
+            <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="signin-email" name="email" placeholder="you@example.com" autocomplete="email" required />
+          </div>
+        </div>
+        <div class="auth-field">
+          <label for="signin-password">Password</label>
+          <div class="auth-pw-wrap">
+            <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="signin-password" name="password" placeholder="Your password" autocomplete="current-password" required />
+            <button type="button" class="pw-toggle" onclick="togglePw('signin-password','pw-eye')" aria-label="Show password">
+              <svg id="pw-eye" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
-          <p class="auth-hint" id="su-username-hint">Auto-generated — you can edit it anytime</p>
         </div>
-
-        <div class="su-google-note" id="su-google-note" style="display:none">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-          Your email is linked via Google. No password needed.
-        </div>
-
-        <div class="signup-nav">
-          <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(0)">← Back</button>
-          <button class="btn btn-primary" onclick="goSignUpStep(2)">Continue →</button>
-        </div>
-      </div>
-
-      <!-- ---- STEP 2: About you ---- -->
-      <div class="signup-step" id="signup-step-2">
-        <div class="su-step-icon" style="background: rgba(79,70,229,0.08); color: var(--accent);">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </div>
-        <h2 class="auth-heading">About you</h2>
-        <p class="auth-sub">Helps us personalise your experience</p>
-
-        <div class="auth-field">
-          <label for="su-dob">Date of Birth</label>
-          <input type="date" id="su-dob" class="auth-date-input" />
-          <p class="auth-hint">You must be at least 13 years old to use Itara</p>
-        </div>
-
-        <div class="auth-field">
-          <label>Gender</label>
-          <div class="gender-grid">
-            <button type="button" class="gender-btn" data-gender="Male" onclick="selectGender(this)">Male</button>
-            <button type="button" class="gender-btn" data-gender="Female" onclick="selectGender(this)">Female</button>
-            <button type="button" class="gender-btn" data-gender="Non-binary" onclick="selectGender(this)">Non-binary</button>
-            <button type="button" class="gender-btn" data-gender="Prefer not to say" onclick="selectGender(this)">Prefer not to say</button>
-          </div>
-        </div>
-
-        <div class="signup-nav">
-          <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(1)">← Back</button>
-          <button class="btn btn-primary" onclick="goSignUpStep(3)">Continue →</button>
-        </div>
-      </div>
-
-      <!-- ---- STEP 3: Interests ---- -->
-      <div class="signup-step" id="signup-step-3">
-        <div class="su-step-icon" style="background: rgba(124,58,237,0.08); color: var(--violet);">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <h2 class="auth-heading">What interests you?</h2>
-        <p class="auth-sub">Pick at least 3 to personalise your feed <span id="interests-count" class="interests-counter">0/3</span></p>
-
-        <div class="interests-grid">
-          <button type="button" class="interest-btn" data-interest="Large Language Models" onclick="toggleInterest(this)">
-            <span class="interest-emoji">🧠</span>
-            <span class="interest-name">Large Language Models</span>
-            <span class="interest-tags">GPT, Claude, Gemini, Llama</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="Image Generation" onclick="toggleInterest(this)">
-            <span class="interest-emoji">🎨</span>
-            <span class="interest-name">Image Generation</span>
-            <span class="interest-tags">DALL-E, Midjourney, Stable Diffusion</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="Code & Dev Tools" onclick="toggleInterest(this)">
-            <span class="interest-emoji">💻</span>
-            <span class="interest-name">Code &amp; Dev Tools</span>
-            <span class="interest-tags">Copilot, Cursor, Cody</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="Video & Animation" onclick="toggleInterest(this)">
-            <span class="interest-emoji">🎬</span>
-            <span class="interest-name">Video &amp; Animation</span>
-            <span class="interest-tags">Runway, Pika, Sora</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="Audio & Music" onclick="toggleInterest(this)">
-            <span class="interest-emoji">🎵</span>
-            <span class="interest-name">Audio &amp; Music</span>
-            <span class="interest-tags">ElevenLabs, Suno, Udio</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="ML & Training" onclick="toggleInterest(this)">
-            <span class="interest-emoji">⚙️</span>
-            <span class="interest-name">ML &amp; Training</span>
-            <span class="interest-tags">Fine-tuning, datasets, MLOps</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="GPU & Compute" onclick="toggleInterest(this)">
-            <span class="interest-emoji">⚡</span>
-            <span class="interest-name">GPU &amp; Compute</span>
-            <span class="interest-tags">Cloud GPUs, rentals, benchmarks</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="AI Agents & Automation" onclick="toggleInterest(this)">
-            <span class="interest-emoji">🤖</span>
-            <span class="interest-name">AI Agents &amp; Automation</span>
-            <span class="interest-tags">AutoGPT, workflows, chains</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="AI Research" onclick="toggleInterest(this)">
-            <span class="interest-emoji">📚</span>
-            <span class="interest-name">AI Research</span>
-            <span class="interest-tags">Papers, breakthroughs, benchmarks</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="Prompt Engineering" onclick="toggleInterest(this)">
-            <span class="interest-emoji">✍️</span>
-            <span class="interest-name">Prompt Engineering</span>
-            <span class="interest-tags">Techniques, templates, optimisation</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="Data & Analytics" onclick="toggleInterest(this)">
-            <span class="interest-emoji">📊</span>
-            <span class="interest-name">Data &amp; Analytics</span>
-            <span class="interest-tags">Data science, visualisation, BI</span>
-          </button>
-          <button type="button" class="interest-btn" data-interest="Business & Productivity" onclick="toggleInterest(this)">
-            <span class="interest-emoji">💼</span>
-            <span class="interest-name">Business &amp; Productivity</span>
-            <span class="interest-tags">CRM, marketing, sales tools</span>
-          </button>
-        </div>
-
-        <div class="signup-nav">
-          <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(2)">← Back</button>
-          <button class="btn btn-primary" id="interests-continue-btn" onclick="goSignUpStep(4)" disabled>Continue →</button>
-        </div>
-      </div>
-
-      <!-- ---- STEP 4: Almost there (notifications + T&C + launch) ---- -->
-      <div class="signup-step" id="signup-step-4">
-        <div class="su-step-icon" style="background: rgba(217,119,6,0.08); color: var(--amber);">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        </div>
-        <h2 class="auth-heading">Almost there!</h2>
-        <p class="auth-sub">Just a couple more things</p>
-
-        <div class="notif-toggle-row">
-          <div class="notif-info">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <div>
-              <div class="notif-title">Notifications</div>
-              <div class="notif-desc">New tools, price drops, community updates</div>
-            </div>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="su-notifications" checked />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
-        <div class="perks-box">
-          <div class="perks-title">Your free account includes:</div>
-          <ul class="perks-list">
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-              Access the full Itara marketplace
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-              Browse GPU listings &amp; AI agents
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-              Post jobs on NeuralWork
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-              Track AI models with AXIS
-            </li>
-          </ul>
-        </div>
-
-        <div class="toc-row">
-          <label class="toc-label">
-            <input type="checkbox" id="su-toc" onchange="updateLaunchBtn()" />
-            <span>I agree to the <a href="#" class="link-btn">Terms of Service</a> and <a href="#" class="link-btn">Privacy Policy</a></span>
-          </label>
-        </div>
-
-        <div id="su-final-error" class="auth-error" style="display:none"></div>
-
-        <button class="btn btn-primary btn-full auth-submit" id="su-launch-btn" onclick="launchAccount()" disabled>
-          <span id="su-launch-text">🚀 Launch my account</span>
-          <svg id="su-launch-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <div id="signin-error" class="auth-error" style="display:none"></div>
+        <button type="submit" class="btn btn-primary btn-full auth-submit" id="signin-btn">
+          <span id="signin-btn-text">Sign In</span>
+          <svg id="signin-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         </button>
-        <p class="auth-hint" style="text-align:center; margin-top:0.5rem">Notifications are optional. Terms acceptance is required.</p>
+      </form>
 
-        <div class="signup-nav" style="justify-content:flex-start; margin-top:0">
-          <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(3)">← Back</button>
-        </div>
-      </div>
+      <p class="auth-switch">Don't have an account? <button onclick="switchToSignUp()" class="link-btn">Sign up</button></p>
+    </div>
 
-      <!-- ---- SUCCESS ---- -->
-      <div class="signup-step" id="signup-step-5">
-        <div class="modal-success-wrap">
-          <div class="success-check">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-          </div>
-          <h3>You're in!</h3>
-          <p>Welcome to Itara. Taking you to Mission Control…</p>
-        </div>
-      </div>
-
+    <div id="signin-success" style="display:none" class="modal-success-wrap">
+      <div class="success-check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h3>Signed in!</h3>
+      <p>Taking you to Mission Control…</p>
     </div>
   </div>
+</div>
 
-  <!-- ============================================================
-       WAITLIST MODAL (kept for module card fallback)
-       ============================================================ -->
-  <div id="itara-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="display:none">
-    <div class="modal-backdrop" onclick="closeModal()"></div>
-    <div class="modal-box">
-      <button class="modal-close" onclick="closeModal()" aria-label="Close">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+<!-- ============================================================
+     SIGN UP MODAL — 4-step onboarding
+     ============================================================ -->
+<div id="signup-overlay" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="signup-title">
+  <div class="auth-backdrop" onclick="closeSignUp()"></div>
+  <div class="auth-card auth-card-signup" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeSignUp()" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div class="signup-progress" id="signup-progress">
+      <span class="prog-dot active" data-step="0"></span>
+      <span class="prog-dot" data-step="1"></span>
+      <span class="prog-dot" data-step="2"></span>
+      <span class="prog-dot" data-step="3"></span>
+    </div>
+
+    <!-- STEP 0: Auth method -->
+    <div class="signup-step active" id="signup-step-0">
+      <div class="auth-logo">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="su-prism-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7C3AED"/><stop offset="50%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#06B6D4"/></linearGradient>
+            <linearGradient id="su-prism-left" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#3730A3"/></linearGradient>
+            <linearGradient id="su-prism-right" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#06B6D4"/><stop offset="100%" stop-color="#0284C7"/></linearGradient>
+          </defs>
+          <path d="M20 4L36 13V27L20 36L4 27V13Z" fill="url(#su-prism-top)" opacity="0.9"/>
+          <path d="M4 13L20 22V36L4 27Z" fill="url(#su-prism-left)"/>
+          <path d="M36 13L20 22V36L36 27Z" fill="url(#su-prism-right)"/>
+          <circle cx="20" cy="18" r="2" fill="#fff" opacity="0.95"/>
+          <line x1="20" y1="18" x2="14" y2="22" stroke="#fff" stroke-width="1" stroke-opacity="0.7"/>
+          <line x1="20" y1="18" x2="26" y2="22" stroke="#fff" stroke-width="1" stroke-opacity="0.7"/>
+          <line x1="20" y1="18" x2="20" y2="26" stroke="#fff" stroke-width="1" stroke-opacity="0.7"/>
+        </svg>
+      </div>
+      <h2 id="signup-title" class="auth-heading">Create your account</h2>
+      <p class="auth-sub">Join the world's first AI marketplace</p>
+
+      <button class="btn-oauth btn-oauth-google" onclick="signUpWithGoogle()" type="button">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+        Sign up with Google
       </button>
 
-      <div id="modal-form-wrap">
-        <div class="modal-eyebrow">Early Access</div>
-        <h2 id="modal-title" class="modal-title">Get your spot on Itara</h2>
-        <p class="modal-sub">Be first in line when we open the doors. No spam, ever.</p>
+      <div class="auth-divider"><span>or sign up with email</span></div>
 
-        <form id="waitlist-form" onsubmit="submitWaitlist(event)" novalidate>
-          <input type="hidden" name="_subject" value="New Itara Waitlist Signup" />
-
-          <div class="modal-row">
-            <div class="modal-field">
-              <label for="m-fname">First Name</label>
-              <input type="text" id="m-fname" name="firstName" placeholder="Shyam" required />
-            </div>
-            <div class="modal-field">
-              <label for="m-lname">Last Name</label>
-              <input type="text" id="m-lname" name="lastName" placeholder="Kumar" required />
-            </div>
+      <form id="signup-email-form" onsubmit="submitSignUpEmail(event)" novalidate>
+        <div class="auth-field">
+          <label for="su-email">Email</label>
+          <div class="auth-input-wrap">
+            <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="su-email" placeholder="you@example.com" autocomplete="email" required />
           </div>
-
-          <div class="modal-field">
-            <label for="m-email">Email</label>
-            <input type="email" id="m-email" name="email" placeholder="you@email.com" required />
+        </div>
+        <div class="auth-field">
+          <label for="su-password">Password</label>
+          <div class="auth-pw-wrap">
+            <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="su-password" placeholder="Create a password" autocomplete="new-password" required />
+            <button type="button" class="pw-toggle" onclick="togglePw('su-password','su-pw-eye')" aria-label="Show password">
+              <svg id="su-pw-eye" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
+        </div>
+        <div id="su-email-error" class="auth-error" style="display:none"></div>
+        <button type="submit" class="btn btn-primary btn-full auth-submit" id="su-email-btn">
+          <span id="su-email-btn-text">Continue</span>
+          <svg id="su-email-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </button>
+      </form>
 
-          <div class="modal-field">
-            <label>What interests you most? <span class="label-hint">Select all that apply</span></label>
-            <div class="chip-grid" role="group" aria-label="Select your interests">
-              <button type="button" class="chip" data-value="AI Marketplace" onclick="toggleChip(this)">🛒 AI Marketplace</button>
-              <button type="button" class="chip" data-value="GPU Rentals" onclick="toggleChip(this)">⚡ GPU Rentals</button>
-              <button type="button" class="chip" data-value="AI Tasks" onclick="toggleChip(this)">💼 AI Tasks</button>
-              <button type="button" class="chip" data-value="AI Courses" onclick="toggleChip(this)">🎓 AI Courses</button>
-              <button type="button" class="chip" data-value="AI Prompts" onclick="toggleChip(this)">📝 AI Prompts</button>
-              <button type="button" class="chip" data-value="LLMs" onclick="toggleChip(this)">🧠 LLMs</button>
-              <button type="button" class="chip" data-value="AI Hardware" onclick="toggleChip(this)">🖥️ AI Hardware</button>
-            </div>
-            <input type="hidden" name="interests" id="m-interests" />
-          </div>
+      <p class="auth-switch">Already have an account? <button onclick="switchToSignIn()" class="link-btn">Sign in</button></p>
+    </div>
 
-          <button type="submit" class="btn btn-primary btn-full" id="modal-submit-btn">
-            <span id="modal-btn-text">Secure My Spot</span>
-            <svg id="modal-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            <svg id="modal-btn-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-          </button>
-          <p class="modal-privacy">🔒 No spam. Launch updates only.</p>
-        </form>
+    <!-- STEP 1: Profile -->
+    <div class="signup-step" id="signup-step-1">
+      <div class="su-avatar-wrap">
+        <div class="su-avatar" id="su-avatar-preview">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <label class="su-avatar-btn" for="su-avatar-input" title="Upload photo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </label>
+        <input type="file" id="su-avatar-input" accept="image/*" style="display:none" onchange="previewAvatar(this)" />
       </div>
 
-      <!-- Success -->
-      <div id="modal-success" style="display:none" class="modal-success-wrap">
-        <div class="success-check">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+      <h2 class="auth-heading" id="su-greeting">Hey there! 👋</h2>
+      <p class="auth-sub">Let's set up your Itara identity</p>
+
+      <div class="auth-field">
+        <label for="su-username">Username</label>
+        <div class="auth-input-wrap su-username-wrap">
+          <span class="auth-at-prefix">@</span>
+          <input type="text" id="su-username" placeholder="yourhandle" autocomplete="off" oninput="updateUsername(this)" />
+          <button type="button" class="su-reroll-btn" onclick="rerollUsername()" title="Suggest another">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          </button>
         </div>
-        <h3>You're on the list!</h3>
-        <p>Welcome to Itara. We'll reach out as soon as early access opens.</p>
-        <button onclick="closeModal()" class="btn btn-primary" style="margin-top:1.5rem">Back to Site</button>
-        <p class="already-access">Already have access? <button onclick="closeModal();openSignIn()" class="link-btn">Sign in →</button></p>
+        <p class="auth-hint" id="su-username-hint">Auto-generated — you can edit it anytime</p>
+      </div>
+
+      <div class="su-google-note" id="su-google-note" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Your email is linked via Google. No password needed.
+      </div>
+
+      <div class="signup-nav">
+        <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(0)">← Back</button>
+        <button class="btn btn-primary" onclick="goSignUpStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: About you -->
+    <div class="signup-step" id="signup-step-2">
+      <div class="su-step-icon" style="background: rgba(79,70,229,0.08); color: var(--accent);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <h2 class="auth-heading">About you</h2>
+      <p class="auth-sub">Helps us personalise your experience</p>
+
+      <div class="auth-field">
+        <label for="su-dob">Date of Birth</label>
+        <input type="date" id="su-dob" class="auth-date-input" />
+        <p class="auth-hint">You must be at least 13 years old to use Itara</p>
+      </div>
+
+      <div class="auth-field">
+        <label>Gender</label>
+        <div class="gender-grid">
+          <button type="button" class="gender-btn" data-gender="Male" onclick="selectGender(this)">Male</button>
+          <button type="button" class="gender-btn" data-gender="Female" onclick="selectGender(this)">Female</button>
+          <button type="button" class="gender-btn" data-gender="Non-binary" onclick="selectGender(this)">Non-binary</button>
+          <button type="button" class="gender-btn" data-gender="Prefer not to say" onclick="selectGender(this)">Prefer not to say</button>
+        </div>
+      </div>
+
+      <div class="signup-nav">
+        <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goSignUpStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Interests -->
+    <div class="signup-step" id="signup-step-3">
+      <div class="su-step-icon" style="background: rgba(124,58,237,0.08); color: var(--violet);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <h2 class="auth-heading">What interests you?</h2>
+      <p class="auth-sub">Pick at least 3 to personalise your feed <span id="interests-count" class="interests-counter">0/3</span></p>
+
+      <div class="interests-grid">
+        <button type="button" class="interest-btn" data-interest="Large Language Models" onclick="toggleInterest(this)"><span class="interest-emoji">🧠</span><span class="interest-name">Large Language Models</span><span class="interest-tags">GPT, Claude, Gemini, Llama</span></button>
+        <button type="button" class="interest-btn" data-interest="Image Generation" onclick="toggleInterest(this)"><span class="interest-emoji">🎨</span><span class="interest-name">Image Generation</span><span class="interest-tags">DALL-E, Midjourney, Stable Diffusion</span></button>
+        <button type="button" class="interest-btn" data-interest="Code & Dev Tools" onclick="toggleInterest(this)"><span class="interest-emoji">💻</span><span class="interest-name">Code &amp; Dev Tools</span><span class="interest-tags">Copilot, Cursor, Cody</span></button>
+        <button type="button" class="interest-btn" data-interest="Video & Animation" onclick="toggleInterest(this)"><span class="interest-emoji">🎬</span><span class="interest-name">Video &amp; Animation</span><span class="interest-tags">Runway, Pika, Sora</span></button>
+        <button type="button" class="interest-btn" data-interest="Audio & Music" onclick="toggleInterest(this)"><span class="interest-emoji">🎵</span><span class="interest-name">Audio &amp; Music</span><span class="interest-tags">ElevenLabs, Suno, Udio</span></button>
+        <button type="button" class="interest-btn" data-interest="ML & Training" onclick="toggleInterest(this)"><span class="interest-emoji">⚙️</span><span class="interest-name">ML &amp; Training</span><span class="interest-tags">Fine-tuning, datasets, MLOps</span></button>
+        <button type="button" class="interest-btn" data-interest="GPU & Compute" onclick="toggleInterest(this)"><span class="interest-emoji">⚡</span><span class="interest-name">GPU &amp; Compute</span><span class="interest-tags">Cloud GPUs, rentals, benchmarks</span></button>
+        <button type="button" class="interest-btn" data-interest="AI Agents & Automation" onclick="toggleInterest(this)"><span class="interest-emoji">🤖</span><span class="interest-name">AI Agents &amp; Automation</span><span class="interest-tags">AutoGPT, workflows, chains</span></button>
+        <button type="button" class="interest-btn" data-interest="AI Research" onclick="toggleInterest(this)"><span class="interest-emoji">📚</span><span class="interest-name">AI Research</span><span class="interest-tags">Papers, breakthroughs, benchmarks</span></button>
+        <button type="button" class="interest-btn" data-interest="Prompt Engineering" onclick="toggleInterest(this)"><span class="interest-emoji">✍️</span><span class="interest-name">Prompt Engineering</span><span class="interest-tags">Techniques, templates, optimisation</span></button>
+        <button type="button" class="interest-btn" data-interest="Data & Analytics" onclick="toggleInterest(this)"><span class="interest-emoji">📊</span><span class="interest-name">Data &amp; Analytics</span><span class="interest-tags">Data science, visualisation, BI</span></button>
+        <button type="button" class="interest-btn" data-interest="Business & Productivity" onclick="toggleInterest(this)"><span class="interest-emoji">💼</span><span class="interest-name">Business &amp; Productivity</span><span class="interest-tags">CRM, marketing, sales tools</span></button>
+      </div>
+
+      <div class="signup-nav">
+        <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(2)">← Back</button>
+        <button class="btn btn-primary" id="interests-continue-btn" onclick="goSignUpStep(4)" disabled>Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Almost there -->
+    <div class="signup-step" id="signup-step-4">
+      <div class="su-step-icon" style="background: rgba(217,119,6,0.08); color: var(--amber);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <h2 class="auth-heading">Almost there!</h2>
+      <p class="auth-sub">Just a couple more things</p>
+
+      <div class="notif-toggle-row">
+        <div class="notif-info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div>
+            <div class="notif-title">Notifications</div>
+            <div class="notif-desc">New tools, price drops, community updates</div>
+          </div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="su-notifications" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="perks-box">
+        <div class="perks-title">Your free account includes:</div>
+        <ul class="perks-list">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Access the full Itara marketplace</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Browse GPU listings &amp; AI agents</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Post jobs on NeuralWork</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Track AI models with AXIS</li>
+        </ul>
+      </div>
+
+      <div class="toc-row">
+        <label class="toc-label">
+          <input type="checkbox" id="su-toc" onchange="updateLaunchBtn()" />
+          <span>I agree to the <a href="#" class="link-btn">Terms of Service</a> and <a href="#" class="link-btn">Privacy Policy</a></span>
+        </label>
+      </div>
+
+      <div id="su-final-error" class="auth-error" style="display:none"></div>
+
+      <button class="btn btn-primary btn-full auth-submit" id="su-launch-btn" onclick="launchAccount()" disabled>
+        <span id="su-launch-text">🚀 Launch my account</span>
+        <svg id="su-launch-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      </button>
+      <p class="auth-hint" style="text-align:center;margin-top:0.5rem">Notifications are optional. Terms acceptance is required.</p>
+
+      <div class="signup-nav" style="justify-content:flex-start;margin-top:0">
+        <button class="btn btn-ghost signup-back-btn" onclick="goSignUpStep(3)">← Back</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Success -->
+    <div class="signup-step" id="signup-step-5">
+      <div class="modal-success-wrap">
+        <div class="success-check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3>You're in!</h3>
+        <p>Welcome to Itara. Taking you to Mission Control…</p>
       </div>
     </div>
   </div>
+</div>
 
-  <script src="script.js"></script>
+<!-- ============================================================
+     WAITLIST MODAL
+     ============================================================ -->
+<div id="itara-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="display:none">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div id="modal-form-wrap">
+      <div class="modal-eyebrow">Early Access</div>
+      <h2 id="modal-title" class="modal-title">Get your spot on Itara</h2>
+      <p class="modal-sub">Be first in line when we open the doors. No spam, ever.</p>
+      <form id="waitlist-form" onsubmit="submitWaitlist(event)" novalidate>
+        <input type="hidden" name="_subject" value="New Itara Waitlist Signup" />
+        <div class="modal-row">
+          <div class="modal-field"><label for="m-fname">First Name</label><input type="text" id="m-fname" name="firstName" placeholder="Shyam" required /></div>
+          <div class="modal-field"><label for="m-lname">Last Name</label><input type="text" id="m-lname" name="lastName" placeholder="Kumar" required /></div>
+        </div>
+        <div class="modal-field"><label for="m-email">Email</label><input type="email" id="m-email" name="email" placeholder="you@email.com" required /></div>
+        <div class="modal-field">
+          <label>What interests you most? <span class="label-hint">Select all that apply</span></label>
+          <div class="chip-grid" role="group">
+            <button type="button" class="chip" data-value="AI Marketplace" onclick="toggleChip(this)">🛒 AI Marketplace</button>
+            <button type="button" class="chip" data-value="GPU Rentals" onclick="toggleChip(this)">⚡ GPU Rentals</button>
+            <button type="button" class="chip" data-value="AI Tasks" onclick="toggleChip(this)">💼 AI Tasks</button>
+            <button type="button" class="chip" data-value="AI Courses" onclick="toggleChip(this)">🎓 AI Courses</button>
+            <button type="button" class="chip" data-value="AI Prompts" onclick="toggleChip(this)">📝 AI Prompts</button>
+            <button type="button" class="chip" data-value="LLMs" onclick="toggleChip(this)">🧠 LLMs</button>
+            <button type="button" class="chip" data-value="AI Hardware" onclick="toggleChip(this)">🖥️ AI Hardware</button>
+          </div>
+          <input type="hidden" name="interests" id="m-interests" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="modal-submit-btn">
+          <span id="modal-btn-text">Secure My Spot</span>
+          <svg id="modal-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <svg id="modal-btn-spinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </button>
+        <p class="modal-privacy">🔒 No spam. Launch updates only.</p>
+      </form>
+    </div>
+    <div id="modal-success" style="display:none" class="modal-success-wrap">
+      <div class="success-check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h3>You're on the list!</h3>
+      <p>Welcome to Itara. We'll reach out as soon as early access opens.</p>
+      <button onclick="closeModal()" class="btn btn-primary" style="margin-top:1.5rem">Back to Site</button>
+      <p class="already-access">Already have access? <button onclick="closeModal();openSignIn()" class="link-btn">Sign in →</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     DATA + SHARED HOOKS
+     ============================================================ -->
+<script src="data.js"></script>
+<script type="text/babel" src="shared.jsx"></script>
+
+<!-- ============================================================
+     V3 CRYSTAL NODE WORDMARK OVERRIDE
+     (replaces ItaraMark isometric cube with Crystal Node SVG)
+     ============================================================ -->
+<script type="text/babel">
+// Override Wordmark to use Crystal Node
+function CrystalNode({ size = 32 }) {
+  const s = size;
+  return (
+    <svg width={s} height={s} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', flexShrink: 0 }}>
+      <defs>
+        <linearGradient id="cn-top-wm" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#7C3AED"/>
+          <stop offset="45%" stopColor="#4F46E5"/>
+          <stop offset="100%" stopColor="#06B6D4"/>
+        </linearGradient>
+        <linearGradient id="cn-left-wm" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#4F46E5"/>
+          <stop offset="100%" stopColor="#3730A3"/>
+        </linearGradient>
+        <linearGradient id="cn-right-wm" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#06B6D4"/>
+          <stop offset="100%" stopColor="#0284C7"/>
+        </linearGradient>
+        <linearGradient id="cn-shimmer-wm" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0"/>
+          <stop offset="50%" stopColor="#ffffff" stopOpacity="0.35"/>
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
+        </linearGradient>
+        <clipPath id="cn-clip-wm">
+          <polygon points="28,4 52,17 52,39 28,52 4,39 4,17"/>
+        </clipPath>
+      </defs>
+      {/* Hex shell faces */}
+      <polygon points="28,4 52,17 52,39 28,52 4,39 4,17" fill="url(#cn-top-wm)" opacity="0.15"/>
+      <polygon points="28,4 52,17 28,28" fill="url(#cn-top-wm)"/>
+      <polygon points="4,17 28,28 28,52 4,39" fill="url(#cn-left-wm)"/>
+      <polygon points="52,17 28,28 28,52 52,39" fill="url(#cn-right-wm)"/>
+      {/* Shimmer edge */}
+      <line x1="28" y1="4" x2="52" y2="17" stroke="url(#cn-shimmer-wm)" strokeWidth="1.5"/>
+      {/* Pink accent edge */}
+      <line x1="50" y1="18" x2="50" y2="38" stroke="#FF6AC7" strokeWidth="1.5" opacity="0.7"/>
+      {/* Signal nodes inside (clipped) */}
+      <g clipPath="url(#cn-clip-wm)">
+        <line x1="28" y1="28" x2="20" y2="22" stroke="#ffffff" strokeWidth="1" strokeOpacity="0.6"/>
+        <line x1="28" y1="28" x2="36" y2="22" stroke="#ffffff" strokeWidth="1" strokeOpacity="0.6"/>
+        <line x1="28" y1="28" x2="28" y2="38" stroke="#ffffff" strokeWidth="1" strokeOpacity="0.6"/>
+        <line x1="20" y1="22" x2="28" y2="16" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.4"/>
+        <line x1="36" y1="22" x2="28" y2="16" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.4"/>
+        <circle cx="28" cy="28" r="3" fill="#ffffff" opacity="0.95"/>
+        <circle cx="20" cy="22" r="2" fill="#ffffff" opacity="0.7"/>
+        <circle cx="36" cy="22" r="2" fill="#ffffff" opacity="0.7"/>
+        <circle cx="28" cy="16" r="1.5" fill="#ffffff" opacity="0.5"/>
+        <circle cx="28" cy="38" r="1.5" fill="#ffffff" opacity="0.5"/>
+        {/* Pulse ring */}
+        <circle cx="28" cy="28" r="6" fill="none" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.3">
+          <animate attributeName="r" values="4;9;4" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      {/* Hex border */}
+      <polygon points="28,4 52,17 52,39 28,52 4,39 4,17" fill="none" stroke="url(#cn-top-wm)" strokeWidth="0.8" opacity="0.5"/>
+    </svg>
+  );
+}
+
+// Override the global Wordmark to use Crystal Node
+window.Wordmark = function({ size = 22, color = 'currentColor' }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+      <CrystalNode size={size + 12} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{
+          fontFamily: 'Space Grotesk, sans-serif',
+          fontWeight: 700,
+          fontSize: size,
+          letterSpacing: '-0.03em',
+          color,
+        }}>itara</span>
+        <span style={{
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: Math.max(9, size * 0.52),
+          fontWeight: 600,
+          letterSpacing: '0.06em',
+          color: '#6C5CE7',
+          background: 'rgba(108,92,231,0.1)',
+          border: '1px solid rgba(108,92,231,0.25)',
+          borderRadius: 4,
+          padding: '1px 5px',
+          lineHeight: 1.5,
+        }}>BETA</span>
+      </div>
+    </div>
+  );
+};
+</script>
+
+<!-- ============================================================
+     V3 PAGE (with auth wiring)
+     ============================================================ -->
+<script type="text/babel">
+// Variation 3 — SEARCH-FIRST MARKETPLACE (auth-wired production build)
+const V3 = (() => {
+  const { useState, useEffect, useMemo } = React;
+
+  function Nav() {
+    return (
+      <nav className="v3-nav">
+        <div className="v3-nav-inner">
+          <Wordmark size={22} />
+          <div className="v3-nav-mid">
+            <a>Marketplace</a>
+            <a>How it works</a>
+            <a>Sell on Itara</a>
+            <a>Intel</a>
+          </div>
+          <div className="v3-nav-right">
+            <span className="v3-trust">◆ Escrow · Money-back</span>
+            <button className="v3-btn-ghost" onClick={() => window.openSignIn()}>Sign in</button>
+            <button className="v3-btn-solid" onClick={() => window.openSignUp()}>Start free</button>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  function Hero() {
+    const cats = [
+      { id: 'gpu',    label: 'GPU Compute', ex: 'e.g. "8× H100 in US-East for 2 weeks"' },
+      { id: 'model',  label: 'AI Models',   ex: 'e.g. "fine-tuned Llama-3 for legal docs"' },
+      { id: 'task',   label: 'AI Tasks',    ex: 'e.g. "build a RAG agent on my docs"' },
+      { id: 'talent', label: 'Talent',      ex: 'e.g. "senior LangGraph engineer, remote"' },
+      { id: 'data',   label: 'Datasets',    ex: 'e.g. "licensed medical imaging, 100K+"' },
+    ];
+    const [cat, setCat] = useState('gpu');
+    const [q, setQ] = useState('');
+    const active = cats.find(c => c.id === cat);
+
+    function handleSearch() {
+      if (q.trim()) window.openSignUp();
+    }
+
+    return (
+      <section className="v3-hero">
+        <div className="v3-hero-inner">
+          <div className="v3-badge">
+            <span className="v3-pulse" /> THE WORLD'S FIRST ALL-IN-ONE AI MARKETPLACE
+          </div>
+          <h1 className="v3-h1">
+            Everything AI.<br/>
+            <span className="v3-h1-accent">One marketplace.</span>
+          </h1>
+          <p className="v3-sub">
+            Rent GPUs. Buy models. Post tasks. Hire specialists. Escrow-backed, money-back guaranteed.
+          </p>
+
+          <div className="v3-search">
+            <div className="v3-cats">
+              {cats.map(c => (
+                <button key={c.id}
+                  className={`v3-cat ${cat === c.id ? 'active' : ''}`}
+                  onClick={() => setCat(c.id)}>
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            <div className="v3-search-bar">
+              <span className="v3-search-icon">⌕</span>
+              <input
+                value={q}
+                onChange={e => setQ(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                placeholder={active.ex} />
+              <button className="v3-search-btn" onClick={handleSearch}>Search →</button>
+            </div>
+            <div className="v3-quick">
+              <span>Trending:</span>
+              {['H100 cluster', 'Llama-3 fine-tune', 'RAG agent builder', 'Voice cloning', 'Vision dataset']
+                .map(t => <button key={t} className="v3-quick-chip" onClick={() => { setQ(t); }}>{t}</button>)}
+            </div>
+          </div>
+
+          <LivePulse />
+        </div>
+      </section>
+    );
+  }
+
+  function LivePulse() {
+    const feed = useLiveFeed(5, 1800);
+    const color = { rent:'#4A7BFF', sale:'#FF6AC7', bid:'#FFD84A', list:'#6C5CE7', escrow:'#19D08E', hire:'#FF8A3D' };
+    return (
+      <div className="v3-pulse-strip">
+        <div className="v3-pulse-head"><span className="v3-pulse-dot" /> LIVE · last 30s</div>
+        <div className="v3-pulse-items">
+          {feed.map((f, i) => (
+            <div key={f.id} className="v3-pulse-item" style={{ opacity: Math.max(0.3, 1 - i * 0.15) }}>
+              <span className="v3-pulse-kind" style={{ background: color[f.kind] }}>{f.kind}</span>
+              <span><b>{f.by}</b> {f.text}</span>
+              {f.amt && <span className="v3-pulse-amt">${f.amt.toLocaleString()}</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function Pillars() {
+    const tiles = [
+      { icon: <PillarIcon kind="gpu" />, label: 'Compute',      title: 'GPU',    sub: 'On-demand H100, A100, MI300X, RTX. From $2.49/hr.', stat: '842 live',       cta: 'Browse GPUs' },
+      { icon: <PillarIcon kind="mkt" />, label: 'The Exchange', title: 'Market', sub: 'Trade fine-tuned models, agents, datasets, prompts.', stat: '10,481 assets', cta: 'Shop models' },
+      { icon: <PillarIcon kind="tal" />, label: 'NeuralWork',   title: 'Talent', sub: 'Post a task. Hire verified AI specialists fast.',     stat: '3,120 pros',    cta: 'Hire now' },
+      { icon: <PillarIcon kind="axs" />, label: 'Axis',         title: 'Intel',  sub: 'Compare every model, price, benchmark in real time.', stat: 'Live data',     cta: 'Explore Axis' },
+    ];
+    return (
+      <section className="v3-pillars">
+        <div className="v3-sec-head">
+          <span className="v3-sec-k">Four rails</span>
+          <h2>One account. Every AI thing you need.</h2>
+        </div>
+        <div className="v3-pillars-grid">
+          {tiles.map((t, i) => (
+            <div key={i} className={`v3-pillar v3-p-${i}`} onClick={() => window.openSignUp()}>
+              <div className="v3-pillar-icon">{t.icon}</div>
+              <div className="v3-pillar-label">{t.label}</div>
+              <div className="v3-pillar-title">{t.title}</div>
+              <div className="v3-pillar-sub">{t.sub}</div>
+              <div className="v3-pillar-foot">
+                <span className="v3-pillar-stat">{t.stat}</span>
+                <span className="v3-pillar-cta">{t.cta} →</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  function PillarIcon({ kind }) {
+    const p = { width: 40, height: 40, viewBox: '0 0 40 40', fill: 'none', strokeWidth: 2, stroke: 'currentColor', strokeLinecap: 'round', strokeLinejoin: 'round' };
+    if (kind === 'gpu') return <svg {...p}><rect x="6" y="10" width="28" height="20" rx="2"/><rect x="10" y="14" width="6" height="6"/><rect x="18" y="14" width="6" height="6"/><rect x="26" y="14" width="4" height="6"/><path d="M10 24h20"/><path d="M12 30v4M28 30v4"/></svg>;
+    if (kind === 'mkt') return <svg {...p}><path d="M8 14h24l-2 16H10z"/><path d="M14 14V10a6 6 0 0 1 12 0v4"/><circle cx="16" cy="22" r="1.5"/><circle cx="24" cy="22" r="1.5"/></svg>;
+    if (kind === 'tal') return <svg {...p}><circle cx="20" cy="14" r="5"/><path d="M8 32c2-6 7-8 12-8s10 2 12 8"/><path d="M14 10l2 2M26 10l-2 2"/></svg>;
+    return <svg {...p}><circle cx="20" cy="20" r="12"/><path d="M20 8v24M8 20h24"/><circle cx="20" cy="20" r="4"/></svg>;
+  }
+
+  function GpuBrowse() {
+    const rows = useGpuTicker(2200);
+    const [filter, setFilter] = useState('all');
+    const filters = [
+      { id: 'all', label: 'All' },
+      { id: 'H100', label: 'H100' },
+      { id: 'A100', label: 'A100' },
+      { id: 'RTX',  label: 'RTX' },
+      { id: 'MI',   label: 'AMD MI' },
+    ];
+    const visible = rows.filter(r => filter === 'all' || r.model.includes(filter));
+
+    return (
+      <section className="v3-gpu">
+        <div className="v3-sec-head v3-sec-wide">
+          <div>
+            <span className="v3-sec-k">GPU marketplace · live</span>
+            <h2>Book a supercomputer in the next click.</h2>
+          </div>
+          <button className="v3-btn-ghost" onClick={() => window.openSignUp()}>See all 842 →</button>
+        </div>
+        <div className="v3-gpu-filters">
+          {filters.map(f => (
+            <button key={f.id} className={`v3-filter ${filter === f.id ? 'active' : ''}`} onClick={() => setFilter(f.id)}>
+              {f.label}
+            </button>
+          ))}
+          <div className="v3-filter-sep" />
+          <span className="v3-filter-meta">Sorted by price · ascending</span>
+        </div>
+        <div className="v3-gpu-grid">
+          {visible.slice(0, 6).map((r, i) => (
+            <div key={i} className={`v3-gpu-card ${r.flash ? 'f-' + r.flash : ''}`} onClick={() => window.openSignUp()} style={{ cursor: 'pointer' }}>
+              <div className="v3-gpu-card-top">
+                <span className="v3-gpu-card-model">{r.model}</span>
+                <span className="v3-gpu-card-badge">● Available</span>
+              </div>
+              <div className="v3-gpu-card-meta">
+                <span>{r.vram} VRAM</span>
+                <span>{r.region}</span>
+                <span>by {r.provider}</span>
+              </div>
+              <div className="v3-gpu-card-bars">
+                <span>Throughput <b>▮▮▮▮▮▮▮▮▯▯</b></span>
+                <span>Latency <b>▮▮▮▮▯▯▯▯▯▯</b></span>
+              </div>
+              <div className="v3-gpu-card-foot">
+                <span className={`v3-gpu-card-price ${r.flash === 'up' ? 'up' : r.flash === 'down' ? 'down' : ''}`}>
+                  ${r.livePrice.toFixed(2)}<span>/hr</span>
+                </span>
+                <button className="v3-rent-btn" onClick={e => { e.stopPropagation(); window.openSignUp(); }}>Rent now →</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  function ModelsShelf() {
+    return (
+      <section className="v3-models">
+        <div className="v3-sec-head v3-sec-wide">
+          <div>
+            <span className="v3-sec-k">The Exchange</span>
+            <h2>Top-selling models this week.</h2>
+          </div>
+          <button className="v3-btn-ghost" onClick={() => window.openSignUp()}>Browse all 10,481 →</button>
+        </div>
+        <div className="v3-models-row">
+          {window.ITARA_DATA.MODELS.map((m, i) => (
+            <div key={m.name} className={`v3-model-card v3-mc-${i % 4}`} onClick={() => window.openSignUp()} style={{ cursor: 'pointer' }}>
+              <div className="v3-model-header">
+                <span className="v3-model-badge">{m.tag}</span>
+                <span className="v3-model-kind">{m.kind}</span>
+              </div>
+              <div className="v3-model-name">{m.name}</div>
+              <div className="v3-model-seller">@{m.seller} · ★ 4.{8 - (i % 3)}</div>
+              <div className="v3-model-foot">
+                <span className="v3-model-price">${m.price}</span>
+                <span className="v3-model-sales">{m.sales.toLocaleString()} sold</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  function TasksShelf() {
+    return (
+      <section className="v3-tasks">
+        <div className="v3-sec-head v3-sec-wide">
+          <div>
+            <span className="v3-sec-k">NeuralWork</span>
+            <h2>Fresh AI tasks looking for builders.</h2>
+          </div>
+          <button className="v3-btn-ghost" onClick={() => window.openSignUp()}>Post a task →</button>
+        </div>
+        <div className="v3-tasks-grid">
+          {window.ITARA_DATA.TASKS.map((t, i) => (
+            <div key={i} className="v3-task" onClick={() => window.openSignUp()} style={{ cursor: 'pointer' }}>
+              <div className="v3-task-top">
+                <span className="v3-task-budget">${t.budget.toLocaleString()}</span>
+                <span className="v3-task-eta">{t.eta}</span>
+              </div>
+              <div className="v3-task-title">{t.title}</div>
+              <div className="v3-task-skills">
+                {t.skills.map(s => <span key={s} className="v3-task-skill">{s}</span>)}
+              </div>
+              <div className="v3-task-foot">
+                <span>{t.bids} bids</span>
+                <span className="v3-task-cta">Place bid →</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  function Stats() {
+    const [r1, v1] = useCountUp(52.6, 1400, n => n.toFixed(1));
+    const [r2, v2] = useCountUp(10481, 1400, n => Math.round(n).toLocaleString());
+    const [r3, v3] = useCountUp(2.49, 1400, n => n.toFixed(2));
+    const [r4, v4] = useCountUp(3120, 1400, n => Math.round(n).toLocaleString());
+    return (
+      <section className="v3-stats">
+        <div className="v3-stat" ref={r1}><span>${v1}B</span><label>AI agents market by 2030</label></div>
+        <div className="v3-stat" ref={r2}><span>{v2}</span><label>Assets on the Exchange</label></div>
+        <div className="v3-stat" ref={r3}><span>${v3}</span><label>Per hour · H100 GPU</label></div>
+        <div className="v3-stat" ref={r4}><span>{v4}</span><label>Verified AI specialists</label></div>
+      </section>
+    );
+  }
+
+  function CTA() {
+    return (
+      <section className="v3-cta">
+        <div className="v3-cta-inner">
+          <h2>Your AI stack. All on Itara.</h2>
+          <p>Escrow on every transaction. Money-back if it ships broken. 0% platform fees for the first 90 days.</p>
+          <div className="v3-cta-row">
+            <button className="v3-btn-solid v3-big" onClick={() => window.openSignUp()}>Start free</button>
+            <button className="v3-btn-ghost v3-big" onClick={() => window.openSignUp()}>Sell on Itara</button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  function Footer() {
+    return (
+      <footer className="v3-footer">
+        <div className="v3-footer-top">
+          <div>
+            <Wordmark size={20} />
+            <p className="v3-footer-tag">The world's first all-in-one AI marketplace.</p>
+          </div>
+          <div className="v3-footer-cols">
+            <div><b>Platform</b><a href="compute.html">Compute</a><a href="exchange.html">Market</a><a href="neuralwork.html">Talent</a><a href="axis.html">Axis</a></div>
+            <div><b>Company</b><a href="#">About</a><a href="#">Careers</a><a href="#">Press</a></div>
+            <div><b>Resources</b><a href="#">Docs</a><a href="#">API</a><a href="#">Status</a></div>
+            <div><b>Legal</b><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Escrow</a></div>
+          </div>
+        </div>
+        <div className="v3-footer-bot">© 2026 Itara Labs</div>
+      </footer>
+    );
+  }
+
+  function Page() {
+    return (
+      <div className="v3-root">
+        <Nav />
+        <Hero />
+        <Pillars />
+        <GpuBrowse />
+        <ModelsShelf />
+        <TasksShelf />
+        <Stats />
+        <CTA />
+        <Footer />
+      </div>
+    );
+  }
+
+  return { Page };
+})();
+
+// Mount
+(function mount() {
+  if (!window.Wordmark || !window.ITARA_DATA || !window.useLiveFeed) return setTimeout(mount, 80);
+  if (window.__itaraMounted) return;
+  window.__itaraMounted = true;
+  try {
+    const loader = document.getElementById('loading');
+    if (loader) loader.style.display = 'none';
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(V3.Page));
+  } catch(e) {
+    const l = document.getElementById('loading');
+    if (l) l.textContent = 'Error: ' + e.message;
+    console.error(e);
+  }
+})();
+</script>
+
+<!-- Supabase auth + all modal logic -->
+<script src="script.js"></script>
+
 </body>
 </html>
