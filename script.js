@@ -56,16 +56,112 @@ const supa = createClient(SUPA_URL, SUPA_KEY);
 })();
 
 // ============================================================
-//  SEARCH BAR
+//  UNIVERSAL SEARCH
 // ============================================================
+
+// Search data — all categories across the platform
+const SEARCH_DATA = [
+  // Compute
+  { title: 'H100 GPU Rental', meta: 'COMPUTE · From $2.49/hr', category: 'GPU', color: 'cyan', href: '#' },
+  { title: 'A100 80GB Cluster', meta: 'COMPUTE · High memory workloads', category: 'GPU', color: 'cyan', href: '#' },
+  { title: 'RTX 4090 Node', meta: 'COMPUTE · Consumer-grade inference', category: 'GPU', color: 'cyan', href: '#' },
+  { title: 'H200 SXM5', meta: 'COMPUTE · Frontier training', category: 'GPU', color: 'cyan', href: '#' },
+  // Exchange
+  { title: 'Fine-tuned LLaMA 3 Model', meta: 'EXCHANGE · AI Model', category: 'MODEL', color: 'violet', href: '#' },
+  { title: 'GPT-4 Prompt Pack', meta: 'EXCHANGE · Prompt Bundle', category: 'PROMPT', color: 'violet', href: '#' },
+  { title: 'Stable Diffusion XL Agent', meta: 'EXCHANGE · AI Agent', category: 'AGENT', color: 'violet', href: '#' },
+  { title: 'Custom RAG Pipeline', meta: 'EXCHANGE · Dataset + Model', category: 'DATASET', color: 'violet', href: '#' },
+  { title: 'ChatGPT API Wrapper', meta: 'EXCHANGE · Integration', category: 'MODEL', color: 'violet', href: '#' },
+  // NeuralWork
+  { title: 'AI Developer for Hire', meta: 'NEURALWORK · Verified Talent', category: 'TALENT', color: 'emerald', href: '#' },
+  { title: 'ML Engineer — Remote', meta: 'NEURALWORK · Specialist', category: 'TALENT', color: 'emerald', href: '#' },
+  { title: 'Prompt Engineer', meta: 'NEURALWORK · On-demand', category: 'TALENT', color: 'emerald', href: '#' },
+  { title: 'Fine-tuning Specialist', meta: 'NEURALWORK · LLM Expert', category: 'TALENT', color: 'emerald', href: '#' },
+  // AXIS
+  { title: 'GPT-4o Benchmark', meta: 'AXIS · Model Intelligence', category: 'INTEL', color: 'amber', href: '#' },
+  { title: 'Claude 3.5 Sonnet', meta: 'AXIS · Compare & Track', category: 'INTEL', color: 'amber', href: '#' },
+  { title: 'Gemini Ultra Ranking', meta: 'AXIS · Leaderboard', category: 'INTEL', color: 'amber', href: '#' },
+  { title: 'Mistral 7B Analysis', meta: 'AXIS · Open Source', category: 'INTEL', color: 'amber', href: '#' },
+];
+
+const COLOR_MAP = {
+  cyan:    { bg: 'rgba(6,182,212,0.1)',   color: '#06B6D4',  border: 'rgba(6,182,212,0.2)'  },
+  violet:  { bg: 'rgba(124,58,237,0.1)',  color: '#7C3AED',  border: 'rgba(124,58,237,0.2)' },
+  emerald: { bg: 'rgba(5,150,105,0.1)',   color: '#059669',  border: 'rgba(5,150,105,0.2)'  },
+  amber:   { bg: 'rgba(217,119,6,0.1)',   color: '#D97706',  border: 'rgba(217,119,6,0.2)'  },
+};
+
+function showSearchDropdown() {
+  const dd = document.getElementById('search-dropdown');
+  if (!dd) return;
+  const val = document.getElementById('search-input').value.trim();
+  // Show popular if empty, show results if typing
+  const popular = document.getElementById('search-popular');
+  if (val.length === 0) {
+    if (popular) popular.style.display = '';
+    document.getElementById('search-results').innerHTML = '';
+  }
+  dd.style.display = 'block';
+}
+
+function hideSearchDropdown() {
+  const dd = document.getElementById('search-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+
+function handleSearchInput(e) {
+  const val = e.target.value.trim().toLowerCase();
+  const resultsEl = document.getElementById('search-results');
+  const popularEl = document.getElementById('search-popular');
+  const dd = document.getElementById('search-dropdown');
+  if (!resultsEl || !dd) return;
+
+  dd.style.display = 'block';
+
+  if (val.length === 0) {
+    if (popularEl) popularEl.style.display = '';
+    resultsEl.innerHTML = '';
+    return;
+  }
+
+  if (popularEl) popularEl.style.display = 'none';
+
+  const matches = SEARCH_DATA.filter(item =>
+    item.title.toLowerCase().includes(val) ||
+    item.meta.toLowerCase().includes(val) ||
+    item.category.toLowerCase().includes(val)
+  ).slice(0, 6);
+
+  if (matches.length === 0) {
+    resultsEl.innerHTML = `<div style="padding:1rem;text-align:center;color:var(--text-faint);font-size:0.82rem">No results for "${e.target.value}" — try a different term</div>`;
+    return;
+  }
+
+  resultsEl.innerHTML = matches.map(item => {
+    const c = COLOR_MAP[item.color] || COLOR_MAP.cyan;
+    return `
+      <div class="search-result-item" onclick="fillSearch('${item.title}')">
+        <div class="search-result-icon" style="background:${c.bg};color:${c.color};border:1px solid ${c.border}">${item.category.slice(0,3)}</div>
+        <div class="search-result-text">
+          <div class="search-result-title">${item.title}</div>
+          <div class="search-result-meta">${item.meta}</div>
+        </div>
+        <span class="search-result-tag" style="background:${c.bg};color:${c.color};border:1px solid ${c.border}">${item.category}</span>
+      </div>
+    `;
+  }).join('');
+}
+
 function handleSearch(e) {
   if (e.key === 'Enter') handleSearchClick();
+  if (e.key === 'Escape') hideSearchDropdown();
 }
 
 function handleSearchClick() {
   const val = document.getElementById('search-input').value.trim();
+  hideSearchDropdown();
   if (!val) return;
-  openSignUp(); // Prompt sign-up to use search
+  openSignUp();
 }
 
 function fillSearch(text) {
@@ -73,7 +169,14 @@ function fillSearch(text) {
   if (!input) return;
   input.value = text;
   input.focus();
+  handleSearchInput({ target: input });
 }
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('search-wrap');
+  if (wrap && !wrap.contains(e.target)) hideSearchDropdown();
+});
 
 // ============================================================
 //  WAITLIST MODAL

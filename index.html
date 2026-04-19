@@ -101,11 +101,12 @@
         <a href="#community">Community</a>
       </nav>
 
-      <!-- Actions -->
-      <div class="nav-actions">
+      <!-- Actions (far right) -->
+      <div class="nav-actions nav-actions-right">
         <button data-theme-toggle aria-label="Toggle dark mode" class="nav-icon-btn">
           <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
+        <div class="nav-auth-divider"></div>
         <button onclick="openSignIn()" class="btn btn-ghost">Sign In</button>
         <button onclick="openSignUp()" class="btn btn-primary">Sign Up</button>
       </div>
@@ -118,27 +119,85 @@
   <main class="hero">
     <div class="hero-inner">
 
+      <!-- Crystal Node Logo above headline -->
+      <div class="hero-logo-mark" aria-label="Itara">
+        <svg width="80" height="80" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="hl-prism" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7C3AED"/><stop offset="45%" stop-color="#4F46E5"/><stop offset="100%" stop-color="#06B6D4"/></linearGradient>
+            <linearGradient id="hl-h1" x1="10" y1="15" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#06B6D4"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
+            <linearGradient id="hl-vt" x1="20" y1="10" x2="20" y2="30" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset=".5" stop-color="#EC4899"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
+            <linearGradient id="hl-h2" x1="10" y1="25" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#06B6D4"/></linearGradient>
+            <radialGradient id="hl-cn" cx="42%" cy="36%" r="60%"><stop stop-color="#F9A8D4"/><stop offset=".6" stop-color="#EC4899"/><stop offset="1" stop-color="#7C3AED"/></radialGradient>
+            <linearGradient id="hl-d1" x1="20" y1="20" x2="10" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
+            <linearGradient id="hl-d2" x1="20" y1="20" x2="30" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#EC4899" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
+            <linearGradient id="hl-d3" x1="20" y1="20" x2="10" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0"/></linearGradient>
+            <linearGradient id="hl-d4" x1="20" y1="20" x2="30" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#7C3AED" stop-opacity=".9"/><stop offset="1" stop-color="#06B6D4" stop-opacity="0"/></linearGradient>
+            <linearGradient id="hl-tf" x1="12" y1="2" x2="28" y2="14" gradientUnits="userSpaceOnUse"><stop stop-color="rgba(255,255,255,0.25)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></linearGradient>
+            <filter id="hl-glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <clipPath id="hl-clip"><polygon points="20,2 35,10 35,28 20,36 5,28 5,10"/></clipPath>
+          </defs>
+          <polygon points="20,2 35,10 35,28 20,36 5,28 5,10" fill="url(#hl-prism)" opacity="0.95" filter="url(#hl-glow)"/>
+          <polygon points="20,2 35,10 20,18 5,10" fill="url(#hl-tf)"/>
+          <polygon points="35,10 35,28 20,36 20,18" fill="rgba(0,0,0,0.14)"/>
+          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(236,72,153,0.5)" stroke-width="0.9" stroke-linecap="round"/>
+          <line x1="20" y1="2" x2="35" y2="10" stroke="rgba(255,255,255,0.22)" stroke-width="0.7" stroke-linecap="round"/>
+          <line x1="20" y1="2" x2="5" y2="10" stroke="rgba(255,255,255,0.14)" stroke-width="0.6" stroke-linecap="round"/>
+          <g clip-path="url(#hl-clip)">
+            <line x1="10" y1="15" x2="30" y2="15" stroke="url(#hl-h1)" stroke-width="1.3" stroke-linecap="round" opacity="0.95"/>
+            <line x1="20" y1="15" x2="20" y2="25" stroke="url(#hl-vt)" stroke-width="1.3" stroke-linecap="round" opacity="0.95"/>
+            <line x1="10" y1="25" x2="30" y2="25" stroke="url(#hl-h2)" stroke-width="1.3" stroke-linecap="round" opacity="0.95"/>
+            <line x1="20" y1="20" x2="10" y2="15" stroke="url(#hl-d1)" stroke-width="0.9" opacity="0.75"/>
+            <line x1="20" y1="20" x2="30" y2="15" stroke="url(#hl-d2)" stroke-width="0.9" opacity="0.75"/>
+            <line x1="20" y1="20" x2="10" y2="25" stroke="url(#hl-d3)" stroke-width="0.9" opacity="0.75"/>
+            <line x1="20" y1="20" x2="30" y2="25" stroke="url(#hl-d4)" stroke-width="0.9" opacity="0.75"/>
+            <circle cx="10" cy="15" r="2.4" fill="rgba(6,182,212,0.3)"/><circle cx="10" cy="15" r="1.5" fill="#06B6D4"/>
+            <circle cx="30" cy="15" r="2.4" fill="rgba(79,70,229,0.3)"/><circle cx="30" cy="15" r="1.5" fill="#4F46E5"/>
+            <circle cx="10" cy="25" r="2.4" fill="rgba(79,70,229,0.3)"/><circle cx="10" cy="25" r="1.5" fill="#4F46E5"/>
+            <circle cx="30" cy="25" r="2.4" fill="rgba(6,182,212,0.3)"/><circle cx="30" cy="25" r="1.5" fill="#06B6D4"/>
+            <circle cx="20" cy="20" r="9" fill="rgba(236,72,153,0.1)"/>
+            <circle cx="20" cy="20" r="4" fill="url(#hl-cn)"/>
+          </g>
+        </svg>
+        <div class="hero-logo-pulse"></div>
+      </div>
+
       <!-- Headline -->
       <h1 class="hero-title">
-        <span class="hero-line-main">BUY. SELL.</span>
+        <span class="hero-line-main">BUY. SELL. TRADE.</span>
         <span class="hero-line-main">BUILD THE</span>
-        <span class="hero-line-accent">FUTURE OF AI.</span>
+        <span class="hero-line-accent">FUTURE OF Ai.</span>
       </h1>
       <p class="hero-sub">The global marketplace for GPU compute, AI agents, fine-tuned models, datasets, and AI-skilled talent — built for builders, startups &amp; enterprises.</p>
 
-      <!-- Search bar -->
-      <div class="search-wrap">
-        <div class="search-bar">
+      <!-- Universal Search bar -->
+      <div class="search-wrap" id="search-wrap">
+        <div class="search-bar" id="search-bar">
           <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input
             type="text"
             id="search-input"
             class="search-input"
-            placeholder="Search models, GPUs, talent, datasets…"
+            placeholder="Search models, GPUs, talent, datasets, builders…"
             autocomplete="off"
+            oninput="handleSearchInput(event)"
             onkeydown="handleSearch(event)"
+            onfocus="showSearchDropdown()"
           />
           <button class="search-btn" onclick="handleSearchClick()">Search</button>
+        </div>
+        <!-- Live results dropdown -->
+        <div class="search-dropdown" id="search-dropdown" style="display:none">
+          <div class="search-popular" id="search-popular">
+            <span class="search-pop-label">Popular</span>
+            <div class="search-pop-tags">
+              <button onclick="fillSearch('ChatGPT API')" class="pop-tag">ChatGPT API</button>
+              <button onclick="fillSearch('GPU Rentals')" class="pop-tag">GPU Rentals</button>
+              <button onclick="fillSearch('AI Prompts')" class="pop-tag">AI Prompts</button>
+              <button onclick="fillSearch('H100')" class="pop-tag">H100</button>
+              <button onclick="fillSearch('Fine-tuned Models')" class="pop-tag">Fine-tuned Models</button>
+            </div>
+          </div>
+          <div class="search-results" id="search-results"></div>
         </div>
         <p class="search-hint">Try: <span onclick="fillSearch('H100 GPU rental')">H100 GPU rental</span> · <span onclick="fillSearch('fine-tuned LLaMA model')">fine-tuned LLaMA model</span> · <span onclick="fillSearch('AI developer for hire')">AI developer for hire</span></p>
       </div>
@@ -147,49 +206,69 @@
       <div class="modules-grid" id="platform">
         <!-- Compute -->
         <div class="module-card" data-color="cyan" onclick="openSignUp()">
+          <div class="module-badge">GPU</div>
           <div class="module-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg>
           </div>
           <span class="module-label">COMPUTE</span>
           <p class="module-desc">Rent H100, A100 &amp; RTX clusters on demand</p>
+          <div class="module-stats">
+            <span class="module-stat-pill">$2.49<span>/hr</span></span>
+            <span class="module-stat-pill">No waitlist</span>
+          </div>
           <div class="module-arrow">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
 
         <!-- The Exchange -->
         <div class="module-card" data-color="violet" onclick="openSignUp()">
+          <div class="module-badge">MARKET</div>
           <div class="module-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
           </div>
           <span class="module-label">THE EXCHANGE</span>
           <p class="module-desc">Buy &amp; sell AI models, agents, datasets &amp; prompts</p>
+          <div class="module-stats">
+            <span class="module-stat-pill">10K+ Assets</span>
+            <span class="module-stat-pill">Escrow</span>
+          </div>
           <div class="module-arrow">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
 
         <!-- NeuralWork -->
         <div class="module-card" data-color="emerald" onclick="openSignUp()">
+          <div class="module-badge">TALENT</div>
           <div class="module-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <span class="module-label">NEURALWORK</span>
           <p class="module-desc">Hire verified AI specialists for any task</p>
+          <div class="module-stats">
+            <span class="module-stat-pill">Verified</span>
+            <span class="module-stat-pill">+109%</span>
+          </div>
           <div class="module-arrow">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
 
         <!-- AXIS -->
         <div class="module-card" data-color="amber" onclick="openSignUp()">
+          <div class="module-badge">INTEL</div>
           <div class="module-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
           </div>
           <span class="module-label">AXIS</span>
           <p class="module-desc">Discover, compare &amp; track every AI model</p>
+          <div class="module-stats">
+            <span class="module-stat-pill">Live Data</span>
+            <span class="module-stat-pill">$52.6B mkt</span>
+          </div>
           <div class="module-arrow">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
       </div>
