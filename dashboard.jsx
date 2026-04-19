@@ -322,6 +322,115 @@ const D = (() => {
   }
 
   // ============================================================
+  // Universal Search Bar — sits between hero and stat blocks
+  // ============================================================
+  function UniversalSearch() {
+    const [q, setQ] = useState('');
+    const [open, setOpen] = useState(false);
+    const [active, setActive] = useState(-1);
+    const inputRef = useRef(null);
+    const wrapRef = useRef(null);
+
+    // Search corpus — pulls from real data
+    const corpus = useMemo(() => [
+      ...window.ITARA_DATA.GPUS.map(g => ({ type: 'GPU', label: g.model, sub: `${g.region} · $${g.price}/hr`, icon: '▣', href: '#compute' })),
+      ...window.ITARA_DATA.MODELS.map(m => ({ type: 'MODEL', label: m.name, sub: `${m.kind} · $${m.price}`, icon: '◆', href: '#exchange' })),
+      ...U.TASKS.map(t => ({ type: 'TASK', label: t.title, sub: `$${t.budget.toLocaleString()} · ${t.stage}`, icon: '◉', href: '#neuralwork' })),
+      ...U.TRENDING.map(m => ({ type: 'TRENDING', label: m.name, sub: `${m.kind} · ${m.delta >= 0 ? '▲' : '▼'} ${Math.abs(m.delta)}%`, icon: '✦', href: '#exchange' })),
+      { type: 'NAV', label: 'Compute', sub: 'GPU Rentals', icon: '▣', href: '#compute' },
+      { type: 'NAV', label: 'Exchange', sub: 'AI Marketplace', icon: '◆', href: '#exchange' },
+      { type: 'NAV', label: 'NeuralWork', sub: 'Task Freelancer', icon: '◉', href: '#neuralwork' },
+      { type: 'NAV', label: 'AXIS', sub: 'AI Intelligence Hub', icon: '✦', href: '#axis' },
+      { type: 'NAV', label: 'Wallet', sub: 'Earnings & Payouts', icon: '§', href: '#wallet' },
+    ], []);
+
+    const results = useMemo(() => {
+      if (!q.trim()) return [];
+      const s = q.toLowerCase();
+      return corpus.filter(c => c.label.toLowerCase().includes(s) || c.sub.toLowerCase().includes(s) || c.type.toLowerCase().includes(s)).slice(0, 8);
+    }, [q, corpus]);
+
+    useEffect(() => {
+      if (results.length > 0) setOpen(true);
+      else setOpen(false);
+      setActive(-1);
+    }, [results]);
+
+    // Close on outside click
+    useEffect(() => {
+      function handler(e) {
+        if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      }
+      document.addEventListener('mousedown', handler);
+      return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    function handleKey(e) {
+      if (!open) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(a => Math.min(a + 1, results.length - 1)); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setActive(a => Math.max(a - 1, 0)); }
+      if (e.key === 'Enter' && active >= 0) { window.location.hash = results[active].href; setOpen(false); setQ(''); }
+      if (e.key === 'Escape') { setOpen(false); setQ(''); }
+    }
+
+    // Keyboard shortcut ⌘K / Ctrl+K
+    useEffect(() => {
+      function shortcut(e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); inputRef.current?.focus(); }
+      }
+      document.addEventListener('keydown', shortcut);
+      return () => document.removeEventListener('keydown', shortcut);
+    }, []);
+
+    return (
+      <div className="dB-usearch" ref={wrapRef}>
+        <div className={`dB-usearch-bar ${open ? 'is-open' : ''}`}>
+          <span className="dB-usearch-icon">⌕</span>
+          <input
+            ref={inputRef}
+            className="dB-usearch-input"
+            type="text"
+            placeholder="Search GPUs, models, tasks, pages…"
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            onFocus={() => { if (results.length > 0) setOpen(true); }}
+            onKeyDown={handleKey}
+            autoComplete="off"
+            spellCheck="false"
+          />
+          {q && <button className="dB-usearch-clear" onClick={() => { setQ(''); setOpen(false); inputRef.current?.focus(); }}>✕</button>}
+          <kbd className="dB-usearch-kbd">⌘K</kbd>
+        </div>
+        {open && results.length > 0 && (
+          <div className="dB-usearch-drop">
+            {results.map((r, i) => (
+              <div
+                key={i}
+                className={`dB-usearch-row ${active === i ? 'is-active' : ''}`}
+                onMouseEnter={() => setActive(i)}
+                onClick={() => { window.location.hash = r.href; setOpen(false); setQ(''); }}
+              >
+                <span className="dB-usearch-row-icon">{r.icon}</span>
+                <div className="dB-usearch-row-body">
+                  <span className="dB-usearch-row-label">{r.label}</span>
+                  <span className="dB-usearch-row-sub">{r.sub}</span>
+                </div>
+                <span className="dB-usearch-row-type">{r.type}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {open && results.length === 0 && q.trim() && (
+          <div className="dB-usearch-drop dB-usearch-empty">
+            <span className="dB-usearch-row-icon">○</span>
+            <span style={{ opacity: 0.5 }}>No results for "{q}"</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ============================================================
   // VARIATION B — COMMAND HUD (top nav, hero canvas)
   // ============================================================
   function CommandPage() {
@@ -334,7 +443,10 @@ const D = (() => {
             <a>MISSION</a><a>COMPUTE</a><a>EXCHANGE</a><a>NEURALWORK</a><a>AXIS</a><a>WALLET</a>
           </div>
           <div className="dB-nav-r">
-            <div className="dB-cmdk"><span>⌕</span>Search · <kbd>⌘K</kbd></div>
+            <div className="dB-nav-theme" id="mc-theme-btn-nav" aria-label="Toggle theme">
+              <div className="dB-nav-tgl-track"><div className="dB-nav-tgl-thumb"></div></div>
+              <span className="dB-nav-theme-label" id="mc-theme-label">DARK</span>
+            </div>
             <div className="dB-avatar">{U.USER.name[0]}</div>
           </div>
         </nav>
@@ -350,6 +462,7 @@ const D = (() => {
             WELCOME BACK,<br/>
             <span className="dB-h1-accent">{U.USER.name.toUpperCase()}.</span>
           </h1>
+          <UniversalSearch />
           <div className="dB-hero-sub">
             <div className="dB-hero-stat">
               <span className="dB-stat-k">EARNED WHILE AWAY</span>
