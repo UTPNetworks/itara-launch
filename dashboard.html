@@ -52,34 +52,114 @@
     100% { width: 0%; margin-left: 100%; }
   }
 
-  /* Variant switcher pill — top-right */
-  .mc-switcher {
+  /* Theme toggle — fixed top-right */
+  .mc-theme-btn {
     position: fixed; top: 14px; right: 14px; z-index: 9999;
     display: none;
-    gap: 4px; align-items: center;
-    background: rgba(10,10,12,0.9);
-    backdrop-filter: blur(12px);
+    align-items: center; gap: 9px;
+    background: rgba(10,10,12,0.88);
+    backdrop-filter: blur(14px);
     border: 1px solid rgba(244,242,236,0.18);
-    padding: 5px; border-radius: 999px;
+    padding: 7px 14px 7px 9px;
+    border-radius: 999px;
     font-family: 'JetBrains Mono', monospace;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  }
-  .mc-switcher.visible { display: flex; }
-  .mc-sw-label {
-    font-size: 9px; letter-spacing: 0.18em;
-    color: rgba(244,242,236,0.35);
-    padding: 0 8px;
-  }
-  .mc-sw-btn {
-    background: transparent; border: 0;
-    color: rgba(244,242,236,0.5);
-    padding: 6px 14px; border-radius: 999px;
     font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
-    cursor: pointer; font-family: inherit;
-    transition: all .15s;
+    color: rgba(244,242,236,0.6);
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transition: color .2s, border-color .2s, background .3s;
   }
-  .mc-sw-btn:hover { color: #F4F2EC; }
-  .mc-sw-btn.active { background: #F4F2EC; color: #0A0A0C; }
+  .mc-theme-btn.visible { display: flex; }
+  .mc-theme-btn:hover { color: #F4F2EC; }
+  .mc-tgl-track {
+    width: 40px; height: 22px;
+    border-radius: 999px;
+    background: rgba(244,242,236,0.15);
+    border: 1.5px solid rgba(244,242,236,0.22);
+    position: relative;
+    transition: background .22s, border-color .22s;
+    flex-shrink: 0;
+  }
+  .mc-theme-btn.is-light .mc-tgl-track {
+    background: #6C5CE7;
+    border-color: #6C5CE7;
+  }
+  .mc-tgl-thumb {
+    position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #F4F2EC;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    display: grid; place-items: center;
+    font-size: 9px; line-height: 1;
+  }
+  .mc-theme-btn.is-light .mc-tgl-thumb { transform: translateX(18px); }
+
+  /* Light-mode overrides — applied to <body> */
+  body.mc-light { background: #FAF8F2 !important; }
+  body.mc-light .mc-theme-btn {
+    background: rgba(250,248,242,0.92) !important;
+    border-color: rgba(13,13,20,0.15) !important;
+    color: rgba(13,13,20,0.6) !important;
+  }
+  body.mc-light .mc-tgl-track { background: rgba(13,13,20,0.1) !important; border-color: rgba(13,13,20,0.2) !important; }
+  body.mc-light .mc-theme-btn.is-light .mc-tgl-track { background: #6C5CE7 !important; border-color: #6C5CE7 !important; }
+  body.mc-light .mc-tgl-thumb { background: #0D0D14 !important; }
+  body.mc-light .mc-theme-btn.is-light .mc-tgl-thumb { background: #fff !important; }
+  body.mc-light .dB-root { background: #F0EEE8 !important; color: #0D0D14 !important; }
+  body.mc-light .dB-nav {
+    background: rgba(250,248,242,0.92) !important;
+    border-bottom-color: rgba(13,13,20,0.1) !important;
+  }
+  body.mc-light .dB-nav-l { color: rgba(13,13,20,0.5) !important; }
+  body.mc-light .dB-nav-m { background: rgba(13,13,20,0.06) !important; border-color: rgba(13,13,20,0.1) !important; }
+  body.mc-light .dB-nav-m a { color: rgba(13,13,20,0.5) !important; }
+  body.mc-light .dB-nav-m a:first-child { background: #0D0D14 !important; color: #F4F2EC !important; }
+  body.mc-light .dB-cmdk { border-color: rgba(13,13,20,0.2) !important; color: rgba(13,13,20,0.5) !important; }
+  body.mc-light .dB-avatar { border-color: #0D0D14 !important; }
+  body.mc-light .dB-h1 { color: #0D0D14 !important; }
+  body.mc-light .dB-hero-top { color: rgba(13,13,20,0.45) !important; border-bottom-color: rgba(13,13,20,0.1) !important; }
+  body.mc-light .dB-hero-sub { background: rgba(13,13,20,0.08) !important; }
+  body.mc-light .dB-hero-stat { background: #FAF8F2 !important; }
+  body.mc-light .dB-stat-k { color: rgba(13,13,20,0.45) !important; }
+  body.mc-light .dB-stat-v { color: #0D0D14 !important; }
+  body.mc-light .dB-stat-v small { color: rgba(13,13,20,0.4) !important; }
+  body.mc-light .dB-panel { background: #FFFFFF !important; border-color: rgba(13,13,20,0.1) !important; }
+  body.mc-light .dB-panel-k { color: rgba(13,13,20,0.45) !important; }
+  body.mc-light .dB-panel-lnk { color: #0D0D14 !important; border-color: rgba(13,13,20,0.2) !important; }
+  body.mc-light .dB-panel-cta { background: #0D0D14 !important; color: #F4F2EC !important; border-color: #0D0D14 !important; }
+  body.mc-light .dB-earn-tabs { background: rgba(13,13,20,0.06) !important; }
+  body.mc-light .dB-earn-tabs button { color: rgba(13,13,20,0.5) !important; }
+  body.mc-light .dB-earn-tabs .active { background: #0D0D14 !important; color: #F4F2EC !important; }
+  body.mc-light .dB-earn-grid { background: rgba(13,13,20,0.08) !important; border-top-color: rgba(13,13,20,0.1) !important; }
+  body.mc-light .dB-earn-grid > div { background: #FFFFFF !important; }
+  body.mc-light .dB-earn-grid b { color: #0D0D14 !important; }
+  body.mc-light .dB-earn-grid span { color: rgba(13,13,20,0.45) !important; }
+  body.mc-light .dB-market-cols { color: rgba(13,13,20,0.4) !important; border-bottom-color: rgba(13,13,20,0.1) !important; }
+  body.mc-light .dB-market-row:not(.f-up):not(.f-down) { background: #FAF8F2 !important; }
+  body.mc-light .dB-m-model { color: #0D0D14 !important; }
+  body.mc-light .dB-m-region { color: rgba(13,13,20,0.4) !important; }
+  body.mc-light .dB-trend-grid { background: rgba(13,13,20,0.08) !important; }
+  body.mc-light .dB-trend-cell { background: #FFFFFF !important; }
+  body.mc-light .dB-trend-rank { color: rgba(13,13,20,0.4) !important; }
+  body.mc-light .dB-trend-name { color: #0D0D14 !important; }
+  body.mc-light .dB-trend-kind { color: rgba(13,13,20,0.4) !important; }
+  body.mc-light .dB-trend-foot { border-top-color: rgba(13,13,20,0.1) !important; }
+  body.mc-light .dB-ck-bar { background: rgba(13,13,20,0.08) !important; }
+  body.mc-light .dB-ck-item { border-bottom-color: rgba(13,13,20,0.08) !important; color: #0D0D14 !important; }
+  body.mc-light .dB-ck-item.done { color: rgba(13,13,20,0.35) !important; }
+  body.mc-light .dB-ck-box { border-color: rgba(13,13,20,0.2) !important; }
+  body.mc-light .dB-q { background: #FFFFFF !important; border-color: rgba(13,13,20,0.15) !important; color: #0D0D14 !important; }
+  body.mc-light .dB-q-0 { background: #6C5CE7 !important; border-color: #6C5CE7 !important; color: #fff !important; }
+  body.mc-light .dB-q-1 { background: #FF6AC7 !important; border-color: #FF6AC7 !important; color: #0D0D14 !important; }
+  body.mc-light .dB-q-2 { background: #4A7BFF !important; border-color: #4A7BFF !important; color: #fff !important; }
+  body.mc-light .dB-q-3 { background: #FFD84A !important; border-color: #FFD84A !important; color: #0D0D14 !important; }
+  body.mc-light .dB-feed { background: #FFFFFF !important; border-color: rgba(13,13,20,0.1) !important; }
+  body.mc-light .dB-feed-grid { background: rgba(13,13,20,0.08) !important; }
+  body.mc-light .dB-feed-row { background: #FFFFFF !important; }
+  body.mc-light .dB-feed-g { color: #6C5CE7 !important; }
+  body.mc-light .dB-feed-t { color: #0D0D14 !important; }
+  body.mc-light .dB-feed-time { color: rgba(13,13,20,0.4) !important; }
 
   /* Auth gate overlay */
   .mc-auth-gate {
@@ -159,12 +239,11 @@
   </div>
 </div>
 
-<!-- Variant switcher -->
-<div class="mc-switcher" id="mc-switcher">
-  <span class="mc-sw-label">VARIANT</span>
-  <button class="mc-sw-btn" data-v="cockpit">A · COCKPIT</button>
-  <button class="mc-sw-btn" data-v="command">B · COMMAND HUD</button>
-</div>
+<!-- Theme toggle -->
+<button class="mc-theme-btn" id="mc-theme-btn" aria-label="Toggle theme">
+  <div class="mc-tgl-track"><div class="mc-tgl-thumb"></div></div>
+  <span id="mc-theme-label">DARK</span>
+</button>
 
 <!-- React root -->
 <div id="root"></div>
@@ -191,29 +270,30 @@ const SUPABASE_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const MC_KEY = 'itara_mc_variant';
+const MC_THEME_KEY = 'itara_mc_theme';
 
+// ---- Theme toggle logic (vanilla, outside React) ----
+function initThemeToggle() {
+  const btn = document.getElementById('mc-theme-btn');
+  const label = document.getElementById('mc-theme-label');
+  btn.classList.add('visible');
+
+  let isLight = localStorage.getItem(MC_THEME_KEY) === 'light';
+
+  function applyTheme() {
+    document.body.classList.toggle('mc-light', isLight);
+    btn.classList.toggle('is-light', isLight);
+    label.textContent = isLight ? 'LIGHT' : 'DARK';
+    localStorage.setItem(MC_THEME_KEY, isLight ? 'light' : 'dark');
+  }
+
+  applyTheme();
+  btn.onclick = () => { isLight = !isLight; applyTheme(); };
+}
+
+// ---- Dashboard app — always Command HUD ----
 function DashApp({ user }) {
-  const [variant, setVariant] = React.useState(() => {
-    return localStorage.getItem(MC_KEY) || 'cockpit';
-  });
-
-  // Persist preference
-  React.useEffect(() => {
-    localStorage.setItem(MC_KEY, variant);
-  }, [variant]);
-
-  // Wire switcher buttons
-  React.useEffect(() => {
-    const sw = document.getElementById('mc-switcher');
-    sw.classList.add('visible');
-    sw.querySelectorAll('.mc-sw-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.v === variant);
-      btn.onclick = () => setVariant(btn.dataset.v);
-    });
-  });
-
-  // Patch ITARA_DASH with real user data if available
+  // Patch real user name from Supabase session
   React.useEffect(() => {
     if (user && window.ITARA_DASH) {
       const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'You';
@@ -222,34 +302,26 @@ function DashApp({ user }) {
     }
   }, [user]);
 
-  const Page = variant === 'command'
-    ? window.D.CommandPage
-    : window.D.CockpitPage;
-
-  return <Page />;
+  return <window.D.CommandPage />;
 }
 
 async function boot() {
-  // Wait for all deps
   if (!window.D || !window.ITARA_DASH || !window.ITARA_DATA || !window.Wordmark) {
     return setTimeout(boot, 60);
   }
 
-  // Check auth
   const { data: { session } } = await sb.auth.getSession();
-
   const loading = document.getElementById('mc-loading');
   const authGate = document.getElementById('mc-auth-gate');
 
   if (!session) {
-    // Show auth gate instead of dashboard
     loading.style.display = 'none';
     authGate.style.display = 'grid';
     return;
   }
 
-  // Signed in — mount dashboard
   loading.style.display = 'none';
+  initThemeToggle();
   ReactDOM.createRoot(document.getElementById('root')).render(
     React.createElement(DashApp, { user: session.user })
   );
