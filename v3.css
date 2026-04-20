@@ -32,10 +32,10 @@
 .v3-nav-inner {
   width: 100%;
   padding: 14px 28px;
-  display: grid; grid-template-columns: auto 1fr auto; gap: 32px; align-items: center;
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
 }
 .v3-nav-logo { flex-shrink: 0; display: flex; align-items: center; }
-.v3-nav-mid { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+.v3-nav-mid { display: flex; gap: 32px; justify-content: center; flex: 1; }
 .v3-nav-mid a { font-size: 14px; color: var(--ink); cursor: pointer; font-weight: 500; white-space: nowrap; }
 .v3-nav-mid a:hover { color: var(--violet); }
 .v3-nav-right { display: flex; gap: 12px; align-items: center; flex-shrink: 0; justify-content: flex-end; }
