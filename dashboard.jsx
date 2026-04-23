@@ -86,9 +86,264 @@ const D = (() => {
   // ============================================================
   // VARIATION A — COCKPIT (sidebar + modular grid)
   // ============================================================
+
+  // Modal components
+  function ListGPUModal({ onClose }) {
+    const [gpuType, setGpuType] = useState('h100');
+    const [hourlyRate, setHourlyRate] = useState('2.49');
+    const [sshAccess, setSshAccess] = useState(true);
+    const [vram, setVram] = useState('80gb');
+    const [availability, setAvailability] = useState('24/7');
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>⚡ LIST A GPU RESOURCE</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>GPU Type</label>
+              <select value={gpuType} onChange={e => setGpuType(e.target.value)}>
+                <option value="h100">NVIDIA H100 (80GB)</option>
+                <option value="h200">NVIDIA H200 (141GB)</option>
+                <option value="a100">NVIDIA A100 (80GB)</option>
+                <option value="rtx4090">RTX 4090 (24GB)</option>
+                <option value="rtx6000">RTX 6000 (48GB)</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Rent per Hour (USD)</label>
+              <input type="text" value={hourlyRate} onChange={e => setHourlyRate(e.target.value)} placeholder="0.00" />
+            </div>
+            <div className="form-group">
+              <label>SSH Access</label>
+              <div className="toggle-switch">
+                <input type="checkbox" checked={sshAccess} onChange={e => setSshAccess(e.target.checked)} />
+                <span>{sshAccess ? 'Enabled' : 'Disabled'}</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <label>VRAM</label>
+              <select value={vram} onChange={e => setVram(e.target.value)}>
+                <option value="24gb">24GB</option>
+                <option value="48gb">48GB</option>
+                <option value="80gb">80GB</option>
+                <option value="141gb">141GB</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Availability</label>
+              <select value={availability} onChange={e => setAvailability(e.target.value)}>
+                <option value="24/7">24/7 Always On</option>
+                <option value="scheduled">Scheduled Hours</option>
+                <option value="on-demand">On Demand</option>
+              </select>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button className="btn-primary" onClick={onClose}>List GPU</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function UploadModelModal({ onClose }) {
+    const [modelName, setModelName] = useState('');
+    const [modelType, setModelType] = useState('llm');
+    const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>🤖 UPLOAD A MODEL</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>Model Name</label>
+              <input type="text" value={modelName} onChange={e => setModelName(e.target.value)} placeholder="e.g., FineTuned-Llama-7B" />
+            </div>
+            <div className="form-group">
+              <label>Model Type</label>
+              <select value={modelType} onChange={e => setModelType(e.target.value)}>
+                <option value="llm">Large Language Model</option>
+                <option value="vision">Vision Model</option>
+                <option value="multimodal">Multimodal</option>
+                <option value="embeddings">Embeddings</option>
+                <option value="diffusion">Diffusion</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Price (USD)</label>
+              <input type="text" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="What does this model do? Any special capabilities?" rows="3" />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button className="btn-primary" onClick={onClose}>Upload Model</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function PostTaskModal({ onClose }) {
+    const [title, setTitle] = useState('');
+    const [budget, setBudget] = useState('');
+    const [category, setCategory] = useState('development');
+    const [description, setDescription] = useState('');
+    const [deadline, setDeadline] = useState('');
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>📋 POST A TASK</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>Task Title</label>
+              <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g., Fine-tune GPT model on domain data" />
+            </div>
+            <div className="form-group">
+              <label>Budget (USD)</label>
+              <input type="text" value={budget} onChange={e => setBudget(e.target.value)} placeholder="0.00" />
+            </div>
+            <div className="form-group">
+              <label>Category</label>
+              <select value={category} onChange={e => setCategory(e.target.value)}>
+                <option value="development">Model Development</option>
+                <option value="finetuning">Fine-tuning</option>
+                <option value="testing">Testing & Eval</option>
+                <option value="deployment">Deployment</option>
+                <option value="research">Research</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Detailed requirements..." rows="3" />
+            </div>
+            <div className="form-group">
+              <label>Deadline</label>
+              <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button className="btn-primary" onClick={onClose}>Post Task</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function RentComputeModal({ onClose }) {
+    const [gpuModel, setGpuModel] = useState('h100');
+    const [hours, setHours] = useState('1');
+    const [region, setRegion] = useState('us-west');
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content modal-compact" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>🔧 RENT COMPUTE</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>GPU Type</label>
+              <select value={gpuModel} onChange={e => setGpuModel(e.target.value)}>
+                <option value="h100">H100 - $2.49/hr</option>
+                <option value="a100">A100 - $1.89/hr</option>
+                <option value="rtx4090">RTX 4090 - $0.49/hr</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Hours</label>
+              <input type="number" value={hours} onChange={e => setHours(e.target.value)} min="1" max="720" />
+            </div>
+            <div className="form-group">
+              <label>Region</label>
+              <select value={region} onChange={e => setRegion(e.target.value)}>
+                <option value="us-west">US West (lowest latency)</option>
+                <option value="us-east">US East</option>
+                <option value="eu-west">EU West</option>
+                <option value="ap-south">Asia Pacific</option>
+              </select>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button className="btn-primary" onClick={onClose}>Rent Now</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function HireTalentModal({ onClose }) {
+    const [expertise, setExpertise] = useState('ml-engineer');
+    const [budget, setBudget] = useState('');
+    const [duration, setDuration] = useState('project');
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content modal-compact" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>👤 HIRE TALENT</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>Role Needed</label>
+              <select value={expertise} onChange={e => setExpertise(e.target.value)}>
+                <option value="ml-engineer">ML Engineer</option>
+                <option value="prompt-engineer">Prompt Engineer</option>
+                <option value="data-scientist">Data Scientist</option>
+                <option value="devops">DevOps Engineer</option>
+                <option value="researcher">Researcher</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Budget (USD)</label>
+              <input type="text" value={budget} onChange={e => setBudget(e.target.value)} placeholder="0.00" />
+            </div>
+            <div className="form-group">
+              <label>Duration</label>
+              <select value={duration} onChange={e => setDuration(e.target.value)}>
+                <option value="project">Project (one-time)</option>
+                <option value="part-time">Part-time (ongoing)</option>
+                <option value="full-time">Full-time (exclusive)</option>
+              </select>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button className="btn-primary" onClick={onClose}>Browse Talent</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function CockpitPage() {
     const [nav, setNav] = useState('mission');
+    const [modal, setModal] = useState(null);
     const rows = MarketTicker();
+
+    // Check if user is new (no listings, no earnings)
+    const isNewUser = U.LISTINGS.length === 0 && U.earnings.every(e => e === 0);
 
     return (
       <div className="dA-root" data-screen-label="DA Cockpit">
@@ -127,7 +382,11 @@ const D = (() => {
             <div>
               <div className="dA-eyebrow"><Clock /></div>
               <h1 className="dA-greet">GOOD MORNING,<br/><span className="dA-greet-accent">{U.USER.name.toUpperCase()}.</span></h1>
-              <p className="dA-subgreet">You earned <b>$482.40</b> while you were asleep. 2 rentals active. 1 task awaiting your review.</p>
+              {!isNewUser ? (
+                <p className="dA-subgreet">You earned <b>$482.40</b> while you were asleep. 2 rentals active. 1 task awaiting your review.</p>
+              ) : (
+                <p className="dA-subgreet">Welcome to Itara Mission Control. Get started by listing your first GPU, model, or posting a task.</p>
+              )}
             </div>
             <div className="dA-cmdk">
               <span className="dA-cmdk-icon">⌕</span>
@@ -140,35 +399,33 @@ const D = (() => {
           <section className="dA-kpis">
             <div className="dA-kpi">
               <span className="dA-kpi-k">BALANCE</span>
-              <span className="dA-kpi-v">$<AnimatedNum value={U.USER.balance} fmt={n => n.toFixed(2)} /></span>
-              <span className="dA-kpi-foot">+$482.40 today · <a>withdraw →</a></span>
+              <span className="dA-kpi-v">$<AnimatedNum value={isNewUser ? 0 : U.USER.balance} fmt={n => n.toFixed(2)} /></span>
+              <span className="dA-kpi-foot">{isNewUser ? 'Earn by listing GPUs, models, or completing tasks' : '+$482.40 today · '}<a>{!isNewUser && 'withdraw →'}</a></span>
             </div>
             <div className="dA-kpi">
               <span className="dA-kpi-k">IN ESCROW</span>
-              <span className="dA-kpi-v dA-violet">$<AnimatedNum value={U.USER.escrow} fmt={n => n.toFixed(2)} /></span>
-              <span className="dA-kpi-foot">3 open transactions</span>
+              <span className="dA-kpi-v dA-violet">$<AnimatedNum value={isNewUser ? 0 : U.USER.escrow} fmt={n => n.toFixed(2)} /></span>
+              <span className="dA-kpi-foot">{isNewUser ? 'Escrow protects all transactions' : '3 open transactions'}</span>
             </div>
             <div className="dA-kpi">
               <span className="dA-kpi-k">GPU HOURS SOLD</span>
-              <span className="dA-kpi-v dA-blue"><AnimatedNum value={412} fmt={n => Math.round(n).toLocaleString()} /></span>
-              <span className="dA-kpi-foot">last 30 days · +24%</span>
+              <span className="dA-kpi-v dA-blue"><AnimatedNum value={isNewUser ? 0 : 412} fmt={n => Math.round(n).toLocaleString()} /></span>
+              <span className="dA-kpi-foot">{isNewUser ? 'Start renting to earn' : 'last 30 days · +24%'}</span>
             </div>
             <div className="dA-kpi">
               <span className="dA-kpi-k">LISTINGS LIVE</span>
-              <span className="dA-kpi-v dA-pink"><AnimatedNum value={4} fmt={n => Math.round(n)} /></span>
-              <span className="dA-kpi-foot">2 GPU · 2 models</span>
+              <span className="dA-kpi-v dA-pink"><AnimatedNum value={isNewUser ? 0 : 4} fmt={n => Math.round(n)} /></span>
+              <span className="dA-kpi-foot">{isNewUser ? 'List your first GPU or model above' : '2 GPU · 2 models'}</span>
             </div>
           </section>
 
           {/* Quick actions */}
           <section className="dA-quick">
-            {[
-              ['+ LIST A GPU', 'violet'],
-              ['+ UPLOAD A MODEL', 'pink'],
-              ['+ POST A TASK', 'blue'],
-              ['RENT COMPUTE →', 'yellow'],
-              ['HIRE TALENT →', 'ghost'],
-            ].map(([t, c]) => <button key={t} className={`dA-q dA-q-${c}`}>{t}</button>)}
+            <button className="dA-q dA-q-violet" onClick={() => setModal('list-gpu')}>+ LIST A GPU</button>
+            <button className="dA-q dA-q-pink" onClick={() => setModal('upload-model')}>+ UPLOAD A MODEL</button>
+            <button className="dA-q dA-q-blue" onClick={() => setModal('post-task')}>+ POST A TASK</button>
+            <button className="dA-q dA-q-yellow" onClick={() => setModal('rent-compute')}>RENT COMPUTE →</button>
+            <button className="dA-q dA-q-ghost" onClick={() => setModal('hire-talent')}>HIRE TALENT →</button>
           </section>
 
           {/* Module tiles */}
@@ -317,6 +574,13 @@ const D = (() => {
             </div>
           </section>
         </main>
+
+        {/* Modal rendering */}
+        {modal === 'list-gpu' && <ListGPUModal onClose={() => setModal(null)} />}
+        {modal === 'upload-model' && <UploadModelModal onClose={() => setModal(null)} />}
+        {modal === 'post-task' && <PostTaskModal onClose={() => setModal(null)} />}
+        {modal === 'rent-compute' && <RentComputeModal onClose={() => setModal(null)} />}
+        {modal === 'hire-talent' && <HireTalentModal onClose={() => setModal(null)} />}
       </div>
     );
   }
