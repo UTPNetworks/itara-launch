@@ -723,3 +723,156 @@ document.addEventListener('DOMContentLoaded', () => {
     obs.observe(card);
   });
 });
+
+// ============================================================
+//  DASHBOARD DATA INITIALIZATION (Supabase)
+// ============================================================
+
+async function initializeDashboardData() {
+  try {
+    // Get current logged-in user
+    const { data: { session } } = await supa.auth.getSession();
+    if (!session) {
+      console.log('No active session — using fallback data');
+      return;
+    }
+
+    const userId = session.user.id;
+    const userEmail = session.user.email;
+
+    // Fetch user profile
+    const { data: userData, error: userError } = await supa
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !userData) {
+      console.warn('Could not fetch user profile:', userError);
+      // Initialize with basic user info from auth
+      window.ITARA_DASH = {
+        USER: {
+          name: session.user.user_metadata?.full_name || 'User',
+          handle: '@user_' + userId.slice(0, 8),
+          tier: 'free',
+          balance: 0,
+          escrow: 0
+        },
+        LISTINGS: [],
+        earnings: Array(30).fill(0),
+        TRENDING: [],
+        TASKS: [],
+        NOTIFS: [],
+        CHECKLIST: []
+      };
+      return;
+    }
+
+    // Fetch user's listings (GPU rentals)
+    const { data: listings = [], error: listError } = await supa
+      .from('listings')
+      .select('*')
+      .eq('user_id', userId);
+
+    // Fetch user's tasks
+    const { data: tasks = [], error: taskError } = await supa
+      .from('tasks')
+      .select('*')
+      .eq('creator_id', userId);
+
+    // Fetch user's earnings (last 30 days)
+    const { data: earningsData = [], error: earningError } = await supa
+      .from('earnings')
+      .select('amount, date')
+      .eq('user_id', userId)
+      .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+      .order('date', { ascending: true });
+
+    // Fetch trending items
+    const { data: trending = [], error: trendError } = await supa
+      .from('trending')
+      .select('*')
+      .limit(5);
+
+    // Fetch notifications
+    const { data: notifs = [], error: notifError } = await supa
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    // Fetch checklist items
+    const { data: checklist = [], error: checkError } = await supa
+      .from('checklist')
+      .select('*')
+      .eq('user_id', userId);
+
+    // Process earnings into 30-day array
+    const earningsArray = Array(30).fill(0);
+    earningsData.forEach(entry => {
+      const dayIndex = Math.floor((Date.now() - new Date(entry.date).getTime()) / (24 * 60 * 60 * 1000));
+      if (dayIndex >= 0 && dayIndex < 30) {
+        earningsArray[29 - dayIndex] += parseFloat(entry.amount || 0);
+      }
+    });
+
+    // Populate window.ITARA_DASH
+    window.ITARA_DASH = {
+      USER: {
+        name: userData.full_name || 'User',
+        handle: '@' + (userData.username || 'user_' + userId.slice(0, 8)),
+        tier: userData.tier || 'free',
+        balance: parseFloat(userData.balance || 0),
+        escrow: parseFloat(userData.escrow || 0)
+      },
+      LISTINGS: listings.map(l => ({
+        ...l,
+        kind: l.kind || 'GPU'
+      })) || [],
+      earnings: earningsArray,
+      TRENDING: trending.map(t => ({
+        name: t.name,
+        kind: t.kind || 'model',
+        delta: t.delta || 0
+      })) || [],
+      TASKS: tasks.map(t => ({
+        title: t.title,
+        budget: parseFloat(t.budget || 0),
+        stage: t.stage || 'open'
+      })) || [],
+      NOTIFS: notifs.map(n => ({
+        text: n.text,
+        time: n.created_at
+      })) || [],
+      CHECKLIST: checklist.map(c => ({
+        text: c.text,
+        done: c.done || false
+      })) || []
+    };
+
+    console.log('Dashboard data initialized from Supabase:', window.ITARA_DASH);
+
+  } catch (err) {
+    console.error('Error initializing dashboard data:', err);
+    // Fallback: ensure window.ITARA_DASH exists with empty structure
+    if (!window.ITARA_DASH) {
+      window.ITARA_DASH = {
+        USER: { name: 'User', handle: '@user', tier: 'free', balance: 0, escrow: 0 },
+        LISTINGS: [],
+        earnings: Array(30).fill(0),
+        TRENDING: [],
+        TASKS: [],
+        NOTIFS: [],
+        CHECKLIST: []
+      };
+    }
+  }
+}
+
+// Initialize dashboard data when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeDashboardData);
+} else {
+  initializeDashboardData();
+}
