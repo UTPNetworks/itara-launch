@@ -697,7 +697,94 @@ const D = (() => {
   // ============================================================
   // VARIATION B — COMMAND HUD (top nav, hero canvas)
   // ============================================================
+  function CommandPageProfileDropdown({ isOpen, onClose, avatarRef }) {
+    const dropdownRef = useRef(null);
+    const [position, setPosition] = useState({ top: 0, right: 0 });
+
+    useEffect(() => {
+      if (isOpen && avatarRef.current) {
+        const rect = avatarRef.current.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + 12,
+          right: window.innerWidth - rect.right
+        });
+      }
+    }, [isOpen, avatarRef]);
+
+    useEffect(() => {
+      function handleClickOutside(e) {
+        if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+          if (avatarRef.current && !avatarRef.current.contains(e.target)) {
+            onClose();
+          }
+        }
+      }
+      if (isOpen) {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }
+    }, [isOpen, onClose, avatarRef]);
+
+    if (!isOpen) return null;
+
+    const handleSignOut = () => {
+      localStorage.removeItem('itara_session');
+      window.location.href = '/index.html';
+    };
+
+    return (
+      <div className="dB-profile-dropdown" ref={dropdownRef} style={{ top: `${position.top}px`, right: `${position.right}px` }}>
+        <div className="dB-profile-header">
+          <div className="dB-profile-avatar-large">{U.USER.name[0]}</div>
+          <div>
+            <div className="dB-profile-name">{U.USER.name}</div>
+            <div className="dB-profile-tier">{U.USER.tier} · {U.USER.handle}</div>
+          </div>
+        </div>
+        <div className="dB-profile-divider"></div>
+        <button className="dB-dropdown-item" onClick={onClose}>
+          <span className="dB-dropdown-icon">👤</span>
+          <div>
+            <span>My Profile</span>
+            <span className="dB-dropdown-sub">View & edit your profile</span>
+          </div>
+        </button>
+        <button className="dB-dropdown-item" onClick={onClose}>
+          <span className="dB-dropdown-icon">⚙️</span>
+          <div>
+            <span>Settings</span>
+            <span className="dB-dropdown-sub">Preferences & integrations</span>
+          </div>
+        </button>
+        <button className="dB-dropdown-item" onClick={onClose}>
+          <span className="dB-dropdown-icon">💼</span>
+          <div>
+            <span>My Wallet</span>
+            <span className="dB-dropdown-sub">${U.USER.balance.toFixed(2)} available</span>
+          </div>
+        </button>
+        <button className="dB-dropdown-item" onClick={onClose}>
+          <span className="dB-dropdown-icon">📊</span>
+          <div>
+            <span>Analytics</span>
+            <span className="dB-dropdown-sub">View your stats & reports</span>
+          </div>
+        </button>
+        <div className="dB-profile-divider"></div>
+        <button className="dB-dropdown-item dB-dropdown-danger" onClick={handleSignOut}>
+          <span className="dB-dropdown-icon">🚪</span>
+          <div>
+            <span>Sign Out</span>
+            <span className="dB-dropdown-sub">See you next time</span>
+          </div>
+        </button>
+      </div>
+    );
+  }
+
   function CommandPage() {
+    const [profileOpen, setProfileOpen] = useState(false);
+    const avatarRef = useRef(null);
     const rows = MarketTicker(2500);
     return (
       <div className="dB-root" data-screen-label="DB Command">
@@ -716,7 +803,8 @@ const D = (() => {
               <div className="dB-nav-tgl-track"><div className="dB-nav-tgl-thumb"></div></div>
               <span className="dB-nav-theme-label" id="mc-theme-label">DARK</span>
             </div>
-            <div className="dB-avatar">{U.USER.name[0]}</div>
+            <div ref={avatarRef} className="dB-avatar" onClick={() => setProfileOpen(!profileOpen)} style={{ cursor: 'pointer' }}>{U.USER.name[0]}</div>
+            <CommandPageProfileDropdown isOpen={profileOpen} onClose={() => setProfileOpen(false)} avatarRef={avatarRef} />
           </div>
         </nav>
 
