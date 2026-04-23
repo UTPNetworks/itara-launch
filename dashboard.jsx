@@ -697,7 +697,7 @@ const D = (() => {
   // ============================================================
   // VARIATION B — COMMAND HUD (top nav, hero canvas)
   // ============================================================
-  function CommandPageProfileDropdown({ isOpen, onClose, avatarRef }) {
+  function CommandPageProfileDropdown({ isOpen, onClose, avatarRef, onOpenProfile }) {
     const dropdownRef = useRef(null);
     const [position, setPosition] = useState({ top: 0, right: 0 });
 
@@ -727,9 +727,14 @@ const D = (() => {
 
     if (!isOpen) return null;
 
-    const handleSignOut = () => {
-      localStorage.removeItem('itara_session');
-      window.location.href = '/index.html';
+    const handleSignOut = async () => {
+      try {
+        await supa.auth.signOut();
+        window.location.href = '/index.html';
+      } catch (err) {
+        console.error('Sign out error:', err);
+        window.location.href = '/index.html';
+      }
     };
 
     return (
@@ -742,28 +747,28 @@ const D = (() => {
           </div>
         </div>
         <div className="dB-profile-divider"></div>
-        <button className="dB-dropdown-item" onClick={onClose}>
+        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('profile'); onClose(); }}>
           <span className="dB-dropdown-icon">👤</span>
           <div>
             <span>My Profile</span>
             <span className="dB-dropdown-sub">View & edit your profile</span>
           </div>
         </button>
-        <button className="dB-dropdown-item" onClick={onClose}>
+        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('settings'); onClose(); }}>
           <span className="dB-dropdown-icon">⚙️</span>
           <div>
             <span>Settings</span>
             <span className="dB-dropdown-sub">Preferences & integrations</span>
           </div>
         </button>
-        <button className="dB-dropdown-item" onClick={onClose}>
+        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('wallet'); onClose(); }}>
           <span className="dB-dropdown-icon">💼</span>
           <div>
             <span>My Wallet</span>
             <span className="dB-dropdown-sub">${U.USER.balance.toFixed(2)} available</span>
           </div>
         </button>
-        <button className="dB-dropdown-item" onClick={onClose}>
+        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('analytics'); onClose(); }}>
           <span className="dB-dropdown-icon">📊</span>
           <div>
             <span>Analytics</span>
@@ -782,9 +787,221 @@ const D = (() => {
     );
   }
 
+  // Profile page modals
+  function ProfileModal({ onClose }) {
+    const [editing, setEditing] = useState(false);
+    const [name, setName] = useState(U.USER.name);
+    const [bio, setBio] = useState('AI enthusiast · GPU provider · Model creator');
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>👤 MY PROFILE</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#6C5CE7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: '40px', color: 'white' }}>{U.USER.name[0]}</div>
+              <div style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>{U.USER.name}</div>
+              <div style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '0.5rem' }}>{U.USER.handle}</div>
+            </div>
+            {!editing ? (
+              <>
+                <div className="form-group">
+                  <label>Handle</label>
+                  <input type="text" value={U.USER.handle} disabled style={{ background: '#f5f5f5' }} />
+                </div>
+                <div className="form-group">
+                  <label>Bio</label>
+                  <input type="text" value={bio} disabled style={{ background: '#f5f5f5' }} />
+                </div>
+                <div className="form-group">
+                  <label>Tier</label>
+                  <input type="text" value={U.USER.tier.toUpperCase()} disabled style={{ background: '#f5f5f5' }} />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <input type="text" value={name} onChange={e => setName(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Bio</label>
+                  <textarea value={bio} onChange={e => setBio(e.target.value)} rows="3" placeholder="Tell us about yourself..." />
+                </div>
+              </>
+            )}
+          </div>
+          <div className="modal-footer">
+            {!editing ? (
+              <>
+                <button className="btn-secondary" onClick={onClose}>Close</button>
+                <button className="btn-primary" onClick={() => setEditing(true)}>Edit Profile</button>
+              </>
+            ) : (
+              <>
+                <button className="btn-secondary" onClick={() => setEditing(false)}>Cancel</button>
+                <button className="btn-primary" onClick={() => { setEditing(false); }}>Save Changes</button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function SettingsModal({ onClose }) {
+    const [notifs, setNotifs] = useState(true);
+    const [email, setEmail] = useState(true);
+    const [twofa, setTwofa] = useState(false);
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>⚙️ SETTINGS</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div style={{ marginBottom: '2rem' }}>
+              <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>NOTIFICATIONS</h3>
+              <div className="form-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <label style={{ margin: 0 }}>Platform Notifications</label>
+                <input type="checkbox" checked={notifs} onChange={e => setNotifs(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
+              </div>
+              <div className="form-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ margin: 0 }}>Email Digest</label>
+                <input type="checkbox" checked={email} onChange={e => setEmail(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '2rem' }}>
+              <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>SECURITY</h3>
+              <div className="form-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ margin: 0 }}>Two-Factor Authentication</label>
+                <input type="checkbox" checked={twofa} onChange={e => setTwofa(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
+              </div>
+            </div>
+
+            <div>
+              <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>API KEYS</h3>
+              <button style={{ padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '100%' }}>Generate API Key</button>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Close</button>
+            <button className="btn-primary" onClick={() => { onClose(); }}>Save Settings</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function WalletModal({ onClose }) {
+    const transactions = [
+      { id: 1, type: 'earned', amount: 250.50, desc: 'GPU rental (H100, 50hrs)', date: '2 hours ago' },
+      { id: 2, type: 'earned', amount: 180.00, desc: 'Model sold - Orion', date: '1 day ago' },
+      { id: 3, type: 'withdrawal', amount: 500.00, desc: 'Payout to bank', date: '3 days ago' },
+      { id: 4, type: 'earned', amount: 95.25, desc: 'Task completed', date: '1 week ago' },
+    ];
+
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" style={{ maxWidth: '700px' }} onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>💼 MY WALLET</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div style={{ background: '#6C5CE7', color: 'white', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem' }}>
+              <div style={{ opacity: 0.9, marginBottom: '0.5rem' }}>AVAILABLE BALANCE</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>${U.USER.balance.toFixed(2)}</div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+              <button style={{ padding: '1rem', background: '#f5f5f5', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>→ Withdraw</button>
+              <button style={{ padding: '1rem', background: '#f5f5f5', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>+ Add Funds</button>
+            </div>
+
+            <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>RECENT TRANSACTIONS</h3>
+            {transactions.map(tx => (
+              <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #eee', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: 'bold' }}>{tx.desc}</div>
+                  <div style={{ fontSize: '0.85rem', opacity: 0.6 }}>{tx.date}</div>
+                </div>
+                <div style={{ fontWeight: 'bold', color: tx.type === 'earned' ? '#06B6D4' : '#FF6AC7' }}>
+                  {tx.type === 'earned' ? '+' : '-'}${tx.amount.toFixed(2)}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Close</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function AnalyticsModal({ onClose }) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" style={{ maxWidth: '700px' }} onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>📊 ANALYTICS</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
+                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>TOTAL EARNINGS</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>$24,682</div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
+                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>ACTIVE LISTINGS</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>12</div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
+                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>COMPLETED TASKS</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>48</div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
+                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>AVG RATING</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>4.9⭐</div>
+              </div>
+            </div>
+
+            <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>EARNINGS BREAKDOWN</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ opacity: 0.7, fontSize: '0.85rem', marginBottom: '0.5rem' }}>GPU RENTAL</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#06B6D4' }}>$12,480</div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ opacity: 0.7, fontSize: '0.85rem', marginBottom: '0.5rem' }}>MODELS SOLD</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7C3AED' }}>$8,202</div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ opacity: 0.7, fontSize: '0.85rem', marginBottom: '0.5rem' }}>TASKS</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#FF6AC7' }}>$4,000</div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={onClose}>Close</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function CommandPage() {
     const [profileOpen, setProfileOpen] = useState(false);
     const [modal, setModal] = useState(null);
+    const [profilePage, setProfilePage] = useState(null);
     const avatarRef = useRef(null);
     const rows = MarketTicker(2500);
     return (
@@ -805,9 +1022,15 @@ const D = (() => {
               <span className="dB-nav-theme-label" id="mc-theme-label">DARK</span>
             </div>
             <div ref={avatarRef} className="dB-avatar" onClick={() => setProfileOpen(!profileOpen)} style={{ cursor: 'pointer' }}>{U.USER.name[0]}</div>
-            <CommandPageProfileDropdown isOpen={profileOpen} onClose={() => setProfileOpen(false)} avatarRef={avatarRef} />
+            <CommandPageProfileDropdown isOpen={profileOpen} onClose={() => setProfileOpen(false)} avatarRef={avatarRef} onOpenProfile={setProfilePage} />
           </div>
         </nav>
+
+        {/* Profile Page Modals */}
+        {profilePage === 'profile' && <ProfileModal onClose={() => setProfilePage(null)} />}
+        {profilePage === 'settings' && <SettingsModal onClose={() => setProfilePage(null)} />}
+        {profilePage === 'wallet' && <WalletModal onClose={() => setProfilePage(null)} />}
+        {profilePage === 'analytics' && <AnalyticsModal onClose={() => setProfilePage(null)} />}
 
         {/* Hero / big greeting */}
         <section className="dB-hero">
@@ -824,15 +1047,15 @@ const D = (() => {
           <div className="dB-hero-sub">
             <div className="dB-hero-stat">
               <span className="dB-stat-k">EARNED WHILE AWAY</span>
-              <span className="dB-stat-v">$<AnimatedNum value={482.40} /></span>
+              <span className="dB-stat-v">$<AnimatedNum value={U.earnings.slice(-7).reduce((a, b) => a + b, 0)} fmt={n => n.toFixed(2)} /></span>
             </div>
             <div className="dB-hero-stat">
               <span className="dB-stat-k">ACTIVE NOW</span>
-              <span className="dB-stat-v">2<small> rentals</small></span>
+              <span className="dB-stat-v">{U.LISTINGS.filter(l => l.kind === 'GPU').length}<small> rentals</small></span>
             </div>
             <div className="dB-hero-stat">
               <span className="dB-stat-k">AWAITING YOU</span>
-              <span className="dB-stat-v">14<small> bids</small></span>
+              <span className="dB-stat-v">{U.TASKS.length}<small> bids</small></span>
             </div>
             <div className="dB-hero-stat">
               <span className="dB-stat-k">BALANCE</span>
@@ -873,13 +1096,13 @@ const D = (() => {
               <span className="dB-panel-k">§ EARNINGS · LAST 30 DAYS</span>
               <div className="dB-earn-tabs"><button className="active">30D</button><button>90D</button><button>1Y</button></div>
             </div>
-            <div className="dB-earn-val">$<AnimatedNum value={7480} fmt={n => Math.round(n).toLocaleString()} /></div>
-            <div className="dB-earn-delta">▲ 34.2% VS PRIOR 30D · PROJECTED $9,840 NEXT 30D</div>
+            <div className="dB-earn-val">$<AnimatedNum value={U.earnings.reduce((a, b) => a + b, 0)} fmt={n => Math.round(n).toLocaleString()} /></div>
+            <div className="dB-earn-delta">▲ 34.2% VS PRIOR 30D · PROJECTED ${Math.round(U.earnings.reduce((a, b) => a + b, 0) * 1.342).toLocaleString()} NEXT 30D</div>
             <Bars data={U.earnings} h={160} color="#FF6AC7" />
             <div className="dB-earn-grid">
-              <div><b>$3,564</b><span>Models · Orion, VoxSuno</span></div>
-              <div><b>$2,361</b><span>Compute · 412 GPU hrs sold</span></div>
-              <div><b>$1,555</b><span>Tasks · 2 completed</span></div>
+              <div><b>${(U.earnings.reduce((a, b) => a + b, 0) * 0.48).toFixed(0)}</b><span>Models · {U.LISTINGS.filter(l => l.kind === 'MODEL').length || 'N/A'} listed</span></div>
+              <div><b>${(U.earnings.reduce((a, b) => a + b, 0) * 0.32).toFixed(0)}</b><span>Compute · {U.LISTINGS.filter(l => l.kind === 'GPU').length || 'N/A'} GPU rentals</span></div>
+              <div><b>${(U.earnings.reduce((a, b) => a + b, 0) * 0.20).toFixed(0)}</b><span>Tasks · {U.TASKS.length || 'N/A'} completed</span></div>
             </div>
           </div>
 
