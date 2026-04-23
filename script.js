@@ -320,7 +320,7 @@ async function signInWithGoogle() {
   const { error } = await supa.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: base + '/dashboard.html'
+      redirectTo: base + '/index.html?signin_step=1'
     }
   });
   if (error) {
@@ -658,7 +658,7 @@ async function launchAccount() {
 }
 
 // ============================================================
-//  CHECK FOR GOOGLE OAUTH RETURN (signup_step=1)
+//  CHECK FOR GOOGLE OAUTH RETURN (signup_step=1 or signin_step=1)
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -684,6 +684,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = session.user.user_metadata?.full_name?.split(' ')[0] || 'there';
         if (greeting) greeting.textContent = 'Hey, ' + name + '! 👋';
       }, 50);
+    }
+  }
+
+  if (params.get('signin_step') === '1') {
+    // Returned from Google OAuth during sign-in flow
+    const { data: { session } } = await supa.auth.getSession();
+    if (session) {
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // Redirect to dashboard after successful OAuth sign-in
+      window.location.href = '/dashboard.html';
     }
   }
 });
