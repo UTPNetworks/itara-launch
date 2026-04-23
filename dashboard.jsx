@@ -727,271 +727,251 @@ const D = (() => {
 
     if (!isOpen) return null;
 
-    const handleSignOut = async () => {
-      try {
-        await supa.auth.signOut();
-        window.location.href = '/index.html';
-      } catch (err) {
-        console.error('Sign out error:', err);
-        window.location.href = '/index.html';
-      }
-    };
-
     return (
       <div className="dB-profile-dropdown" ref={dropdownRef} style={{ top: `${position.top}px`, right: `${position.right}px` }}>
         <div className="dB-profile-header">
           <div className="dB-profile-avatar-large">{U.USER.name[0]}</div>
           <div>
             <div className="dB-profile-name">{U.USER.name}</div>
-            <div className="dB-profile-tier">{U.USER.tier} · {U.USER.handle}</div>
+            <div className="dB-profile-tier">{U.USER.email}</div>
           </div>
         </div>
         <div className="dB-profile-divider"></div>
         <button className="dB-dropdown-item" onClick={() => { onOpenProfile('profile'); onClose(); }}>
-          <span className="dB-dropdown-icon">👤</span>
           <div>
-            <span>My Profile</span>
-            <span className="dB-dropdown-sub">View & edit your profile</span>
+            <span>Profile</span>
           </div>
         </button>
-        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('settings'); onClose(); }}>
-          <span className="dB-dropdown-icon">⚙️</span>
+        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('listings'); onClose(); }}>
           <div>
-            <span>Settings</span>
-            <span className="dB-dropdown-sub">Preferences & integrations</span>
+            <span>My Listings</span>
           </div>
         </button>
-        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('wallet'); onClose(); }}>
-          <span className="dB-dropdown-icon">💼</span>
+        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('security'); onClose(); }}>
           <div>
-            <span>My Wallet</span>
-            <span className="dB-dropdown-sub">${U.USER.balance.toFixed(2)} available</span>
-          </div>
-        </button>
-        <button className="dB-dropdown-item" onClick={() => { onOpenProfile('analytics'); onClose(); }}>
-          <span className="dB-dropdown-icon">📊</span>
-          <div>
-            <span>Analytics</span>
-            <span className="dB-dropdown-sub">View your stats & reports</span>
+            <span>Security & MFA</span>
           </div>
         </button>
         <div className="dB-profile-divider"></div>
-        <button className="dB-dropdown-item dB-dropdown-danger" onClick={handleSignOut}>
-          <span className="dB-dropdown-icon">🚪</span>
+        <button className="dB-dropdown-item dB-dropdown-danger" onClick={() => { onOpenProfile('signout'); onClose(); }}>
           <div>
-            <span>Sign Out</span>
-            <span className="dB-dropdown-sub">See you next time</span>
+            <span>Sign out</span>
           </div>
         </button>
       </div>
     );
   }
 
-  // Profile page modals
-  function ProfileModal({ onClose }) {
-    const [editing, setEditing] = useState(false);
-    const [name, setName] = useState(U.USER.name);
+  // Professional Profile Page with sidebar
+  function ProfilePage({ onClose, initialSection = 'overview' }) {
+    const [activeSection, setActiveSection] = useState(initialSection);
+    const [firstName, setFirstName] = useState('Admin');
+    const [lastName, setLastName] = useState('Bhuvi');
+    const [email, setEmail] = useState(U.USER.email || 'admin.bhuvi@gmail.com');
+    const [phone, setPhone] = useState('+1 (555) 000-0000');
     const [bio, setBio] = useState('AI enthusiast · GPU provider · Model creator');
-
-    return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
-          <div className="modal-header">
-            <h2>👤 MY PROFILE</h2>
-            <button className="modal-close" onClick={onClose}>✕</button>
-          </div>
-          <div className="modal-body">
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#6C5CE7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: '40px', color: 'white' }}>{U.USER.name[0]}</div>
-              <div style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>{U.USER.name}</div>
-              <div style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '0.5rem' }}>{U.USER.handle}</div>
-            </div>
-            {!editing ? (
-              <>
-                <div className="form-group">
-                  <label>Handle</label>
-                  <input type="text" value={U.USER.handle} disabled style={{ background: '#f5f5f5' }} />
-                </div>
-                <div className="form-group">
-                  <label>Bio</label>
-                  <input type="text" value={bio} disabled style={{ background: '#f5f5f5' }} />
-                </div>
-                <div className="form-group">
-                  <label>Tier</label>
-                  <input type="text" value={U.USER.tier.toUpperCase()} disabled style={{ background: '#f5f5f5' }} />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input type="text" value={name} onChange={e => setName(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label>Bio</label>
-                  <textarea value={bio} onChange={e => setBio(e.target.value)} rows="3" placeholder="Tell us about yourself..." />
-                </div>
-              </>
-            )}
-          </div>
-          <div className="modal-footer">
-            {!editing ? (
-              <>
-                <button className="btn-secondary" onClick={onClose}>Close</button>
-                <button className="btn-primary" onClick={() => setEditing(true)}>Edit Profile</button>
-              </>
-            ) : (
-              <>
-                <button className="btn-secondary" onClick={() => setEditing(false)}>Cancel</button>
-                <button className="btn-primary" onClick={() => { setEditing(false); }}>Save Changes</button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function SettingsModal({ onClose }) {
-    const [notifs, setNotifs] = useState(true);
-    const [email, setEmail] = useState(true);
     const [twofa, setTwofa] = useState(false);
 
-    return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
-          <div className="modal-header">
-            <h2>⚙️ SETTINGS</h2>
-            <button className="modal-close" onClick={onClose}>✕</button>
-          </div>
-          <div className="modal-body">
-            <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>NOTIFICATIONS</h3>
-              <div className="form-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <label style={{ margin: 0 }}>Platform Notifications</label>
-                <input type="checkbox" checked={notifs} onChange={e => setNotifs(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
-              </div>
-              <div className="form-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label style={{ margin: 0 }}>Email Digest</label>
-                <input type="checkbox" checked={email} onChange={e => setEmail(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>SECURITY</h3>
-              <div className="form-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label style={{ margin: 0 }}>Two-Factor Authentication</label>
-                <input type="checkbox" checked={twofa} onChange={e => setTwofa(e.target.checked)} style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
-              </div>
-            </div>
-
-            <div>
-              <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>API KEYS</h3>
-              <button style={{ padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '100%' }}>Generate API Key</button>
-            </div>
-          </div>
-          <div className="modal-footer">
-            <button className="btn-secondary" onClick={onClose}>Close</button>
-            <button className="btn-primary" onClick={() => { onClose(); }}>Save Settings</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function WalletModal({ onClose }) {
-    const transactions = [
-      { id: 1, type: 'earned', amount: 250.50, desc: 'GPU rental (H100, 50hrs)', date: '2 hours ago' },
-      { id: 2, type: 'earned', amount: 180.00, desc: 'Model sold - Orion', date: '1 day ago' },
-      { id: 3, type: 'withdrawal', amount: 500.00, desc: 'Payout to bank', date: '3 days ago' },
-      { id: 4, type: 'earned', amount: 95.25, desc: 'Task completed', date: '1 week ago' },
+    const sections = [
+      { id: 'overview', label: 'Overview' },
+      { id: 'listings', label: 'My Listings' },
+      { id: 'security', label: 'Security & MFA' },
     ];
 
     return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" style={{ maxWidth: '700px' }} onClick={e => e.stopPropagation()}>
-          <div className="modal-header">
-            <h2>💼 MY WALLET</h2>
-            <button className="modal-close" onClick={onClose}>✕</button>
-          </div>
-          <div className="modal-body">
-            <div style={{ background: '#6C5CE7', color: 'white', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem' }}>
-              <div style={{ opacity: 0.9, marginBottom: '0.5rem' }}>AVAILABLE BALANCE</div>
-              <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>${U.USER.balance.toFixed(2)}</div>
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', background: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto' }} onClick={onClose}>
+        <div style={{ background: 'white', borderRadius: '12px', width: '90%', maxWidth: '1200px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', margin: '2rem auto' }} onClick={e => e.stopPropagation()}>
+          {/* Left Sidebar */}
+          <div style={{ width: '280px', background: '#f9f9f9', borderRight: '1px solid #eee', padding: '2rem 0', overflowY: 'auto' }}>
+            <div style={{ padding: '0 1.5rem', marginBottom: '2rem', textAlign: 'center' }}>
+              <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'linear-gradient(135deg, #6C5CE7 0%, #FF6AC7 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: '48px', color: 'white', fontWeight: 'bold' }}>{U.USER.name[0]}</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>{U.USER.name}</div>
+              <div style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '0.5rem' }}>{email}</div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>Free Member</div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>Member since 2026</div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
-              <button style={{ padding: '1rem', background: '#f5f5f5', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>→ Withdraw</button>
-              <button style={{ padding: '1rem', background: '#f5f5f5', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>+ Add Funds</button>
-            </div>
-
-            <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>RECENT TRANSACTIONS</h3>
-            {transactions.map(tx => (
-              <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #eee', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 'bold' }}>{tx.desc}</div>
-                  <div style={{ fontSize: '0.85rem', opacity: 0.6 }}>{tx.date}</div>
-                </div>
-                <div style={{ fontWeight: 'bold', color: tx.type === 'earned' ? '#06B6D4' : '#FF6AC7' }}>
-                  {tx.type === 'earned' ? '+' : '-'}${tx.amount.toFixed(2)}
-                </div>
-              </div>
+            {sections.map(section => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1.5rem',
+                  textAlign: 'left',
+                  border: 'none',
+                  background: activeSection === section.id ? '#e8e0ff' : 'transparent',
+                  color: activeSection === section.id ? '#6C5CE7' : '#333',
+                  fontWeight: activeSection === section.id ? '600' : '500',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {section.label}
+              </button>
             ))}
-          </div>
-          <div className="modal-footer">
-            <button className="btn-secondary" onClick={onClose}>Close</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  function AnalyticsModal({ onClose }) {
-    return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" style={{ maxWidth: '700px' }} onClick={e => e.stopPropagation()}>
-          <div className="modal-header">
-            <h2>📊 ANALYTICS</h2>
-            <button className="modal-close" onClick={onClose}>✕</button>
-          </div>
-          <div className="modal-body">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
-              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>TOTAL EARNINGS</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>$24,682</div>
-              </div>
-              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>ACTIVE LISTINGS</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>12</div>
-              </div>
-              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>COMPLETED TASKS</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>48</div>
-              </div>
-              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-                <div style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '0.5rem' }}>AVG RATING</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>4.9⭐</div>
-              </div>
-            </div>
-
-            <h3 style={{ marginBottom: '1rem', fontSize: '1rem', opacity: 0.8 }}>EARNINGS BREAKDOWN</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ opacity: 0.7, fontSize: '0.85rem', marginBottom: '0.5rem' }}>GPU RENTAL</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#06B6D4' }}>$12,480</div>
-              </div>
-              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ opacity: 0.7, fontSize: '0.85rem', marginBottom: '0.5rem' }}>MODELS SOLD</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7C3AED' }}>$8,202</div>
-              </div>
-              <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ opacity: 0.7, fontSize: '0.85rem', marginBottom: '0.5rem' }}>TASKS</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#FF6AC7' }}>$4,000</div>
-              </div>
+            <div style={{ padding: '1.5rem', marginTop: '2rem', borderTop: '1px solid #eee' }}>
+              <button
+                onClick={async () => {
+                  try {
+                    await supa.auth.signOut();
+                    window.location.href = '/index.html';
+                  } catch (err) {
+                    console.error('Sign out error:', err);
+                    window.location.href = '/index.html';
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  textAlign: 'left',
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#FF6AC7',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem'
+                }}
+              >
+                Sign out
+              </button>
             </div>
           </div>
-          <div className="modal-footer">
-            <button className="btn-secondary" onClick={onClose}>Close</button>
+
+          {/* Main Content */}
+          <div style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+            {activeSection === 'overview' && (
+              <div>
+                <h1 style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>Personal Information</h1>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.5rem' }}>First Name</label>
+                    <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First name" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.95rem' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.5rem' }}>Last Name</label>
+                    <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last name" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.95rem' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.5rem' }}>Email</label>
+                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.95rem' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.5rem' }}>Phone</label>
+                    <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.95rem' }} />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.5rem' }}>Bio</label>
+                  <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell the community a bit about yourself…" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.95rem', minHeight: '100px' }} />
+                </div>
+
+                <button style={{ padding: '0.75rem 2rem', background: 'linear-gradient(135deg, #00D9FF 0%, #FF00FF 100%)', color: 'white', border: 'none', borderRadius: '20px', fontWeight: '600', cursor: 'pointer', fontSize: '0.95rem' }}>💾 Save Changes</button>
+
+                <div style={{ background: 'linear-gradient(135deg, #6C5CE7 0%, #4A7BFF 100%)', color: 'white', padding: '2rem', borderRadius: '12px', marginTop: '2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.3rem', fontWeight: 'bold' }}>Free Membership</h2>
+                      <p style={{ margin: 0, opacity: 0.9 }}>Member since 2026 · Save up to 50% on AI models</p>
+                    </div>
+                    <button style={{ padding: '0.75rem 1.5rem', background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', fontWeight: '600', cursor: 'pointer' }}>Upgrade</button>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
+                    <div>
+                      <div style={{ opacity: 0.8, fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Saved</div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>$0.00</div>
+                    </div>
+                    <div>
+                      <div style={{ opacity: 0.8, fontSize: '0.85rem', marginBottom: '0.5rem' }}>Member Since</div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>2026</div>
+                    </div>
+                    <div>
+                      <div style={{ opacity: 0.8, fontSize: '0.85rem', marginBottom: '0.5rem' }}>Plan</div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Free</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'listings' && (
+              <div>
+                <h1 style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>My Listings</h1>
+                <div style={{ padding: '2rem', textAlign: 'center', background: '#f9f9f9', borderRadius: '8px' }}>
+                  <p style={{ margin: 0, opacity: 0.7 }}>You have {U.LISTINGS.length} active listings</p>
+                  {U.LISTINGS.length === 0 ? (
+                    <>
+                      <p style={{ marginTop: '1rem', opacity: 0.6 }}>Start by creating your first listing</p>
+                      <button style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>+ Create Listing</button>
+                    </>
+                  ) : (
+                    <div style={{ marginTop: '1rem' }}>
+                      {U.LISTINGS.map((l, i) => (
+                        <div key={i} style={{ padding: '1rem', background: 'white', marginTop: '0.75rem', borderRadius: '6px', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <div style={{ fontWeight: 'bold' }}>{l.title || l.kind} Listing</div>
+                            <div style={{ fontSize: '0.85rem', opacity: 0.6 }}>Created on 2026-01-15</div>
+                          </div>
+                          <button style={{ padding: '0.5rem 1rem', background: '#f5f5f5', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Edit</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'security' && (
+              <div>
+                <h1 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Security Settings</h1>
+                <p style={{ opacity: 0.7, marginBottom: '2rem' }}>Manage your account security, two-factor authentication, and passkeys.</p>
+
+                <div style={{ padding: '1.5rem', border: '1px solid #eee', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                    <div>
+                      <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', fontWeight: '600' }}>Two-Factor Authentication</h3>
+                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.7 }}>Enabled · Use an authenticator app for an extra layer of security</p>
+                    </div>
+                    <span style={{ background: '#10B981', color: 'white', padding: '0.35rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>Active</span>
+                  </div>
+                  <div style={{ padding: '0.75rem', background: '#f9f9f9', borderRadius: '4px', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>WhichAI Admin · Added 4/9/2026</span>
+                    <button style={{ background: 'none', border: 'none', color: '#FF6AC7', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
+                  </div>
+                  <button style={{ width: '100%', padding: '0.75rem', border: '2px dashed #6C5CE7', background: 'transparent', color: '#6C5CE7', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Add another authenticator</button>
+                </div>
+
+                <div style={{ padding: '1.5rem', border: '1px solid #eee', borderRadius: '8px' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', fontWeight: '600' }}>Passkeys</h3>
+                    <p style={{ margin: '0.25rem 0 1rem 0', fontSize: '0.85rem', opacity: 0.7 }}>Sign in with fingerprint, face recognition, or security key</p>
+                  </div>
+                  <button style={{ width: '100%', padding: '0.75rem', border: '2px dashed #06B6D4', background: 'transparent', color: '#06B6D4', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Register a passkey</button>
+                  <p style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '1rem' }}>Passkeys use your device's biometric authentication (fingerprint, face, PIN) or a physical security key. They're more secure than passwords and can't be phished.</p>
+                </div>
+
+                <div style={{ padding: '1.5rem', border: '1px solid #eee', borderRadius: '8px', marginTop: '1.5rem' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: '600' }}>Account Info</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '0.5rem' }}>Email</div>
+                      <div style={{ fontWeight: '500' }}>{email}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '0.5rem' }}>Sign-in method</div>
+                      <div style={{ fontWeight: '500' }}>Email / Password</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '0.5rem' }}>MFA status</div>
+                      <div style={{ fontWeight: '500', color: '#10B981' }}>Enabled</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1026,11 +1006,19 @@ const D = (() => {
           </div>
         </nav>
 
-        {/* Profile Page Modals */}
-        {profilePage === 'profile' && <ProfileModal onClose={() => setProfilePage(null)} />}
-        {profilePage === 'settings' && <SettingsModal onClose={() => setProfilePage(null)} />}
-        {profilePage === 'wallet' && <WalletModal onClose={() => setProfilePage(null)} />}
-        {profilePage === 'analytics' && <AnalyticsModal onClose={() => setProfilePage(null)} />}
+        {/* Profile Page */}
+        {profilePage === 'signout' && (() => {
+          (async () => {
+            try {
+              await supa.auth.signOut();
+            } catch (err) {
+              console.error('Sign out error:', err);
+            }
+            window.location.href = '/index.html';
+          })();
+          return null;
+        })()}
+        {profilePage && profilePage !== 'signout' && <ProfilePage onClose={() => setProfilePage(null)} initialSection={profilePage} />}
 
         {/* Hero / big greeting */}
         <section className="dB-hero">
