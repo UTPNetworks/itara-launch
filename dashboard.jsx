@@ -784,6 +784,7 @@ const D = (() => {
 
   function CommandPage() {
     const [profileOpen, setProfileOpen] = useState(false);
+    const [modal, setModal] = useState(null);
     const avatarRef = useRef(null);
     const rows = MarketTicker(2500);
     return (
@@ -943,9 +944,11 @@ const D = (() => {
 
         {/* Quick actions ribbon */}
         <section className="dB-quick">
-          {['+ LIST A GPU', '+ UPLOAD A MODEL', '+ POST A TASK', 'RENT COMPUTE →', 'HIRE TALENT →'].map((t, i) => (
-            <button key={t} className={`dB-q dB-q-${i}`}>{t}</button>
-          ))}
+          <button className="dB-q dB-q-0" onClick={() => setModal('list-gpu')}>+ LIST A GPU</button>
+          <button className="dB-q dB-q-1" onClick={() => setModal('upload-model')}>+ UPLOAD A MODEL</button>
+          <button className="dB-q dB-q-2" onClick={() => setModal('post-task')}>+ POST A TASK</button>
+          <button className="dB-q dB-q-3" onClick={() => setModal('rent-compute')}>RENT COMPUTE →</button>
+          <button className="dB-q dB-q-4" onClick={() => setModal('hire-talent')}>HIRE TALENT →</button>
         </section>
 
         {/* Activity stream */}
@@ -964,6 +967,13 @@ const D = (() => {
             ))}
           </div>
         </section>
+
+        {/* Modal rendering */}
+        {modal === 'list-gpu' && <ListGPUModal onClose={() => setModal(null)} />}
+        {modal === 'upload-model' && <UploadModelModal onClose={() => setModal(null)} />}
+        {modal === 'post-task' && <PostTaskModal onClose={() => setModal(null)} />}
+        {modal === 'rent-compute' && <RentComputeModal onClose={() => setModal(null)} />}
+        {modal === 'hire-talent' && <HireTalentModal onClose={() => setModal(null)} />}
       </div>
     );
   }
