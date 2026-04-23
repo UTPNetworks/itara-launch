@@ -770,7 +770,10 @@ const D = (() => {
     const [email, setEmail] = useState(U.USER.email || 'admin.bhuvi@gmail.com');
     const [phone, setPhone] = useState('+1 (555) 000-0000');
     const [bio, setBio] = useState('AI enthusiast · GPU provider · Model creator');
+    const [avatar, setAvatar] = useState('A');
     const [twofa, setTwofa] = useState(false);
+    const [authenticators, setAuthenticators] = useState([{ id: 1, name: 'WhichAI Admin', date: '4/9/2026' }]);
+    const [passkeys, setPasskeys] = useState([]);
 
     const sections = [
       { id: 'overview', label: 'Overview' },
@@ -845,6 +848,29 @@ const D = (() => {
             {activeSection === 'overview' && (
               <div>
                 <h1 style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>Personal Information</h1>
+
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', opacity: 0.7, marginBottom: '1rem' }}>Profile Picture</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, #6C5CE7 0%, #FF6AC7 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', color: 'white', fontWeight: 'bold' }}>{avatar}</div>
+                    <div>
+                      <label style={{ display: 'inline-block', padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>
+                        Upload Photo
+                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                          if (e.target.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              // In a real app, you'd upload this to Supabase
+                              console.log('Photo selected:', event.target.result);
+                            };
+                            reader.readAsDataURL(e.target.files[0]);
+                          }
+                        }} />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.5rem' }}>First Name</label>
@@ -869,7 +895,10 @@ const D = (() => {
                   <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell the community a bit about yourself…" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.95rem', minHeight: '100px' }} />
                 </div>
 
-                <button style={{ padding: '0.75rem 2rem', background: 'linear-gradient(135deg, #00D9FF 0%, #FF00FF 100%)', color: 'white', border: 'none', borderRadius: '20px', fontWeight: '600', cursor: 'pointer', fontSize: '0.95rem' }}>💾 Save Changes</button>
+                <button onClick={() => {
+                  console.log('Profile updated:', { firstName, lastName, email, phone, bio });
+                  alert('Profile saved successfully!');
+                }} style={{ padding: '0.75rem 2rem', background: 'linear-gradient(135deg, #00D9FF 0%, #FF00FF 100%)', color: 'white', border: 'none', borderRadius: '20px', fontWeight: '600', cursor: 'pointer', fontSize: '0.95rem' }}>Save Changes</button>
 
                 <div style={{ background: 'linear-gradient(135deg, #6C5CE7 0%, #4A7BFF 100%)', color: 'white', padding: '2rem', borderRadius: '12px', marginTop: '2rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -905,7 +934,7 @@ const D = (() => {
                   {U.LISTINGS.length === 0 ? (
                     <>
                       <p style={{ marginTop: '1rem', opacity: 0.6 }}>Start by creating your first listing</p>
-                      <button style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>+ Create Listing</button>
+                      <button onClick={() => alert('Redirecting to create listing form...')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Create Listing</button>
                     </>
                   ) : (
                     <div style={{ marginTop: '1rem' }}>
@@ -915,7 +944,7 @@ const D = (() => {
                             <div style={{ fontWeight: 'bold' }}>{l.title || l.kind} Listing</div>
                             <div style={{ fontSize: '0.85rem', opacity: 0.6 }}>Created on 2026-01-15</div>
                           </div>
-                          <button style={{ padding: '0.5rem 1rem', background: '#f5f5f5', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Edit</button>
+                          <button onClick={() => alert('Editing listing: ' + (l.title || l.kind))} style={{ padding: '0.5rem 1rem', background: '#f5f5f5', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}>Edit</button>
                         </div>
                       ))}
                     </div>
@@ -937,11 +966,22 @@ const D = (() => {
                     </div>
                     <span style={{ background: '#10B981', color: 'white', padding: '0.35rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>Active</span>
                   </div>
-                  <div style={{ padding: '0.75rem', background: '#f9f9f9', borderRadius: '4px', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>WhichAI Admin · Added 4/9/2026</span>
-                    <button style={{ background: 'none', border: 'none', color: '#FF6AC7', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
-                  </div>
-                  <button style={{ width: '100%', padding: '0.75rem', border: '2px dashed #6C5CE7', background: 'transparent', color: '#6C5CE7', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Add another authenticator</button>
+                  {authenticators.map(auth => (
+                    <div key={auth.id} style={{ padding: '0.75rem', background: '#f9f9f9', borderRadius: '4px', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>{auth.name} · Added {auth.date}</span>
+                      <button onClick={() => {
+                        setAuthenticators(authenticators.filter(a => a.id !== auth.id));
+                        alert('Authenticator removed');
+                      }} style={{ background: 'none', border: 'none', color: '#FF6AC7', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
+                    </div>
+                  ))}
+                  <button onClick={() => {
+                    const name = prompt('Enter authenticator name:');
+                    if (name) {
+                      setAuthenticators([...authenticators, { id: Date.now(), name, date: new Date().toLocaleDateString() }]);
+                      alert('Authenticator added successfully!');
+                    }
+                  }} style={{ width: '100%', padding: '0.75rem', border: '2px dashed #6C5CE7', background: 'transparent', color: '#6C5CE7', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Add another authenticator</button>
                 </div>
 
                 <div style={{ padding: '1.5rem', border: '1px solid #eee', borderRadius: '8px' }}>
@@ -949,7 +989,26 @@ const D = (() => {
                     <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', fontWeight: '600' }}>Passkeys</h3>
                     <p style={{ margin: '0.25rem 0 1rem 0', fontSize: '0.85rem', opacity: 0.7 }}>Sign in with fingerprint, face recognition, or security key</p>
                   </div>
-                  <button style={{ width: '100%', padding: '0.75rem', border: '2px dashed #06B6D4', background: 'transparent', color: '#06B6D4', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Register a passkey</button>
+                  {passkeys.length > 0 && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      {passkeys.map(pk => (
+                        <div key={pk.id} style={{ padding: '0.75rem', background: '#f9f9f9', borderRadius: '4px', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span>{pk.name} · Registered {pk.date}</span>
+                          <button onClick={() => {
+                            setPasskeys(passkeys.filter(p => p.id !== pk.id));
+                            alert('Passkey removed');
+                          }} style={{ background: 'none', border: 'none', color: '#FF6AC7', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <button onClick={() => {
+                    const name = prompt('Enter passkey name (e.g., iPhone, Windows):');
+                    if (name) {
+                      setPasskeys([...passkeys, { id: Date.now(), name, date: new Date().toLocaleDateString() }]);
+                      alert('Passkey registered successfully!');
+                    }
+                  }} style={{ width: '100%', padding: '0.75rem', border: '2px dashed #06B6D4', background: 'transparent', color: '#06B6D4', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Register a passkey</button>
                   <p style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '1rem' }}>Passkeys use your device's biometric authentication (fingerprint, face, PIN) or a physical security key. They're more secure than passwords and can't be phished.</p>
                 </div>
 
