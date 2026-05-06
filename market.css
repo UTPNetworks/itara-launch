@@ -280,7 +280,7 @@
 
 /* Hero */
 .mkA-hero {
-  padding: 80px 40px 56px;
+  padding: 64px 32px 44.8px;
   max-width: 1440px; margin: 0 auto;
   text-align: center;
 }
@@ -292,7 +292,7 @@
   margin-bottom: 24px;
 }
 .mkA-h1 {
-  font-size: clamp(64px, 9vw, 140px);
+  font-size: clamp(51.2px, 7.2vw, 112px);
   line-height: 0.88;
   letter-spacing: -0.045em;
   font-weight: 700;
@@ -309,7 +309,7 @@
   -webkit-text-fill-color: transparent;
 }
 .mkA-hero-sub {
-  font-size: 17px; color: var(--mute);
+  font-size: 13.6px; color: var(--mute);
   max-width: 640px; margin: 0 auto 40px;
   line-height: 1.5;
 }
@@ -339,7 +339,7 @@
 .mkA-hero-q:hover { border-color: var(--bone); background: var(--ink-2); }
 
 .mkA-pills-wrap {
-  padding: 16px 40px;
+  padding: 12.8px 32px;
   max-width: 1440px; margin: 0 auto;
   border-bottom: 1px solid var(--line);
   position: sticky; top: 71px; z-index: 9;
@@ -364,7 +364,7 @@
   font-weight: 700;
 }
 .mkA-h2 {
-  font-size: 40px; letter-spacing: -0.03em;
+  font-size: 32px; letter-spacing: -0.03em;
   font-weight: 700;
   margin: 0;
   line-height: 1;
