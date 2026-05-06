@@ -317,6 +317,9 @@
 <!-- Market variants (DiscoveryPage, TerminalPage, IndexPage) -->
 <script type="text/babel" src="market-variants.jsx"></script>
 
+<!-- Listing Feature -->
+<script type="text/babel" src="listing.jsx"></script>
+
 <!-- Boot script -->
 <script type="text/babel">
 const SUPABASE_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
@@ -349,7 +352,7 @@ function mountWordmark() {
 
 // ---- Mount Terminal page ----
 function mountMarket(user) {
-  if (!window.MKT_PAGES || !window.MKT || !window.ITARA_MARKET) {
+  if (!window.MKT_PAGES || !window.MKT || !window.ITARA_MARKET || !window.LISTING) {
     return setTimeout(() => mountMarket(user), 80);
   }
 
@@ -360,15 +363,32 @@ function mountMarket(user) {
     av.textContent = name[0].toUpperCase();
   }
 
+  // Add Post a Listing button to nav
+  const navRight = document.querySelector('.it-nav-r');
+  if (navRight) {
+    const buttonContainer = document.createElement('div');
+    ReactDOM.createRoot(buttonContainer).render(
+      React.createElement(window.LISTING.ListingButton, {
+        onClick: () => {
+          // Global function to open listing modal
+          if (window.openListingModal) window.openListingModal();
+        }
+      })
+    );
+    navRight.insertBefore(buttonContainer.firstChild, navRight.firstChild);
+  }
+
   // State: selected item for detail view
   let selectedItem = null;
 
   function App() {
     const [open, setOpen] = React.useState(null);
+    const [listingModalOpen, setListingModalOpen] = React.useState(false);
 
     // Expose openItem globally (used by DetailView similar cards)
     React.useEffect(() => {
       window.MKT.openItem = (it) => setOpen(it);
+      window.openListingModal = () => setListingModalOpen(true);
     }, []);
 
     return (
@@ -384,6 +404,12 @@ function mountMarket(user) {
             live={true}
           />
         )}
+        <window.LISTING.ListingModal
+          isOpen={listingModalOpen}
+          onClose={() => setListingModalOpen(false)}
+          user={user}
+          supabase={sb}
+        />
       </>
     );
   }
