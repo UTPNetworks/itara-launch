@@ -254,47 +254,72 @@
     // Fetch live data from Supabase
     useEffect(() => {
       const fetchLiveListings = async () => {
-        if (!window.supabase) return;
+        // Safe check for Supabase client
+        const sb = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
+        if (!sb) {
+          console.warn("Market Terminal: Supabase client not found yet. Retrying...");
+          // If we're loading and don't have static items yet, show syncing
+          if (liveItems.length === 0) setLoading(true);
+          return;
+        }
+
         setLoading(true);
         setFetchError(null);
         try {
-          const { data, error } = await window.supabase
+          const { data, error } = await sb
             .from('listings')
             .select('*')
             .eq('status', 'active'); // Only show active/published listings
 
           if (error) {
             console.error("Supabase Fetch Error:", error);
-            setFetchError(error.message || "Failed to sync with live database.");
+            setFetchError(`Sync Error: ${error.message || "Connection failed"}`);
             return;
           }
 
-          const listings = data || [];
-          // Map Supabase columns to UI properties
-          const mapped = listings.map((it, idx) => ({
-            id: it?.id || `live-${idx}`,
-            cat: (it?.category || 'llm').toLowerCase().replace(' ', ''),
-            kind: it?.category?.toUpperCase() || 'LLM',
-            name: it?.title || 'Untitled Listing',
-            creator: it?.seller_id ? 'Community' : 'Itara',
-            price: it?.price || 0,
-            priceUnit: it?.pricing_type === 'Subscription' ? '/mo' : '',
-            delta: Math.floor(Math.random() * 20) - 5,
-            rating: 4.5 + (Math.random() * 0.5),
-            sales: Math.floor(Math.random() * 1000),
-            imageUrl: getLiveImage(it?.category, it?.title, idx)
-          }));
+          const listings = Array.isArray(data) ? data : [];
+          // Map Supabase columns to UI properties with aggressive optional chaining
+          const mapped = listings.map((it, idx) => {
+            try {
+              return {
+                id: it?.id || `live-${idx}-${Date.now()}`,
+                cat: String(it?.category || 'llm').toLowerCase().replace(/\s/g, ''),
+                kind: String(it?.category || 'LLM').toUpperCase(),
+                name: it?.title || 'Untitled Listing',
+                creator: it?.seller_id ? 'Community' : 'Itara',
+                price: typeof it?.price === 'number' ? it.price : parseFloat(it?.price || 0),
+                priceUnit: it?.pricing_type === 'Subscription' ? '/mo' : (it?.price_unit === 'per_hour' ? '/hr' : ''),
+                delta: it?.delta || (Math.floor(Math.random() * 20) - 5),
+                rating: it?.rating || (4.5 + (Math.random() * 0.5)),
+                sales: it?.sales || Math.floor(Math.random() * 1000),
+                imageUrl: it?.image_url || getLiveImage(it?.category, it?.title, idx),
+                isNew: true
+              };
+            } catch (mapErr) {
+              console.error("Mapping error for item:", it, mapErr);
+              return null;
+            }
+          }).filter(Boolean);
           
           setLiveItems([...mapped, ...(M?.ITEMS || [])]);
         } catch (err) {
           console.error('Unexpected error fetching live items:', err);
-          setFetchError("An unexpected error occurred while syncing data.");
+          setFetchError("Market terminal encountered an unexpected sync error.");
         } finally {
           setLoading(false);
         }
       };
 
+      // Initial fetch
       fetchLiveListings();
+
+      // Simple retry if supabase isn't ready
+      const t = setInterval(() => {
+        if (!window.supabase && !fetchError) fetchLiveListings();
+        else clearInterval(t);
+      }, 2000);
+
+      return () => clearInterval(t);
     }, [refreshSignal]);
 
     // Expose image map globally for the helper
