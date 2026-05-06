@@ -233,8 +233,9 @@
     const [sort, setSort] = useState('trending');
     const [profileOpen, setProfileOpen] = useState(false);
     const [profilePage, setProfilePage] = useState(null);
-    const [liveItems, setLiveItems] = useState(M.ITEMS);
+    const [liveItems, setLiveItems] = useState(M?.ITEMS || []);
     const [loading, setLoading] = useState(false);
+    const [fetchError, setFetchError] = useState(null);
     const avatarRef = useRef(null);
 
     // High-fidelity image mapping for live data
@@ -245,7 +246,8 @@
                         c.includes('workstation') || c.includes('pc') || c.includes('phone') || c.includes('tablet') ? 'hardware' :
                         c.includes('gpu') ? 'gpu' : c;
       
-      const list = window.ITARA_MARKET_IMG_MAP[mappedCat] || window.ITARA_MARKET_IMG_MAP.llm;
+      const list = window.ITARA_MARKET_IMG_MAP ? (window.ITARA_MARKET_IMG_MAP[mappedCat] || window.ITARA_MARKET_IMG_MAP.llm) : [];
+      if (!list || list.length === 0) return 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800';
       return list[idx % list.length];
     };
 
@@ -254,36 +256,39 @@
       const fetchLiveListings = async () => {
         if (!window.supabase) return;
         setLoading(true);
+        setFetchError(null);
         try {
           const { data, error } = await window.supabase
             .from('listings')
             .select('*')
             .eq('status', 'active'); // Only show active/published listings
 
-          if (error) throw error;
-
-          if (data && data.length > 0) {
-            // Map Supabase columns to UI properties
-            const mapped = data.map((it, idx) => ({
-              id: it.id,
-              cat: (it.category || 'llm').toLowerCase().replace(' ', ''),
-              kind: it.category?.toUpperCase() || 'LLM',
-              name: it.title,
-              creator: it.seller_id ? 'Community' : 'Itara', // Simple creator mapping
-              price: it.price || 0,
-              priceUnit: it.pricing_type === 'Subscription' ? '/mo' : '',
-              delta: Math.floor(Math.random() * 20) - 5, // Simulated delta for UI liveliness
-              rating: 4.5 + (Math.random() * 0.5),
-              sales: Math.floor(Math.random() * 1000),
-              imageUrl: getLiveImage(it.category, it.title, idx)
-            }));
-            
-            // Combine with static data or replace
-            // For now, let's prepend live data to make it visible
-            setLiveItems([...mapped, ...M.ITEMS]);
+          if (error) {
+            console.error("Supabase Fetch Error:", error);
+            setFetchError(error.message || "Failed to sync with live database.");
+            return;
           }
+
+          const listings = data || [];
+          // Map Supabase columns to UI properties
+          const mapped = listings.map((it, idx) => ({
+            id: it?.id || `live-${idx}`,
+            cat: (it?.category || 'llm').toLowerCase().replace(' ', ''),
+            kind: it?.category?.toUpperCase() || 'LLM',
+            name: it?.title || 'Untitled Listing',
+            creator: it?.seller_id ? 'Community' : 'Itara',
+            price: it?.price || 0,
+            priceUnit: it?.pricing_type === 'Subscription' ? '/mo' : '',
+            delta: Math.floor(Math.random() * 20) - 5,
+            rating: 4.5 + (Math.random() * 0.5),
+            sales: Math.floor(Math.random() * 1000),
+            imageUrl: getLiveImage(it?.category, it?.title, idx)
+          }));
+          
+          setLiveItems([...mapped, ...(M?.ITEMS || [])]);
         } catch (err) {
-          console.error('Error fetching live marketplace items:', err);
+          console.error('Unexpected error fetching live items:', err);
+          setFetchError("An unexpected error occurred while syncing data.");
         } finally {
           setLoading(false);
         }
@@ -294,8 +299,6 @@
 
     // Expose image map globally for the helper
     if (!window.ITARA_MARKET_IMG_MAP) {
-      // Extract the map from market-data.js indirectly by looking at ITARA_MARKET's source or re-defining
-      // For speed and reliability, I'll re-define it here or ensure it's on window
       window.ITARA_MARKET_IMG_MAP = {
         llm: [
           'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800',
@@ -337,8 +340,8 @@
       };
     }
 
-    const filtered = useMemo(() => MKT.filterItems(liveItems, { cat, q, sort }), [liveItems, cat, q, sort]);
-    const topTick = liveItems.slice(0, 20);
+    const filtered = useMemo(() => MKT.filterItems(liveItems || [], { cat, q, sort }), [liveItems, cat, q, sort]);
+    const topTick = (liveItems || []).slice(0, 20);
 
     return (
       <div className="mkB-root" data-screen-label="MB Terminal">
@@ -346,12 +349,14 @@
         <header className="mkB-top">
           <div className="mkB-top-l"><Wordmark size={18} /><span>/ MARKET TERMINAL</span></div>
           <div className="mkB-top-m">
-            <MKT.SearchBar value={q} onChange={setQ} placeholder={`Search ${liveItems.length} items · ⌘K`} />
+            <MKT.SearchBar value={q} onChange={setQ} placeholder={`Search ${liveItems?.length || 0} items · ⌘K`} />
           </div>
           <div className="mkB-top-r">
             <span className="mkB-status">
               {loading ? (
                 <span style={{ opacity: 0.5 }}>SYNCING…</span>
+              ) : fetchError ? (
+                <span style={{ color: '#FF5C5C', fontSize: '10px' }}>OFFLINE</span>
               ) : (
                 <><MKT.LiveDot />MARKETS OPEN</>
               )}
@@ -364,7 +369,7 @@
                   onClick={() => setProfileOpen(!profileOpen)}
                   style={{ cursor: 'pointer', background: isLight ? '#6C5CE7' : 'var(--pink)', color: isLight ? '#FFFFFF' : '#0A0A0C' }}
                 >
-                  {(user.user_metadata?.full_name || user.email || 'U')[0].toUpperCase()}
+                  {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
                 </div>
                 <MKT.CommandPageProfileDropdown
                   isOpen={profileOpen}
@@ -477,11 +482,53 @@
           </aside>
           <div className="mkB-grid">
             <div className="mkB-grid-head">
-              <span>{filtered.length} ITEMS · {sort.toUpperCase()}</span>
-              <span className="mkB-live-n"><MKT.LiveDot />LIVE PRICING</span>
+              <span>{(filtered || []).length} ITEMS · {sort?.toUpperCase() || ''}</span>
+              <span className="mkB-live-n">
+                {loading ? 'REFRESHING…' : <><MKT.LiveDot />LIVE PRICING</>}
+              </span>
             </div>
+            
             <div className="mkB-grid-items">
-              {filtered.map(it => <MKT.ProductCard key={it.id} item={it} onOpen={onOpen} live={live} size="md" />)}
+              {fetchError ? (
+                <div style={{ gridColumn: '1/-1', padding: '60px', textAlign: 'center', background: 'rgba(255,92,92,0.05)', borderRadius: '16px', border: '1px dashed rgba(255,92,92,0.2)' }}>
+                  <div style={{ fontSize: '32px', marginBottom: '16px' }}>⚠️</div>
+                  <div style={{ color: 'var(--bone)', fontWeight: 'bold', marginBottom: '8px' }}>Sync Connection Failed</div>
+                  <div style={{ color: 'var(--mute)', fontSize: '14px' }}>{fetchError}</div>
+                  <button 
+                    onClick={() => window.refreshMarketplaceData?.()} 
+                    style={{ marginTop: '20px', background: 'transparent', border: '1px solid var(--line)', color: 'var(--bone)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}
+                  >
+                    RETRY SYNC
+                  </button>
+                </div>
+              ) : loading && (!filtered || filtered.length === 0) ? (
+                // Initial loading skeleton
+                [1,2,3,4,5,6].map(i => (
+                  <div key={i} className="mkt-card mkt-card-md" style={{ opacity: 0.5, pointerEvents: 'none' }}>
+                    <div className="mkt-card-art" style={{ background: 'var(--ink-3)' }}></div>
+                    <div className="mkt-card-body">
+                      <div style={{ height: '14px', width: '60%', background: 'var(--line)', borderRadius: '4px', marginBottom: '8px' }}></div>
+                      <div style={{ height: '10px', width: '40%', background: 'var(--line)', borderRadius: '4px' }}></div>
+                    </div>
+                  </div>
+                ))
+              ) : (filtered || []).length > 0 ? (
+                (filtered || []).map(it => <MKT.ProductCard key={it?.id || Math.random()} item={it} onOpen={onOpen} live={live} size="md" />)
+              ) : (
+                <div style={{ gridColumn: '1/-1', padding: '80px 20px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔍</div>
+                  <h3 style={{ color: 'var(--bone)', marginBottom: '8px' }}>No active listings found</h3>
+                  <p style={{ color: 'var(--mute)', fontSize: '14px', maxWidth: '400px', margin: '0 auto 24px' }}>
+                    Be the first to list your AI models, compute, or hardware on the Itara Market.
+                  </p>
+                  <button 
+                    onClick={() => window.openListingModal?.()}
+                    style={{ background: 'var(--violet)', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+                  >
+                    + POST A LISTING
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>

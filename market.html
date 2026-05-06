@@ -452,7 +452,7 @@ function mountMarket(user) {
     }, []);
 
     return (
-      <>
+      <window.MKT.ErrorBoundary>
         <window.MKT_PAGES.TerminalPage
           onOpen={(it) => setOpen(it)}
           live={true}
@@ -475,7 +475,7 @@ function mountMarket(user) {
             supabase={sb}
           />
         )}
-      </>
+      </window.MKT.ErrorBoundary>
     );
   }
 

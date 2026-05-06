@@ -602,8 +602,46 @@
     );
   }
 
+  // ---- Error Boundary ----
+  class ErrorBoundary extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error) {
+      return { hasError: true, error };
+    }
+    componentDidCatch(error, errorInfo) {
+      console.error("Market Runtime Error:", error, errorInfo);
+    }
+    render() {
+      if (this.state.hasError) {
+        return (
+          <div style={{ height: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', padding: '40px', textAlign: 'center' }}>
+            <div style={{ fontSize: '64px', marginBottom: '24px' }}>⛈️</div>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Terminal Session Crashed</h2>
+            <p style={{ color: 'rgba(244,242,236,0.6)', maxWidth: '500px', lineHeight: '1.6', marginBottom: '32px' }}>
+              The Itara Market interface encountered a runtime exception. Your session remains secure, but the view needs to be reset.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => window.location.reload()} style={{ background: '#6C5CE7', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' }}>RELOAD TERMINAL</button>
+              <button onClick={() => this.setState({ hasError: false })} style={{ background: 'transparent', border: '1px solid rgba(244,242,236,0.2)', color: 'white', padding: '12px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' }}>TRY AGAIN</button>
+            </div>
+            {this.state.error && (
+              <pre style={{ marginTop: '40px', padding: '16px', background: 'rgba(255,0,0,0.05)', borderRadius: '8px', fontSize: '11px', color: '#FF5C5C', maxWidth: '100%', overflow: 'auto' }}>
+                {this.state.error.toString()}
+              </pre>
+            )}
+          </div>
+        );
+      }
+      return this.props.children;
+    }
+  }
+
   window.MKT = {
     SearchBar, PillRow, ProductCard, ProductRow, MiniChart, LiveDot, LivePrice,
     formatPrice, filterItems, DetailView, kindColor,
+    CommandPageProfileDropdown, ProfilePage, ErrorBoundary
   };
 })();
