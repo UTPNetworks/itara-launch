@@ -127,6 +127,130 @@
   function ProductCard({ item, onOpen, size = 'md', live = true }) {
     const [hover, setHover] = useState(false);
     const c = kindColor(item.kind);
+
+    // Mock product visualization based on item type
+    const renderProductArt = () => {
+      const gradId = `grad-${item.id}`;
+
+      if (item.kind === 'LLM') {
+        return (
+          <svg viewBox="0 0 240 165" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={c} stopOpacity="0.3" />
+                <stop offset="100%" stopColor={c} stopOpacity="0.8" />
+              </linearGradient>
+            </defs>
+            <rect width="240" height="165" fill={`url(#${gradId})`} />
+            <circle cx="120" cy="60" r="35" fill={c} opacity="0.4" />
+            <circle cx="120" cy="60" r="30" fill="none" stroke={c} strokeWidth="1.5" opacity="0.6" />
+            <path d="M 80 100 Q 120 80 160 100" fill="none" stroke={c} strokeWidth="2" opacity="0.5" />
+            <path d="M 85 110 Q 120 95 155 110" fill="none" stroke={c} strokeWidth="1.5" opacity="0.4" />
+            <circle cx="120" cy="60" r="8" fill={c} opacity="0.9" />
+          </svg>
+        );
+      }
+
+      if (item.kind === 'GPU' || item.kind === 'GPU RENT') {
+        return (
+          <svg viewBox="0 0 240 165" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={c} stopOpacity="0.3" />
+                <stop offset="100%" stopColor={c} stopOpacity="0.8" />
+              </linearGradient>
+            </defs>
+            <rect width="240" height="165" fill={`url(#${gradId})`} />
+            <rect x="60" y="40" width="120" height="85" fill="none" stroke={c} strokeWidth="2" opacity="0.7" rx="4" />
+            <rect x="70" y="50" width="30" height="30" fill={c} opacity="0.3" rx="2" />
+            <rect x="105" y="50" width="30" height="30" fill={c} opacity="0.5" rx="2" />
+            <rect x="140" y="50" width="30" height="30" fill={c} opacity="0.3" rx="2" />
+            <line x1="65" y1="95" x2="175" y2="95" stroke={c} strokeWidth="1" opacity="0.4" />
+            <circle cx="80" cy="110" r="4" fill={c} opacity="0.6" />
+            <circle cx="120" cy="110" r="4" fill={c} opacity="0.6" />
+            <circle cx="160" cy="110" r="4" fill={c} opacity="0.6" />
+          </svg>
+        );
+      }
+
+      if (item.kind === 'AGENT') {
+        return (
+          <svg viewBox="0 0 240 165" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={c} stopOpacity="0.3" />
+                <stop offset="100%" stopColor={c} stopOpacity="0.8" />
+              </linearGradient>
+            </defs>
+            <rect width="240" height="165" fill={`url(#${gradId})`} />
+            <circle cx="120" cy="55" r="18" fill={c} opacity="0.7" />
+            <circle cx="120" cy="55" r="15" fill="none" stroke={c} strokeWidth="1.5" opacity="0.5" />
+            <rect x="70" y="90" width="100" height="50" fill={c} opacity="0.15" rx="6" />
+            <path d="M 90 90 L 90 110" stroke={c} strokeWidth="1.5" opacity="0.6" />
+            <path d="M 120 90 L 120 110" stroke={c} strokeWidth="1.5" opacity="0.6" />
+            <path d="M 150 90 L 150 110" stroke={c} strokeWidth="1.5" opacity="0.6" />
+            <circle cx="85" cy="125" r="3" fill={c} opacity="0.8" />
+            <circle cx="120" cy="125" r="3" fill={c} opacity="0.8" />
+            <circle cx="155" cy="125" r="3" fill={c} opacity="0.8" />
+          </svg>
+        );
+      }
+
+      if (item.kind === 'VISION' || item.kind === 'CODE' || item.kind === 'AUDIO') {
+        return (
+          <svg viewBox="0 0 240 165" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={c} stopOpacity="0.3" />
+                <stop offset="100%" stopColor={c} stopOpacity="0.8" />
+              </linearGradient>
+            </defs>
+            <rect width="240" height="165" fill={`url(#${gradId})`} />
+            {item.kind === 'CODE' && (
+              <>
+                <rect x="50" y="45" width="140" height="75" fill="none" stroke={c} strokeWidth="1.5" opacity="0.6" rx="3" />
+                <line x1="60" y1="55" x2="100" y2="55" stroke={c} strokeWidth="1" opacity="0.5" />
+                <line x1="60" y1="70" x2="110" y2="70" stroke={c} strokeWidth="1" opacity="0.5" />
+                <line x1="60" y1="85" x2="90" y2="85" stroke={c} strokeWidth="1" opacity="0.5" />
+                <line x1="60" y1="100" x2="105" y2="100" stroke={c} strokeWidth="1" opacity="0.5" />
+              </>
+            )}
+            {item.kind === 'VISION' && (
+              <>
+                <circle cx="120" cy="75" r="35" fill="none" stroke={c} strokeWidth="1.5" opacity="0.6" />
+                <circle cx="120" cy="75" r="25" fill={c} opacity="0.2" />
+                <circle cx="120" cy="75" r="12" fill={c} opacity="0.5" />
+              </>
+            )}
+            {item.kind === 'AUDIO' && (
+              <>
+                <path d="M 100 65 Q 110 45 120 60 Q 130 45 140 65" fill="none" stroke={c} strokeWidth="2" opacity="0.6" />
+                <path d="M 95 80 Q 110 50 120 75 Q 130 50 145 80" fill="none" stroke={c} strokeWidth="1.5" opacity="0.4" />
+                <line x1="120" y1="45" x2="120" y2="105" stroke={c} strokeWidth="1" opacity="0.3" />
+              </>
+            )}
+          </svg>
+        );
+      }
+
+      // Default/fallback visualization
+      return (
+        <svg viewBox="0 0 240 165" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={c} stopOpacity="0.3" />
+              <stop offset="100%" stopColor={c} stopOpacity="0.8" />
+            </linearGradient>
+          </defs>
+          <rect width="240" height="165" fill={`url(#${gradId})`} />
+          <circle cx="60" cy="50" r="12" fill={c} opacity="0.6" />
+          <circle cx="120" cy="70" r="14" fill={c} opacity="0.5" />
+          <circle cx="180" cy="45" r="11" fill={c} opacity="0.7" />
+          <path d="M 60 50 L 120 70 L 180 45" fill="none" stroke={c} strokeWidth="1" opacity="0.3" />
+        </svg>
+      );
+    };
+
     return (
       <div
         className={`mkt-card mkt-card-${size}`}
@@ -135,14 +259,15 @@
         onClick={() => onOpen?.(item)}
       >
         <div className="mkt-card-art" style={{ background: `linear-gradient(135deg, ${c}22, ${c}66)` }}>
-          <div className="mkt-card-kind" style={{ color: c }}>{item.kind}</div>
-          <div className="mkt-card-sigil" style={{ color: c }}>
+          {renderProductArt()}
+          <div className="mkt-card-kind" style={{ color: c, position: 'relative', zIndex: 2 }}>{item.kind}</div>
+          <div className="mkt-card-sigil" style={{ color: c, position: 'relative', zIndex: 2 }}>
             {item.kind === 'LLM' ? '◈' : item.kind === 'AGENT' ? '◉' : item.kind === 'VISION' ? '◆' :
              item.kind === 'AUDIO' ? '♪' : item.kind === 'CODE' ? '§' : item.kind === 'GPU' ? '▣' :
              item.kind === 'CREDITS' ? '¢' : item.kind === 'API' ? '⎔' : item.kind.includes('SERVER') ? '▤' :
              item.kind === 'GPU RENT' ? '⏱' : '◧'}
           </div>
-          {item.tag && <span className="mkt-card-tag" style={{ background: c, color: c === '#FFD84D' ? '#0A0A0C' : '#F4F2EC' }}>{item.tag}</span>}
+          {item.tag && <span className="mkt-card-tag" style={{ background: c, color: c === '#FFD84D' ? '#0A0A0C' : '#F4F2EC', position: 'relative', zIndex: 3 }}>{item.tag}</span>}
           {hover && <div className="mkt-card-chart"><MiniChart seed={item.name.length * 3} color={c} bias={item.delta / 20} w={220} h={80} /></div>}
         </div>
         <div className="mkt-card-body">

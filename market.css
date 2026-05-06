@@ -156,6 +156,11 @@
   display: flex; flex-direction: column; justify-content: space-between;
   overflow: hidden;
 }
+.mkt-card-art svg {
+  pointer-events: none;
+  opacity: 0.75;
+  filter: blur(0.5px);
+}
 .mkt-card-kind {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
@@ -655,9 +660,11 @@
 .mkB-hero {
   display: grid; grid-template-columns: 1.6fr 1fr;
   gap: 20px;
-  padding: 32px 32px;
-  max-width: 1640px;
+  padding: 32px;
   margin: 0 auto;
+  width: 100%;
+  max-width: calc(1640px + 64px);
+  box-sizing: border-box;
 }
 .mkB-hero-editorial {
   padding: 48px;
@@ -769,13 +776,19 @@
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: var(--ink-2);
+  margin: 0 auto;
+  width: 100%;
+  max-width: calc(1640px + 64px);
+  box-sizing: border-box;
 }
 .mkB-main {
   display: grid; grid-template-columns: 240px 1fr;
   gap: 20px;
   padding: 32px;
-  max-width: 1640px;
   margin: 0 auto;
+  width: 100%;
+  max-width: calc(1640px + 64px);
+  box-sizing: border-box;
 }
 .mkB-filters {
   display: flex; flex-direction: column; gap: 28px;
