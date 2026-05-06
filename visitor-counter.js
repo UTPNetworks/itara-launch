@@ -224,7 +224,6 @@ function injectCounterHTML() {
 
   const counterHTML = `
     <div id="visitor-counter" class="visitor-counter">
-      <div class="visitor-counter-glow"></div>
       <div class="visitor-counter-content">
         <div class="visitor-counter-label">
           <span class="visitor-counter-icon">👁️</span>
@@ -237,7 +236,14 @@ function injectCounterHTML() {
     </div>
   `;
 
-  document.body.insertAdjacentHTML('afterbegin', counterHTML);
+  // Try to inject into ticker label area (next to "GLOBAL AI PULSE")
+  const tickerLabel = document.querySelector('.ticker-label');
+  if (tickerLabel) {
+    tickerLabel.insertAdjacentHTML('afterend', counterHTML);
+  } else {
+    // Fallback: inject after body start
+    document.body.insertAdjacentHTML('afterbegin', counterHTML);
+  }
 }
 
 // Initialize when DOM is ready
