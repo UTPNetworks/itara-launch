@@ -284,7 +284,7 @@ function DashApp({ user }) {
     }
   }, [user]);
 
-  return <window.D.CommandPage />;
+  return <window.D.CommandPage user={user} supabase={window.supa} />;
 }
 
 // ---- Session persistence check ----

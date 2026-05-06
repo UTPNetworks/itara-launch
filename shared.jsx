@@ -113,4 +113,212 @@ function useGpuTicker(intervalMs = 2200) {
   return rows;
 }
 
-Object.assign(window, { ItaraMark, Wordmark, useLiveFeed, useCountUp, useGpuTicker });
+// ---- Global Profile Dropdown (for all pages) ----
+function GlobalProfileDropdown({ user }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const avatarRef = useRef(null);
+  const [position, setPosition] = useState({ top: 0, right: 0 });
+
+  useEffect(() => {
+    if (isOpen && avatarRef.current) {
+      const rect = avatarRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + 12,
+        right: window.innerWidth - rect.right
+      });
+    }
+  }, [isOpen, avatarRef]);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        if (avatarRef.current && !avatarRef.current.contains(e.target)) {
+          setIsOpen(false);
+        }
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const handleMyListings = () => {
+    window.location.href = 'dashboard.html?section=listings';
+    setIsOpen(false);
+  };
+
+  const handleSignout = async () => {
+    try {
+      await window.supabase.auth.signOut();
+      window.location.href = 'index.html';
+    } catch (err) {
+      console.error('Signout error:', err);
+    }
+  };
+
+  return (
+    <>
+      <div
+        ref={avatarRef}
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          cursor: 'pointer',
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #6C5CE7 0%, #FF6AC7 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontWeight: '600',
+          fontSize: '14px',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+          border: '1px solid rgba(244,242,236,0.2)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(108, 92, 231, 0.3)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+      >
+        {user?.user_metadata?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+      </div>
+
+      {isOpen && (
+        <div
+          ref={dropdownRef}
+          style={{
+            position: 'fixed',
+            top: `${position.top}px`,
+            right: `${position.right}px`,
+            background: 'white',
+            border: '1px solid #eee',
+            borderRadius: '8px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+            zIndex: 9999,
+            minWidth: '220px',
+          }}
+        >
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid #eee', display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6C5CE7 0%, #FF6AC7 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: '600',
+                fontSize: '16px',
+              }}
+            >
+              {user?.user_metadata?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div>
+              <div style={{ fontWeight: '600', color: '#0A0A0C', fontSize: '14px' }}>
+                {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+              </div>
+              <div style={{ fontSize: '12px', color: '#999', marginTop: '2px' }}>
+                {user?.email}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              window.location.href = 'dashboard.html?section=profile';
+              setIsOpen(false);
+            }}
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              border: 'none',
+              background: 'transparent',
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: '14px',
+              color: '#0A0A0C',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => { e.target.style.background = '#f5f5f5'; }}
+            onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
+          >
+            👤 Profile
+          </button>
+
+          <button
+            onClick={handleMyListings}
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              border: 'none',
+              background: 'transparent',
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: '14px',
+              color: '#0A0A0C',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => { e.target.style.background = '#f5f5f5'; }}
+            onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
+          >
+            📋 My Listings
+          </button>
+
+          <button
+            onClick={() => {
+              window.location.href = 'dashboard.html?section=security';
+              setIsOpen(false);
+            }}
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              border: 'none',
+              background: 'transparent',
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: '14px',
+              color: '#0A0A0C',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => { e.target.style.background = '#f5f5f5'; }}
+            onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
+          >
+            🔒 Security & MFA
+          </button>
+
+          <div style={{ borderTop: '1px solid #eee' }} />
+
+          <button
+            onClick={handleSignout}
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              border: 'none',
+              background: 'transparent',
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: '14px',
+              color: '#E63946',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => { e.target.style.background = 'rgba(230, 57, 70, 0.05)'; }}
+            onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
+          >
+            🚪 Sign out
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+Object.assign(window, { ItaraMark, Wordmark, useLiveFeed, useCountUp, useGpuTicker, GlobalProfileDropdown });

@@ -762,8 +762,115 @@ const D = (() => {
     );
   }
 
+  // My Listings Section - fetches actual listings from Supabase
+  function MyListingsSection({ user, supabase }) {
+    const [listings, setListings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      const fetchListings = async () => {
+        if (!user || !supabase) {
+          setLoading(false);
+          return;
+        }
+
+        try {
+          setLoading(true);
+          const { data, error: fetchError } = await supabase
+            .from('listings')
+            .select(`
+              id,
+              title,
+              category,
+              price,
+              status,
+              created_at,
+              listing_images(image_url, is_cover)
+            `)
+            .eq('seller_id', user.id)
+            .order('created_at', { ascending: false });
+
+          if (fetchError) throw fetchError;
+
+          setListings(data || []);
+          setError(null);
+        } catch (err) {
+          console.error('Error fetching listings:', err);
+          setError(err.message);
+          setListings([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchListings();
+    }, [user, supabase]);
+
+    const formatDate = (dateStr) => {
+      const date = new Date(dateStr);
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    };
+
+    const getCoverImage = (listingImages) => {
+      if (!listingImages || !Array.isArray(listingImages)) return null;
+      const coverImg = listingImages.find(img => img.is_cover);
+      return coverImg ? coverImg.image_url : (listingImages[0]?.image_url || null);
+    };
+
+    return (
+      <div>
+        <h1 style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>My Listings</h1>
+        <div style={{ padding: '2rem', textAlign: 'center', background: '#f9f9f9', borderRadius: '8px' }}>
+          {loading ? (
+            <p style={{ margin: 0, opacity: 0.7 }}>Loading listings...</p>
+          ) : error ? (
+            <p style={{ margin: 0, color: '#E63946', opacity: 0.8 }}>Error loading listings: {error}</p>
+          ) : (
+            <>
+              <p style={{ margin: 0, opacity: 0.7 }}>You have {listings.length} active listing{listings.length !== 1 ? 's' : ''}</p>
+              {listings.length === 0 ? (
+                <>
+                  <p style={{ marginTop: '1rem', opacity: 0.6 }}>Start by creating your first listing</p>
+                  <button onClick={() => alert('Open the Post a Listing modal from the Market Terminal')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Create Listing</button>
+                </>
+              ) : (
+                <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                  {listings.map((listing) => {
+                    const coverImg = getCoverImage(listing.listing_images);
+                    return (
+                      <div key={listing.id} style={{ padding: '0', background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', textAlign: 'left', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        {/* Thumbnail */}
+                        {coverImg ? (
+                          <img src={coverImg} alt={listing.title} style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '160px', background: 'linear-gradient(135deg, #6C5CE7 0%, #A78BFA 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '48px' }}>📦</div>
+                        )}
+                        {/* Content */}
+                        <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                          <div style={{ fontWeight: 'bold', fontSize: '0.95rem', marginBottom: '0.25rem', color: '#0A0A0C' }}>{listing.title}</div>
+                          <div style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '0.5rem' }}>{listing.category}</div>
+                          <div style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '0.75rem' }}>Created on {formatDate(listing.created_at)}</div>
+                          <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid #eee' }}>
+                            <div style={{ fontWeight: '600', color: '#6C5CE7', fontSize: '0.9rem' }}>${listing.price || 'Contact'}</div>
+                            <span style={{ background: '#10B981', color: 'white', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>{listing.status}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Professional Profile Page with sidebar
-  function ProfilePage({ onClose, initialSection = 'overview' }) {
+  function ProfilePage({ onClose, initialSection = 'overview', user, supabase }) {
     const [activeSection, setActiveSection] = useState(initialSection);
     const [firstName, setFirstName] = useState('Admin');
     const [lastName, setLastName] = useState('Bhuvi');
@@ -931,32 +1038,7 @@ const D = (() => {
               </div>
             )}
 
-            {activeSection === 'listings' && (
-              <div>
-                <h1 style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>My Listings</h1>
-                <div style={{ padding: '2rem', textAlign: 'center', background: '#f9f9f9', borderRadius: '8px' }}>
-                  <p style={{ margin: 0, opacity: 0.7 }}>You have {U.LISTINGS.length} active listings</p>
-                  {U.LISTINGS.length === 0 ? (
-                    <>
-                      <p style={{ marginTop: '1rem', opacity: 0.6 }}>Start by creating your first listing</p>
-                      <button onClick={() => alert('Redirecting to create listing form...')} style={{ marginTop: '1rem', padding: '0.75rem 1.5rem', background: '#6C5CE7', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>+ Create Listing</button>
-                    </>
-                  ) : (
-                    <div style={{ marginTop: '1rem' }}>
-                      {U.LISTINGS.map((l, i) => (
-                        <div key={i} style={{ padding: '1rem', background: 'white', marginTop: '0.75rem', borderRadius: '6px', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                            <div style={{ fontWeight: 'bold' }}>{l.title || l.kind} Listing</div>
-                            <div style={{ fontSize: '0.85rem', opacity: 0.6 }}>Created on 2026-01-15</div>
-                          </div>
-                          <button onClick={() => alert('Editing listing: ' + (l.title || l.kind))} style={{ padding: '0.5rem 1rem', background: '#f5f5f5', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}>Edit</button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {activeSection === 'listings' && <MyListingsSection user={user} supabase={supabase} />}
 
             {activeSection === 'security' && (
               <div>
@@ -1042,7 +1124,7 @@ const D = (() => {
     );
   }
 
-  function CommandPage() {
+  function CommandPage({ user, supabase }) {
     const [profileOpen, setProfileOpen] = useState(false);
     const [modal, setModal] = useState(null);
     const [profilePage, setProfilePage] = useState(null);
@@ -1088,7 +1170,7 @@ const D = (() => {
           })();
           return null;
         })()}
-        {profilePage && profilePage !== 'signout' && <ProfilePage onClose={() => setProfilePage(null)} initialSection={profilePage} />}
+        {profilePage && profilePage !== 'signout' && <ProfilePage onClose={() => setProfilePage(null)} initialSection={profilePage} user={user} supabase={supabase} />}
 
         {/* Hero / big greeting */}
         <section className="dB-hero">

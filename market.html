@@ -357,13 +357,6 @@ function mountMarket(user) {
     return setTimeout(() => mountMarket(user), 80);
   }
 
-  // Patch avatar
-  const av = document.getElementById('it-avatar');
-  if (av && user) {
-    const name = user.user_metadata?.full_name || user.email || 'U';
-    av.textContent = name[0].toUpperCase();
-  }
-
   // State: selected item for detail view
   let selectedItem = null;
 
@@ -391,6 +384,17 @@ function mountMarket(user) {
       window.MKT.openItem = (it) => setOpen(it);
       window.openListingModal = () => setListingModalOpen(true);
       window.refreshMarketplaceData = () => setRefreshSignal(s => s + 1);
+
+      // Replace avatar with GlobalProfileDropdown
+      const av = document.getElementById('it-avatar');
+      if (av && user && !document.getElementById('avatar-dropdown-root')) {
+        const avatarRoot = document.createElement('div');
+        avatarRoot.id = 'avatar-dropdown-root';
+        av.parentNode.replaceChild(avatarRoot, av);
+        ReactDOM.createRoot(avatarRoot).render(
+          React.createElement(window.GlobalProfileDropdown, { user })
+        );
+      }
 
       // Add listing button to nav after mount
       if (window.LISTING && !document.getElementById('listing-button-container')) {

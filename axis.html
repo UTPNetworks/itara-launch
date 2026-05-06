@@ -941,9 +941,13 @@ function mountWordmark() {
 }
 function mountPage(user) {
   const av = document.getElementById('it-avatar');
-  if (av && user) {
-    const name = user.user_metadata?.full_name || user.email || 'U';
-    av.textContent = name[0].toUpperCase();
+  if (av && user && !document.getElementById('avatar-dropdown-root')) {
+    const avatarRoot = document.createElement('div');
+    avatarRoot.id = 'avatar-dropdown-root';
+    av.parentNode.replaceChild(avatarRoot, av);
+    ReactDOM.createRoot(avatarRoot).render(
+      React.createElement(window.GlobalProfileDropdown, { user })
+    );
   }
   ReactDOM.createRoot(document.getElementById('root')).render(
     React.createElement(AxisPage, { user })
