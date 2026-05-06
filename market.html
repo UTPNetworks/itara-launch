@@ -352,7 +352,7 @@ function mountWordmark() {
 
 // ---- Mount Terminal page ----
 function mountMarket(user) {
-  if (!window.MKT_PAGES || !window.MKT || !window.ITARA_MARKET || !window.LISTING) {
+  if (!window.MKT_PAGES || !window.MKT || !window.ITARA_MARKET) {
     return setTimeout(() => mountMarket(user), 80);
   }
 
@@ -361,21 +361,6 @@ function mountMarket(user) {
   if (av && user) {
     const name = user.user_metadata?.full_name || user.email || 'U';
     av.textContent = name[0].toUpperCase();
-  }
-
-  // Add Post a Listing button to nav
-  const navRight = document.querySelector('.it-nav-r');
-  if (navRight) {
-    const buttonContainer = document.createElement('div');
-    ReactDOM.createRoot(buttonContainer).render(
-      React.createElement(window.LISTING.ListingButton, {
-        onClick: () => {
-          // Global function to open listing modal
-          if (window.openListingModal) window.openListingModal();
-        }
-      })
-    );
-    navRight.insertBefore(buttonContainer.firstChild, navRight.firstChild);
   }
 
   // State: selected item for detail view
@@ -389,6 +374,44 @@ function mountMarket(user) {
     React.useEffect(() => {
       window.MKT.openItem = (it) => setOpen(it);
       window.openListingModal = () => setListingModalOpen(true);
+
+      // Add listing button to nav after mount
+      if (window.LISTING && !document.getElementById('listing-button-container')) {
+        const navRight = document.querySelector('.it-nav-r');
+        if (navRight) {
+          const buttonContainer = document.createElement('div');
+          buttonContainer.id = 'listing-button-container';
+          buttonContainer.style.display = 'flex';
+          buttonContainer.style.alignItems = 'center';
+
+          const button = document.createElement('button');
+          button.innerHTML = '✨ Post a Listing';
+          button.style.cssText = `
+            background-color: rgba(108, 92, 231, 0.2);
+            color: #F4F2EC;
+            border: 1px solid rgba(108, 92, 231, 0.5);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+          `;
+          button.onmouseover = () => {
+            button.style.backgroundColor = 'rgba(108, 92, 231, 0.4)';
+            button.style.borderColor = '#6C5CE7';
+          };
+          button.onmouseout = () => {
+            button.style.backgroundColor = 'rgba(108, 92, 231, 0.2)';
+            button.style.borderColor = 'rgba(108, 92, 231, 0.5)';
+          };
+          button.onclick = () => setListingModalOpen(true);
+
+          buttonContainer.appendChild(button);
+          navRight.insertBefore(buttonContainer, navRight.firstChild);
+        }
+      }
     }, []);
 
     return (
@@ -404,12 +427,14 @@ function mountMarket(user) {
             live={true}
           />
         )}
-        <window.LISTING.ListingModal
-          isOpen={listingModalOpen}
-          onClose={() => setListingModalOpen(false)}
-          user={user}
-          supabase={sb}
-        />
+        {window.LISTING && (
+          <window.LISTING.ListingModal
+            isOpen={listingModalOpen}
+            onClose={() => setListingModalOpen(false)}
+            user={user}
+            supabase={sb}
+          />
+        )}
       </>
     );
   }
