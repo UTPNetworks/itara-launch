@@ -970,8 +970,33 @@ const V3 = (() => {
   return { Page };
 })();
 
+// ---- Session check — redirect to dashboard if already logged in ----
+(async function checkSessionBeforeMount() {
+  try {
+    const SUPA_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
+    const SUPA_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
+    const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+    // Give Supabase time to initialize
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const { data: { session } } = await supa.auth.getSession();
+    if (session) {
+      console.log('[Index] Session found, redirecting to dashboard...');
+      window.location.href = '/dashboard.html';
+      return; // Don't continue with page mount
+    }
+  } catch (err) {
+    console.warn('[Index] Session check failed:', err.message);
+    // Continue with normal page render if check fails
+  }
+
+  // No session or check failed — proceed with normal page mount
+  mount();
+})();
+
 // Mount
-(function mount() {
+function mount() {
   if (!window.Wordmark || !window.ITARA_DATA || !window.useLiveFeed) return setTimeout(mount, 80);
   if (window.__itaraMounted) return;
   window.__itaraMounted = true;
@@ -984,7 +1009,7 @@ const V3 = (() => {
     if (l) l.textContent = 'Error: ' + e.message;
     console.error(e);
   }
-})();
+}
 </script>
 
 <!-- Supabase auth + all modal logic -->

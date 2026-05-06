@@ -227,6 +227,25 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const MC_THEME_KEY = 'itara_mc_theme';
 
+// ---- Auth state change listener ----
+function setupAuthListener() {
+  // Listen for auth state changes (sign in, sign out, token refresh)
+  const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+    console.log('[Auth State]', event, session ? 'authenticated' : 'unauthenticated');
+
+    if (event === 'SIGNED_OUT') {
+      // User signed out, redirect to signin
+      console.log('User signed out, redirecting...');
+      window.location.href = '/index.html';
+    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      // Session valid, allow dashboard to continue
+      console.log('Session established or refreshed');
+    }
+  });
+
+  return subscription;
+}
+
 // ---- Theme toggle logic (vanilla, outside React) ----
 function initThemeToggle() {
   // Poll until React mounts the nav-embedded toggle
@@ -264,6 +283,9 @@ function DashApp({ user }) {
   return <window.D.CommandPage />;
 }
 
+// ---- Session persistence check ----
+let sessionCheckTimeout = null;
+
 async function boot() {
   if (!window.D || !window.ITARA_DASH || !window.ITARA_DATA || !window.Wordmark) {
     return setTimeout(boot, 60);
@@ -280,13 +302,51 @@ async function boot() {
   }
 
   loading.style.display = 'none';
+  setupAuthListener();
   initThemeToggle();
   ReactDOM.createRoot(document.getElementById('root')).render(
     React.createElement(DashApp, { user: session.user })
   );
 }
 
-setTimeout(boot, 300);
+// ---- Auto-restore session on page load ----
+async function restoreSession() {
+  // Give Supabase JS lib time to initialize
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  // Check if session exists
+  const { data: { session } } = await sb.auth.getSession();
+
+  if (session) {
+    // Session found, boot dashboard
+    boot();
+  } else {
+    // No session, check if we're still loading
+    if (sessionCheckTimeout) clearTimeout(sessionCheckTimeout);
+
+    // Retry up to 3 times with delay (in case Supabase is still initializing)
+    let retries = 0;
+    const retryCheck = async () => {
+      retries++;
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const { data: { session: retrySession } } = await sb.auth.getSession();
+      if (retrySession) {
+        boot();
+      } else if (retries < 3) {
+        retryCheck();
+      } else {
+        // No session found after retries, proceed with normal flow
+        boot();
+      }
+    };
+
+    retryCheck();
+  }
+}
+
+// Start restoration immediately
+restoreSession();
 </script>
 
 </body>

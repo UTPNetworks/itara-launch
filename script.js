@@ -361,10 +361,20 @@ async function submitSignIn(e) {
     return;
   }
 
-  // Success
+  // Success — wait for session to be established
   document.getElementById('signin-form-wrap').style.display = 'none';
   document.getElementById('signin-success').style.display   = 'flex';
-  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+
+  // Verify session is available before redirecting
+  setTimeout(async () => {
+    const { data: { session } } = await supa.auth.getSession();
+    if (session) {
+      window.location.href = 'dashboard.html';
+    } else {
+      // Session not ready, retry
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+    }
+  }, 1000);
 }
 
 // ============================================================
