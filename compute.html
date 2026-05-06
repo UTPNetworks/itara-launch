@@ -562,6 +562,260 @@ body.mkt-light .cp-ticker-price { color: #0A0A0C; }
 .cp-ticker-price { font-weight: 700; color: #F4F2EC; }
 .cp-ticker-delta.up { color: #4ADE80; }
 .cp-ticker-delta.dn { color: #FF5C5C; }
+
+/* ============================================================
+   RENTAL MODAL - Glassmorphism Design
+============================================================ */
+#rental-backdrop {
+  position: fixed; inset: 0; background: rgba(10,10,12,0.7);
+  backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 5000;
+}
+#rental-backdrop.visible {
+  opacity: 1; pointer-events: auto;
+}
+
+#rental-modal {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  opacity: 0; pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 5001;
+  width: 90%; max-width: 480px;
+}
+#rental-modal.visible {
+  opacity: 1; pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.rental-modal-content {
+  background: rgba(20,21,26,0.92);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(244,242,236,0.15);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5),
+              0 0 1px rgba(108,92,231,0.5);
+}
+
+.rental-modal-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.rental-modal-title {
+  font-size: 24px; font-weight: 700; color: #F4F2EC;
+  margin: 0;
+}
+
+.rental-modal-close {
+  background: none; border: none;
+  font-size: 24px; color: rgba(244,242,236,0.5);
+  cursor: pointer; padding: 0; width: 32px; height: 32px;
+  display: grid; place-items: center;
+  transition: color 0.2s, transform 0.2s;
+}
+.rental-modal-close:hover {
+  color: #F4F2EC;
+  transform: rotate(90deg);
+}
+
+.rental-gpu-card {
+  background: rgba(108,92,231,0.08);
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px;
+}
+
+.rental-gpu-info {
+  flex: 1;
+}
+
+.rental-gpu-name {
+  font-size: 14px; font-weight: 700; color: #F4F2EC;
+  display: block; margin-bottom: 4px;
+}
+
+.rental-gpu-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: rgba(244,242,236,0.5);
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.rental-gpu-price {
+  font-size: 16px; font-weight: 700; color: #6C5CE7;
+  text-align: right;
+}
+
+.rental-duration-section {
+  margin-bottom: 24px;
+}
+
+.rental-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.2em; color: rgba(244,242,236,0.4);
+  display: block; margin-bottom: 10px;
+}
+
+.rental-duration-buttons {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.duration-btn {
+  background: rgba(244,242,236,0.06);
+  border: 1.5px solid rgba(244,242,236,0.12);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(244,242,236,0.55);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+.duration-btn:hover {
+  background: rgba(108,92,231,0.15);
+  border-color: rgba(108,92,231,0.3);
+  color: #8C7DFF;
+}
+
+.duration-btn.active {
+  background: #6C5CE7;
+  border-color: #6C5CE7;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(108,92,231,0.4);
+}
+
+.rental-cost-section {
+  background: rgba(108,92,231,0.06);
+  border: 1px solid rgba(108,92,231,0.15);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.rental-cost-breakdown {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(244,242,236,0.65);
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px;
+}
+
+.rental-total-cost {
+  font-size: 28px; font-weight: 700; color: #6C5CE7;
+  font-variant-numeric: tabular-nums;
+}
+
+.rental-modal-footer {
+  display: flex; gap: 10px;
+}
+
+.rental-btn-confirm {
+  flex: 1;
+  background: #6C5CE7;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rental-btn-confirm:hover:not(:disabled) {
+  background: #8C7DFF;
+  box-shadow: 0 0 20px rgba(108,92,231,0.4);
+}
+
+.rental-btn-confirm:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.rental-btn-confirm:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.rental-btn-cancel {
+  flex: 1;
+  background: transparent;
+  color: rgba(244,242,236,0.7);
+  border: 1px solid rgba(244,242,236,0.14);
+  border-radius: 10px;
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rental-btn-cancel:hover {
+  border-color: rgba(244,242,236,0.3);
+  color: #F4F2EC;
+}
+
+/* Light mode adjustments */
+body.mkt-light #rental-modal .rental-modal-content {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(10,10,12,0.12);
+}
+
+body.mkt-light .rental-modal-title,
+body.mkt-light .rental-gpu-name {
+  color: #0A0A0C;
+}
+
+body.mkt-light .rental-gpu-card {
+  background: rgba(108,92,231,0.08);
+  border-color: rgba(108,92,231,0.15);
+}
+
+body.mkt-light .duration-btn {
+  background: rgba(10,10,12,0.04);
+  border-color: rgba(10,10,12,0.12);
+  color: rgba(10,10,12,0.55);
+}
+
+body.mkt-light .duration-btn:hover {
+  background: rgba(108,92,231,0.12);
+  border-color: rgba(108,92,231,0.25);
+  color: #5B4BC8;
+}
+
+body.mkt-light .duration-btn.active {
+  background: #6C5CE7;
+  border-color: #6C5CE7;
+  color: #fff;
+}
+
+body.mkt-light .rental-cost-section {
+  background: rgba(108,92,231,0.06);
+  border-color: rgba(108,92,231,0.12);
+}
+
+body.mkt-light .rental-cost-breakdown {
+  color: rgba(10,10,12,0.65);
+}
+
+body.mkt-light .rental-btn-cancel {
+  border-color: rgba(10,10,12,0.12);
+  color: rgba(10,10,12,0.6);
+}
+
+body.mkt-light .rental-btn-cancel:hover {
+  border-color: rgba(10,10,12,0.2);
+  color: #0A0A0C;
+}
 </style>
 </head>
 <body>
@@ -635,6 +889,59 @@ body.mkt-light .cp-ticker-price { color: #0A0A0C; }
 
   <!-- React mounts here -->
   <div id="root"></div>
+</div>
+
+<!-- RENTAL MODAL -->
+<div id="rental-backdrop"></div>
+<div id="rental-modal">
+  <div class="rental-modal-content">
+    <!-- Header -->
+    <div class="rental-modal-header">
+      <h2 class="rental-modal-title">Rent GPU</h2>
+      <button class="rental-modal-close" onclick="closeRentalModal()">×</button>
+    </div>
+
+    <!-- GPU Info Card -->
+    <div class="rental-gpu-card">
+      <div class="rental-gpu-info">
+        <span class="rental-gpu-name" id="modal-gpu-name">H100 SXM5 80GB</span>
+        <div class="rental-gpu-meta">
+          <span id="modal-gpu-provider">CoreWeave • US-EAST</span>
+          <span id="modal-gpu-uptime">99.9% uptime</span>
+        </div>
+      </div>
+      <div class="rental-gpu-price" id="modal-gpu-price">$3.29/hr</div>
+    </div>
+
+    <!-- Duration Selection -->
+    <div class="rental-duration-section">
+      <label class="rental-section-label">RENTAL DURATION</label>
+      <div class="rental-duration-buttons">
+        <button class="duration-btn active" id="duration-1h">1H</button>
+        <button class="duration-btn" id="duration-6h">6H</button>
+        <button class="duration-btn" id="duration-24h">24H</button>
+        <button class="duration-btn" id="duration-1w">1W</button>
+      </div>
+    </div>
+
+    <!-- Cost Breakdown -->
+    <div class="rental-cost-section">
+      <div class="rental-cost-breakdown">
+        <span id="modal-cost-hours">1 hours</span>
+        <span>@</span>
+        <span id="modal-cost-breakdown-inline">$3.29/hr</span>
+      </div>
+      <div class="rental-total-cost">
+        <span id="modal-total-cost">$3.29</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="rental-modal-footer">
+      <button class="rental-btn-confirm" id="modal-confirm-btn" onclick="confirmRental()">CONFIRM RENTAL</button>
+      <button class="rental-btn-cancel" onclick="closeRentalModal()">CANCEL</button>
+    </div>
+  </div>
 </div>
 
 <!-- Libraries -->
@@ -1056,6 +1363,159 @@ function mountPage(user) {
   );
 }
 
+/* ════════════════════════════════════════════════════════════
+   RENTAL MODAL — Brilliant Creative Experience
+   ════════════════════════════════════════════════════════════ */
+
+const GPUS_CATALOG = [
+  { name: 'H100 SXM5 80GB', model: 'H100', price: 3.29, region: 'US-EAST', provider: 'CoreWeave', uptime: 99.9 },
+  { name: 'H100 PCIe 80GB', model: 'H100P', price: 2.36, region: 'US-WEST', provider: 'Lambda Labs', uptime: 99.8 },
+  { name: 'A100 SXM4 80GB', model: 'A100', price: 2.17, region: 'EU-WEST', provider: 'Vast.ai', uptime: 99.5 },
+  { name: 'RTX 4090 24GB', model: 'RTX4090', price: 0.77, region: 'APAC', provider: 'Vast.ai', uptime: 98.9 },
+];
+
+let currentRentalState = {
+  selectedGpu: null,
+  duration: 1,
+  unit: 'hour'
+};
+
+function openRentalModal(gpuName = null) {
+  const modal = document.getElementById('rental-modal');
+  const backdrop = document.getElementById('rental-backdrop');
+
+  if (gpuName) {
+    const gpu = GPUS_CATALOG.find(g => g.name.includes(gpuName) || g.model === gpuName);
+    if (gpu) currentRentalState.selectedGpu = gpu;
+  }
+
+  if (!currentRentalState.selectedGpu && GPUS_CATALOG.length > 0) {
+    currentRentalState.selectedGpu = GPUS_CATALOG[0];
+  }
+
+  updateRentalModal();
+  modal.classList.add('visible');
+  backdrop.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeRentalModal() {
+  const modal = document.getElementById('rental-modal');
+  const backdrop = document.getElementById('rental-backdrop');
+  modal.classList.remove('visible');
+  backdrop.classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function updateRentalModal() {
+  const gpu = currentRentalState.selectedGpu;
+  if (!gpu) return;
+
+  const durationValue = currentRentalState.duration;
+  const unit = currentRentalState.unit;
+
+  // Calculate hours for pricing
+  let hours = durationValue;
+  if (unit === 'day') hours = durationValue * 24;
+  if (unit === 'week') hours = durationValue * 24 * 7;
+
+  const totalCost = gpu.price * hours;
+
+  // Update GPU info
+  document.getElementById('modal-gpu-name').textContent = gpu.name;
+  document.getElementById('modal-gpu-provider').textContent = `${gpu.provider} • ${gpu.region}`;
+  document.getElementById('modal-gpu-uptime').textContent = `${gpu.uptime}% uptime`;
+  document.getElementById('modal-gpu-price').textContent = `$${gpu.price.toFixed(2)}/hr`;
+
+  // Update duration display
+  const hourText = hours === 1 ? 'hour' : 'hours';
+  document.getElementById('modal-cost-hours').textContent = `${hours} ${hourText}`;
+
+  // Update cost breakdown inline
+  const breakdownEl = document.getElementById('modal-cost-breakdown-inline');
+  if (breakdownEl) {
+    breakdownEl.textContent = `$${gpu.price.toFixed(2)}/hr`;
+  }
+
+  // Update total cost
+  document.getElementById('modal-total-cost').textContent = `$${totalCost.toFixed(2)}`;
+}
+
+function confirmRental() {
+  const gpu = currentRentalState.selectedGpu;
+  const durationValue = currentRentalState.duration;
+  const unit = currentRentalState.unit;
+
+  let hours = durationValue;
+  if (unit === 'day') hours = durationValue * 24;
+  if (unit === 'week') hours = durationValue * 24 * 7;
+  const totalCost = gpu.price * hours;
+
+  // Create new rental entry
+  const newRental = {
+    id: 'R-' + Math.floor(Math.random() * 10000),
+    model: gpu.name,
+    nodes: 1,
+    status: 'running',
+    elapsed: '0h 00m',
+    earn: 0,
+    task: 'On-demand rental'
+  };
+
+  // Add to RENTALS array (this would normally be done via API)
+  RENTALS.unshift(newRental);
+
+  // Trigger success animation
+  const btn = document.getElementById('modal-confirm-btn');
+  btn.disabled = true;
+  btn.innerHTML = '✓ CONFIRMED';
+  btn.style.background = '#4ADE80';
+
+  setTimeout(() => {
+    closeRentalModal();
+    btn.disabled = false;
+    btn.innerHTML = 'CONFIRM RENTAL';
+    btn.style.background = '';
+    // Re-render to show new rental
+    location.reload();
+  }, 800);
+}
+
+// Wire up button handlers
+document.addEventListener('DOMContentLoaded', () => {
+  // Hero RENT button
+  const heroBtn = document.querySelector('.cp-btn-primary');
+  if (heroBtn && heroBtn.textContent.includes('RENT')) {
+    heroBtn.onclick = (e) => { e.preventDefault(); openRentalModal(); };
+  }
+
+  // Duration button handlers (for use after boot)
+  function setupDurationButtons() {
+    ['1h', '6h', '24h', '1w'].forEach((label, idx) => {
+      const btn = document.getElementById(`duration-${label}`);
+      if (btn) {
+        btn.onclick = (e) => {
+          e.preventDefault();
+          const durations = [
+            { value: 1, unit: 'hour' },
+            { value: 6, unit: 'hour' },
+            { value: 24, unit: 'hour' },
+            { value: 1, unit: 'week' }
+          ];
+          currentRentalState.duration = durations[idx].value;
+          currentRentalState.unit = durations[idx].unit;
+          updateRentalModal();
+
+          // Visual feedback - update active state
+          document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+      }
+    });
+  }
+  setupDurationButtons();
+});
+
 async function boot() {
   if (!window.Wordmark) return setTimeout(boot, 80);
   const { data: { session } } = await sb.auth.getSession();
@@ -1065,6 +1525,43 @@ async function boot() {
   initTheme();
   mountWordmark();
   mountPage(session.user);
+
+  // Wire up RENT buttons in GPU table
+  setTimeout(() => {
+    document.querySelectorAll('.cp-rent-btn').forEach((btn, idx) => {
+      btn.onclick = () => {
+        const gpu = GPUS_CATALOG[idx] || GPUS_CATALOG[0];
+        currentRentalState.selectedGpu = gpu;
+        currentRentalState.duration = 1;
+        currentRentalState.unit = 'hour';
+        openRentalModal();
+      };
+    });
+
+    // Wire up quick action buttons
+    document.querySelectorAll('.cp-quick-btn').forEach(btn => {
+      if (btn.textContent.includes('RENT')) {
+        btn.onclick = () => {
+          currentRentalState.duration = 1;
+          currentRentalState.unit = 'hour';
+          openRentalModal();
+        };
+      }
+    });
+
+    // Wire up NEW RENTAL button
+    const newRentalBtn = Array.from(document.querySelectorAll('.cp-btn-primary')).find(b => b.textContent.includes('NEW RENTAL'));
+    if (newRentalBtn) {
+      newRentalBtn.onclick = () => {
+        currentRentalState.duration = 1;
+        currentRentalState.unit = 'hour';
+        openRentalModal();
+      };
+    }
+
+    // Setup duration button handlers
+    setupDurationButtons();
+  }, 300);
 }
 setTimeout(boot, 300);
 </script>
