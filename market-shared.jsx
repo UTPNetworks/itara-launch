@@ -128,6 +128,85 @@
     const [hover, setHover] = useState(false);
     const c = kindColor(item.kind);
 
+    // Render type-specific visual elements
+    const renderArtVisual = () => {
+      const seed = item.name.length * 7;
+      const rng = (() => { let s = seed; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; })();
+
+      if (item.kind === 'LLM') {
+        return (
+          <svg viewBox="0 0 100 100" className="mkt-card-visual" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, opacity: 0.6 }}>
+            <rect x="10" y="20" width="30" height="60" fill="none" stroke={c} strokeWidth="1.5" rx="2"/>
+            <rect x="50" y="15" width="35" height="70" fill="none" stroke={c} strokeWidth="1.5" rx="2"/>
+            <circle cx="25" cy="35" r="4" fill={c} opacity="0.7"/>
+            <circle cx="67" cy="30" r="5" fill={c} opacity="0.6"/>
+            <line x1="15" y1="50" x2="35" y2="50" stroke={c} strokeWidth="1" opacity="0.5"/>
+            <line x1="55" y1="50" x2="80" y2="50" stroke={c} strokeWidth="1" opacity="0.5"/>
+          </svg>
+        );
+      } else if (item.kind === 'GPU') {
+        return (
+          <svg viewBox="0 0 100 100" className="mkt-card-visual" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, opacity: 0.6 }}>
+            <rect x="15" y="15" width="70" height="70" fill="none" stroke={c} strokeWidth="2" rx="3"/>
+            {[0,1,2,3].map(i => <rect key={i} x={25+i*15} y="30" width="10" height="50" fill={c} opacity={0.3+i*0.15} rx="1"/>)}
+            <line x1="20" y1="25" x2="80" y2="25" stroke={c} strokeWidth="1.5" opacity="0.5"/>
+          </svg>
+        );
+      } else if (item.kind === 'AGENT') {
+        return (
+          <svg viewBox="0 0 100 100" className="mkt-card-visual" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, opacity: 0.6 }}>
+            <circle cx="50" cy="40" r="18" fill="none" stroke={c} strokeWidth="2"/>
+            <circle cx="50" cy="40" r="10" fill={c} opacity="0.4"/>
+            <line x1="35" y1="50" x2="25" y2="65" stroke={c} strokeWidth="2"/>
+            <line x1="65" y1="50" x2="75" y2="65" stroke={c} strokeWidth="2"/>
+            <circle cx="25" cy="65" r="5" fill="none" stroke={c} strokeWidth="1.5"/>
+            <circle cx="75" cy="65" r="5" fill="none" stroke={c} strokeWidth="1.5"/>
+          </svg>
+        );
+      } else if (item.kind === 'VISION') {
+        return (
+          <svg viewBox="0 0 100 100" className="mkt-card-visual" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, opacity: 0.6 }}>
+            <circle cx="50" cy="45" r="28" fill="none" stroke={c} strokeWidth="2"/>
+            <circle cx="50" cy="45" r="18" fill="none" stroke={c} strokeWidth="1.5" opacity="0.6"/>
+            <circle cx="50" cy="45" r="8" fill={c} opacity="0.5"/>
+            <path d="M 50 20 Q 60 30 60 45 Q 60 60 50 70 Q 40 60 40 45 Q 40 30 50 20" fill="none" stroke={c} strokeWidth="1" opacity="0.4"/>
+          </svg>
+        );
+      } else if (item.kind === 'AUDIO') {
+        return (
+          <svg viewBox="0 0 100 100" className="mkt-card-visual" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, opacity: 0.6 }}>
+            <circle cx="50" cy="50" r="8" fill={c} opacity="0.7"/>
+            <path d="M 50 50 Q 35 35 35 50 Q 35 65 50 50" fill="none" stroke={c} strokeWidth="2" opacity="0.6"/>
+            <path d="M 50 50 Q 30 30 30 50 Q 30 70 50 50" fill="none" stroke={c} strokeWidth="1.5" opacity="0.4"/>
+            <path d="M 50 50 Q 65 35 65 50 Q 65 65 50 50" fill="none" stroke={c} strokeWidth="2" opacity="0.6"/>
+            <path d="M 50 50 Q 70 30 70 50 Q 70 70 50 50" fill="none" stroke={c} strokeWidth="1.5" opacity="0.4"/>
+          </svg>
+        );
+      } else if (item.kind === 'CODE') {
+        return (
+          <svg viewBox="0 0 100 100" className="mkt-card-visual" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, opacity: 0.6 }}>
+            <path d="M 25 30 L 40 50 L 25 70" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
+            <path d="M 75 30 L 60 50 L 75 70" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="45" y1="25" x2="55" y2="75" stroke={c} strokeWidth="1.5" opacity="0.5"/>
+            <circle cx="50" cy="50" r="22" fill="none" stroke={c} strokeWidth="1" opacity="0.3" strokeDasharray="3,3"/>
+          </svg>
+        );
+      } else {
+        // Default visual for other types
+        return (
+          <svg viewBox="0 0 100 100" className="mkt-card-visual" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, opacity: 0.5 }}>
+            <defs>
+              <pattern id={`pat-${seed}`} patternUnits="userSpaceOnUse" width="10" height="10">
+                <line x1="0" y1="0" x2="10" y2="10" stroke={c} strokeWidth="0.8" opacity="0.4"/>
+              </pattern>
+            </defs>
+            <rect x="0" y="0" width="100" height="100" fill={`url(#pat-${seed})`}/>
+            <circle cx="50" cy="50" r="25" fill="none" stroke={c} strokeWidth="1.5" opacity="0.6"/>
+          </svg>
+        );
+      }
+    };
+
     return (
       <div
         className={`mkt-card mkt-card-${size}`}
@@ -135,15 +214,16 @@
         onMouseLeave={() => setHover(false)}
         onClick={() => onOpen?.(item)}
       >
-        <div className="mkt-card-art" style={{ background: `linear-gradient(135deg, ${c}22, ${c}66)` }}>
-          <div className="mkt-card-kind" style={{ color: c }}>{item.kind}</div>
-          <div className="mkt-card-sigil" style={{ color: c }}>
+        <div className="mkt-card-art" style={{ background: `linear-gradient(135deg, ${c}22, ${c}66)`, position: 'relative', overflow: 'hidden' }}>
+          {renderArtVisual()}
+          <div className="mkt-card-kind" style={{ color: c, position: 'relative', zIndex: 2 }}>{item.kind}</div>
+          <div className="mkt-card-sigil" style={{ color: c, position: 'relative', zIndex: 2, fontSize: '3em' }}>
             {item.kind === 'LLM' ? '◈' : item.kind === 'AGENT' ? '◉' : item.kind === 'VISION' ? '◆' :
              item.kind === 'AUDIO' ? '♪' : item.kind === 'CODE' ? '§' : item.kind === 'GPU' ? '▣' :
              item.kind === 'CREDITS' ? '¢' : item.kind === 'API' ? '⎔' : item.kind.includes('SERVER') ? '▤' :
              item.kind === 'GPU RENT' ? '⏱' : '◧'}
           </div>
-          {item.tag && <span className="mkt-card-tag" style={{ background: c, color: c === '#FFD84D' ? '#0A0A0C' : '#F4F2EC' }}>{item.tag}</span>}
+          {item.tag && <span className="mkt-card-tag" style={{ background: c, color: c === '#FFD84D' ? '#0A0A0C' : '#F4F2EC', position: 'relative', zIndex: 2 }}>{item.tag}</span>}
           {hover && <div className="mkt-card-chart"><MiniChart seed={item.name.length * 3} color={c} bias={item.delta / 20} w={220} h={80} /></div>}
         </div>
         <div className="mkt-card-body">

@@ -161,16 +161,24 @@
   opacity: 0.75;
   filter: blur(0.5px);
 }
+.mkt-card-visual {
+  animation: mkt-float 4s ease-in-out infinite;
+}
+@keyframes mkt-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
 .mkt-card-kind {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
 }
 .mkt-card-sigil {
-  font-size: 56px;
+  font-size: 64px;
   line-height: 1;
   font-weight: 400;
   margin-left: auto; margin-top: auto;
-  opacity: 0.85;
+  opacity: 0.9;
+  text-shadow: 0 0 16px rgba(108,92,231,0.3);
 }
 .mkt-card-tag {
   position: absolute; top: 14px; right: 14px;
