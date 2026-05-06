@@ -819,12 +819,17 @@ const D = (() => {
               <button
                 onClick={async () => {
                   try {
+                    console.log('[Signout] Starting sign-out from profile...');
                     await supa.auth.signOut();
-                    window.location.href = '/index.html';
+                    console.log('[Signout] Sign-out successful');
                   } catch (err) {
-                    console.error('Sign out error:', err);
-                    window.location.href = '/index.html';
+                    console.error('[Signout] Error:', err);
                   }
+                  // Small delay to ensure sign-out is processed
+                  setTimeout(() => {
+                    console.log('[Signout] Redirecting to index...');
+                    window.location.href = '/index.html';
+                  }, 300);
                 }}
                 style={{
                   width: '100%',
@@ -1069,11 +1074,17 @@ const D = (() => {
         {profilePage === 'signout' && (() => {
           (async () => {
             try {
+              console.log('[Signout] Starting sign-out...');
               await supa.auth.signOut();
+              console.log('[Signout] Sign-out successful');
             } catch (err) {
-              console.error('Sign out error:', err);
+              console.error('[Signout] Error:', err);
             }
-            window.location.href = '/index.html';
+            // Small delay to ensure sign-out is processed
+            setTimeout(() => {
+              console.log('[Signout] Redirecting to index...');
+              window.location.href = '/index.html';
+            }, 300);
           })();
           return null;
         })()}

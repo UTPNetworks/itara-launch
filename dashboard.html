@@ -225,6 +225,10 @@ const SUPABASE_URL = 'https://pduogjyvgvpgxdzxdrqx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ahLDuaB1GT9wOxgg4ZCHng_lBQ9hc4L';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Expose to window for dashboard.jsx and other scripts
+window.supa = sb;
+window.sb = sb;
+
 const MC_THEME_KEY = 'itara_mc_theme';
 
 // ---- Auth state change listener ----
