@@ -509,42 +509,19 @@
             <div className="mkB-grid-head">
               <span>{(filtered || []).length} ITEMS · {sort?.toUpperCase() || ''}</span>
               <span className="mkB-live-n">
-                {loading ? 'REFRESHING…' : <><MKT.LiveDot />LIVE PRICING</>}
+                {loading ? 'SYNCING…' : <><MKT.LiveDot />LIVE PRICING</>}
               </span>
             </div>
             
             <div className="mkB-grid-items">
-              {fetchError ? (
-                <div style={{ gridColumn: '1/-1', padding: '60px', textAlign: 'center', background: 'rgba(255,92,92,0.05)', borderRadius: '16px', border: '1px dashed rgba(255,92,92,0.2)' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '16px' }}>⚠️</div>
-                  <div style={{ color: 'var(--bone)', fontWeight: 'bold', marginBottom: '8px' }}>Sync Connection Failed</div>
-                  <div style={{ color: 'var(--mute)', fontSize: '14px' }}>{fetchError}</div>
-                  <button 
-                    onClick={() => window.refreshMarketplaceData?.()} 
-                    style={{ marginTop: '20px', background: 'transparent', border: '1px solid var(--line)', color: 'var(--bone)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}
-                  >
-                    RETRY SYNC
-                  </button>
-                </div>
-              ) : loading && (!filtered || filtered.length === 0) ? (
-                // Initial loading skeleton
-                [1,2,3,4,5,6].map(i => (
-                  <div key={i} className="mkt-card mkt-card-md" style={{ opacity: 0.5, pointerEvents: 'none' }}>
-                    <div className="mkt-card-art" style={{ background: 'var(--ink-3)' }}></div>
-                    <div className="mkt-card-body">
-                      <div style={{ height: '14px', width: '60%', background: 'var(--line)', borderRadius: '4px', marginBottom: '8px' }}></div>
-                      <div style={{ height: '10px', width: '40%', background: 'var(--line)', borderRadius: '4px' }}></div>
-                    </div>
-                  </div>
-                ))
-              ) : (filtered || []).length > 0 ? (
+              {(filtered || []).length > 0 ? (
                 (filtered || []).map(it => <MKT.ProductCard key={it?.id || Math.random()} item={it} onOpen={onOpen} live={live} size="md" />)
               ) : (
                 <div style={{ gridColumn: '1/-1', padding: '80px 20px', textAlign: 'center' }}>
                   <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔍</div>
-                  <h3 style={{ color: 'var(--bone)', marginBottom: '8px' }}>No active listings found</h3>
+                  <h3 style={{ color: 'var(--bone)', marginBottom: '8px' }}>No items found</h3>
                   <p style={{ color: 'var(--mute)', fontSize: '14px', maxWidth: '400px', margin: '0 auto 24px' }}>
-                    Be the first to list your AI models, compute, or hardware on the Itara Market.
+                    Adjust your filters or be the first to list your AI assets.
                   </p>
                   <button 
                     onClick={() => window.openListingModal?.()}
