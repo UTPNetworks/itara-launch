@@ -25,57 +25,58 @@
     const modalStyle = {
       position: 'fixed',
       inset: 0,
-      backgroundColor: 'rgba(0,0,0,0.7)',
+      backgroundColor: 'rgba(0,0,0,0.3)',
       display: isOpen ? 'flex' : 'none',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 999,
-      backdropFilter: 'blur(4px)',
+      backdropFilter: 'blur(8px)',
     };
 
     const contentStyle = {
-      backgroundColor: '#1a1a1c',
-      borderRadius: '12px',
-      border: '1px solid rgba(244,242,236,0.1)',
-      padding: '32px',
-      maxWidth: '600px',
+      backgroundColor: '#F8F7F3',
+      borderRadius: '16px',
+      border: '2px solid #6C5CE7',
+      padding: '40px',
+      maxWidth: '650px',
       width: '90vw',
       maxHeight: '80vh',
       overflowY: 'auto',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+      boxShadow: '0 25px 80px rgba(108,92,231,0.2)',
     };
 
     const titleStyle = {
-      color: '#F4F2EC',
-      fontSize: '24px',
-      fontWeight: 600,
+      color: '#0A0A0C',
+      fontSize: '28px',
+      fontWeight: 700,
       marginBottom: '8px',
     };
 
     const subtitleStyle = {
-      color: 'rgba(244,242,236,0.6)',
+      color: 'rgba(10,10,12,0.6)',
       fontSize: '13px',
       marginBottom: '24px',
+      fontWeight: 600,
     };
 
     const progressStyle = {
-      height: '4px',
-      backgroundColor: 'rgba(244,242,236,0.1)',
-      borderRadius: '2px',
+      height: '6px',
+      backgroundColor: 'rgba(108,92,231,0.1)',
+      borderRadius: '3px',
       marginBottom: '24px',
       overflow: 'hidden',
     };
 
     const progressFillStyle = {
       height: '100%',
-      backgroundColor: '#6C5CE7',
+      background: 'linear-gradient(90deg, #6C5CE7, #A78BFA)',
       width: `${(step / 3) * 100}%`,
       transition: 'width 0.3s',
     };
 
     const buttonStyle = {
       backgroundColor: '#6C5CE7',
-      color: '#F4F2EC',
+      color: '#F8F7F3',
       border: 'none',
       borderRadius: '8px',
       padding: '10px 16px',
@@ -88,17 +89,17 @@
 
     const secondaryButtonStyle = {
       ...buttonStyle,
-      backgroundColor: 'rgba(244,242,236,0.1)',
-      color: 'rgba(244,242,236,0.8)',
+      backgroundColor: 'rgba(108,92,231,0.1)',
+      color: '#6C5CE7',
     };
 
     const inputStyle = {
       width: '100%',
       padding: '10px 12px',
-      backgroundColor: 'rgba(244,242,236,0.05)',
-      border: '1px solid rgba(244,242,236,0.1)',
+      backgroundColor: '#FFFFFF',
+      border: '1px solid rgba(108,92,231,0.2)',
       borderRadius: '6px',
-      color: '#F4F2EC',
+      color: '#0A0A0C',
       fontSize: '13px',
       marginBottom: '12px',
       fontFamily: 'inherit',
@@ -106,9 +107,9 @@
 
     const labelStyle = {
       display: 'block',
-      color: '#F4F2EC',
+      color: '#0A0A0C',
       fontSize: '12px',
-      fontWeight: 600,
+      fontWeight: 700,
       marginBottom: '6px',
       textTransform: 'uppercase',
       letterSpacing: '0.1em',
@@ -168,7 +169,6 @@
 
       setLoading(true);
       try {
-        // Create listing
         const { data: listing, error: listingError } = await supabase
           .from('listings')
           .insert({
@@ -190,7 +190,6 @@
 
         if (listingError) throw listingError;
 
-        // Upload images
         for (const img of images) {
           const fileName = `${user.id}/${listing.id}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpg`;
 
@@ -244,10 +243,10 @@
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
             <div>
-              <div style={titleStyle}>Post a Listing</div>
+              <div style={titleStyle}>✨ Post a Listing</div>
               <div style={subtitleStyle}>Step {step} of 3</div>
             </div>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#F4F2EC', fontSize: '24px', cursor: 'pointer' }}>✕</button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#0A0A0C', fontSize: '24px', cursor: 'pointer' }}>✕</button>
           </div>
 
           {/* Progress bar */}
@@ -263,7 +262,7 @@
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 style={{
-                  border: '2px dashed rgba(108, 92, 231, 0.3)',
+                  border: '2px dashed #6C5CE7',
                   borderRadius: '8px',
                   padding: '24px',
                   textAlign: 'center',
@@ -275,15 +274,15 @@
               >
                 <input ref={fileInputRef} type="file" multiple accept="image/*" onChange={handleFileSelect} style={{ display: 'none' }} />
                 <div style={{ fontSize: '32px', marginBottom: '8px' }}>📁</div>
-                <div style={{ color: '#F4F2EC', fontSize: '13px' }}>Drop images here or click to browse</div>
-                <div style={{ color: 'rgba(244,242,236,0.5)', fontSize: '12px', marginTop: '4px' }}>{images.length} / 10 images</div>
+                <div style={{ color: '#0A0A0C', fontSize: '13px', fontWeight: 600 }}>Drop images here or click to browse</div>
+                <div style={{ color: 'rgba(10,10,12,0.5)', fontSize: '12px', marginTop: '4px' }}>{images.length} / 10 images</div>
               </div>
 
               {images.length > 0 && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '20px' }}>
                   {images.map((img, i) => (
                     <div key={i} style={{ position: 'relative', aspectRatio: '1' }}>
-                      <img src={img.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: img.isCover ? '2px solid #6C5CE7' : '1px solid rgba(244,242,236,0.1)' }} />
+                      <img src={img.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: img.isCover ? '2px solid #6C5CE7' : '1px solid rgba(108,92,231,0.1)' }} />
                       <button onClick={() => removeImage(i)} style={{ position: 'absolute', top: '4px', right: '4px', background: '#E63946', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '12px' }}>✕</button>
                       {img.isCover && <div style={{ position: 'absolute', top: '4px', left: '4px', background: '#6C5CE7', color: 'white', fontSize: '10px', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>COVER</div>}
                     </div>
@@ -293,7 +292,7 @@
 
               <label style={labelStyle}>Title *</label>
               <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="What are you selling?" maxLength="120" style={inputStyle} />
-              <div style={{ fontSize: '11px', color: 'rgba(244,242,236,0.5)', marginBottom: '16px' }}>{formData.title.length} / 120</div>
+              <div style={{ fontSize: '11px', color: 'rgba(10,10,12,0.5)', marginBottom: '16px' }}>{formData.title.length} / 120</div>
 
               <label style={labelStyle}>Category *</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px' }}>
@@ -303,9 +302,9 @@
                     onClick={() => setFormData({ ...formData, category: cat })}
                     style={{
                       ...buttonStyle,
-                      backgroundColor: formData.category === cat ? '#6C5CE7' : 'rgba(244,242,236,0.05)',
-                      color: formData.category === cat ? '#F4F2EC' : 'rgba(244,242,236,0.7)',
-                      border: formData.category === cat ? '1px solid #6C5CE7' : '1px solid rgba(244,242,236,0.1)',
+                      backgroundColor: formData.category === cat ? '#6C5CE7' : '#FFFFFF',
+                      color: formData.category === cat ? '#F8F7F3' : '#6C5CE7',
+                      border: formData.category === cat ? '2px solid #6C5CE7' : '2px solid rgba(108,92,231,0.2)',
                       padding: '8px 12px',
                     }}
                   >
@@ -336,16 +335,16 @@
             <div>
               <label style={labelStyle}>Description *</label>
               <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Describe what you're selling..." maxLength="2000" rows="4" style={{ ...inputStyle, resize: 'none', fontFamily: 'inherit' }} />
-              <div style={{ fontSize: '11px', color: 'rgba(244,242,236,0.5)', marginBottom: '16px' }}>{formData.description.length} / 2000</div>
+              <div style={{ fontSize: '11px', color: 'rgba(10,10,12,0.5)', marginBottom: '16px' }}>{formData.description.length} / 2000</div>
 
               <label style={labelStyle}>Tags / Keywords</label>
               <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={handleAddTag} placeholder="Add tags (press Enter)" style={inputStyle} />
               {formData.tags.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
                   {formData.tags.map((tag, i) => (
-                    <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 8px', backgroundColor: 'rgba(108, 92, 231, 0.2)', borderRadius: '16px', fontSize: '12px', color: '#A78BFA' }}>
+                    <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 8px', backgroundColor: 'rgba(108, 92, 231, 0.15)', borderRadius: '16px', fontSize: '12px', color: '#6C5CE7' }}>
                       {tag}
-                      <button onClick={() => removeTag(i)} style={{ background: 'none', border: 'none', color: '#A78BFA', cursor: 'pointer', fontSize: '14px' }}>✕</button>
+                      <button onClick={() => removeTag(i)} style={{ background: 'none', border: 'none', color: '#6C5CE7', cursor: 'pointer', fontSize: '14px' }}>✕</button>
                     </div>
                   ))}
                 </div>
@@ -359,9 +358,9 @@
                     onClick={() => setFormData({ ...formData, licenseType: lic })}
                     style={{
                       ...buttonStyle,
-                      backgroundColor: formData.licenseType === lic ? '#6C5CE7' : 'rgba(244,242,236,0.05)',
-                      color: formData.licenseType === lic ? '#F4F2EC' : 'rgba(244,242,236,0.7)',
-                      border: formData.licenseType === lic ? '1px solid #6C5CE7' : '1px solid rgba(244,242,236,0.1)',
+                      backgroundColor: formData.licenseType === lic ? '#6C5CE7' : '#FFFFFF',
+                      color: formData.licenseType === lic ? '#F8F7F3' : '#6C5CE7',
+                      border: formData.licenseType === lic ? '2px solid #6C5CE7' : '2px solid rgba(108,92,231,0.2)',
                       padding: '8px 12px',
                     }}
                   >
@@ -394,9 +393,9 @@
                     onClick={() => setFormData({ ...formData, deliveryMethod: method.id })}
                     style={{
                       ...buttonStyle,
-                      backgroundColor: formData.deliveryMethod === method.id ? 'rgba(108, 92, 231, 0.2)' : 'rgba(244,242,236,0.05)',
-                      color: '#F4F2EC',
-                      border: formData.deliveryMethod === method.id ? '1px solid #6C5CE7' : '1px solid rgba(244,242,236,0.1)',
+                      backgroundColor: formData.deliveryMethod === method.id ? 'rgba(108, 92, 231, 0.2)' : '#FFFFFF',
+                      color: '#0A0A0C',
+                      border: formData.deliveryMethod === method.id ? '2px solid #6C5CE7' : '1px solid rgba(108,92,231,0.1)',
                       padding: '12px',
                       textAlign: 'left',
                       height: 'auto',
@@ -409,18 +408,18 @@
                 ))}
               </div>
 
-              <div style={{ backgroundColor: 'rgba(244,242,236,0.05)', border: '1px solid rgba(244,242,236,0.1)', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#F4F2EC', marginBottom: '8px' }}>Preview</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#F4F2EC', marginBottom: '4px' }}>{formData.title || 'Untitled'}</div>
-                <div style={{ fontSize: '12px', color: 'rgba(244,242,236,0.7)', marginBottom: '4px' }}>{formData.category}</div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#F4F2EC' }}>${formData.price || '0.00'}{formData.pricingType === 'Subscription' && '/mo'}</div>
+              <div style={{ backgroundColor: '#FFFFFF', border: '2px solid rgba(108,92,231,0.1)', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#0A0A0C', marginBottom: '8px' }}>Preview</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#0A0A0C', marginBottom: '4px' }}>{formData.title || 'Untitled'}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(10,10,12,0.7)', marginBottom: '4px' }}>{formData.category}</div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#6C5CE7' }}>${formData.price || '0.00'}{formData.pricingType === 'Subscription' && '/mo'}</div>
               </div>
 
-              <div style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)', border: '1px solid rgba(76, 175, 80, 0.3)', borderRadius: '8px', padding: '12px', display: 'flex', gap: '8px' }}>
+              <div style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)', border: '2px solid rgba(76, 175, 80, 0.3)', borderRadius: '8px', padding: '12px', display: 'flex', gap: '8px' }}>
                 <div style={{ fontSize: '16px' }}>🛡️</div>
                 <div>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#4CAF50' }}>Protected by WhichAI Escrow</div>
-                  <div style={{ fontSize: '11px', color: 'rgba(244,242,236,0.6)', marginTop: '2px' }}>Payment held securely until buyer confirms delivery</div>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#2E7D32' }}>Protected by WhichAI Escrow</div>
+                  <div style={{ fontSize: '11px', color: 'rgba(10,10,12,0.6)', marginTop: '2px' }}>Payment held securely until buyer confirms delivery</div>
                 </div>
               </div>
             </div>
@@ -448,36 +447,5 @@
     );
   }
 
-  // Listing Button Component
-  function ListingButton({ onClick }) {
-    return (
-      <button
-        onClick={onClick}
-        style={{
-          backgroundColor: 'rgba(108, 92, 231, 0.2)',
-          color: '#F4F2EC',
-          border: '1px solid rgba(108, 92, 231, 0.5)',
-          borderRadius: '8px',
-          padding: '8px 12px',
-          fontSize: '12px',
-          fontWeight: 600,
-          cursor: 'pointer',
-          transition: 'all 0.2s',
-          whiteSpace: 'nowrap',
-        }}
-        onMouseOver={(e) => {
-          e.target.style.backgroundColor = 'rgba(108, 92, 231, 0.4)';
-          e.target.style.borderColor = '#6C5CE7';
-        }}
-        onMouseOut={(e) => {
-          e.target.style.backgroundColor = 'rgba(108, 92, 231, 0.2)';
-          e.target.style.borderColor = 'rgba(108, 92, 231, 0.5)';
-        }}
-      >
-        ✨ Post a Listing
-      </button>
-    );
-  }
-
-  window.LISTING = { ListingModal, ListingButton };
+  window.LISTING = { ListingModal };
 })();
