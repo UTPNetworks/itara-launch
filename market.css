@@ -137,6 +137,29 @@
 .mkt-live-p.up { background: rgba(74,222,128,0.12); color: var(--green) !important; }
 .mkt-live-p.down { background: rgba(255,92,92,0.12); color: var(--red) !important; }
 
+/* Auth Dropdown & Profile */
+.dB-dropdown-item:hover {
+  background: rgba(244, 242, 236, 0.08) !important;
+  color: #FFFFFF !important;
+}
+.dB-dropdown-danger:hover {
+  background: rgba(255, 92, 92, 0.1) !important;
+  color: #FF5C5C !important;
+}
+.mkt-light .dB-dropdown-item:hover {
+  background: rgba(10, 10, 12, 0.05) !important;
+  color: #0A0A0C !important;
+}
+.mkt-light .dB-profile-dropdown {
+  background: #FFFFFF !important;
+  border-color: rgba(10, 10, 12, 0.1) !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+}
+.mkt-light .dB-profile-name { color: #0A0A0C !important; }
+.mkt-light .dB-profile-divider { background: rgba(10, 10, 12, 0.08) !important; }
+.mkt-light .dB-dropdown-item { color: rgba(10, 10, 12, 0.7) !important; }
+.mkt-light .dB-profile-header .dB-profile-avatar-large { background: #6C5CE7 !important; }
+
 /* Product card */
 .mkt-card {
   background: var(--ink-2);

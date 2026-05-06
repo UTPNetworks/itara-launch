@@ -369,11 +369,27 @@ function mountMarket(user) {
   function App() {
     const [open, setOpen] = React.useState(null);
     const [listingModalOpen, setListingModalOpen] = React.useState(false);
+    const [isLight, setIsLight] = React.useState(document.body.classList.contains('mkt-light'));
+    const [refreshSignal, setRefreshSignal] = React.useState(0);
 
-    // Expose openItem globally (used by DetailView similar cards)
+    // Theme listener
+    React.useEffect(() => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            setIsLight(document.body.classList.contains('mkt-light'));
+          }
+        });
+      });
+      observer.observe(document.body, { attributes: true });
+      return () => observer.disconnect();
+    }, []);
+
+    // Expose openItem globally
     React.useEffect(() => {
       window.MKT.openItem = (it) => setOpen(it);
       window.openListingModal = () => setListingModalOpen(true);
+      window.refreshMarketplaceData = () => setRefreshSignal(s => s + 1);
 
       // Add listing button to nav after mount
       if (window.LISTING && !document.getElementById('listing-button-container')) {
@@ -440,6 +456,9 @@ function mountMarket(user) {
         <window.MKT_PAGES.TerminalPage
           onOpen={(it) => setOpen(it)}
           live={true}
+          user={user}
+          isLight={isLight}
+          refreshSignal={refreshSignal}
         />
         {open && (
           <window.MKT.DetailView

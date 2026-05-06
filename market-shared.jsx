@@ -114,6 +114,208 @@
     );
   }
 
+  // ---- Auth Dropdown ----
+  function CommandPageProfileDropdown({ isOpen, onClose, avatarRef, onOpenProfile, user }) {
+    const dropdownRef = useRef(null);
+    const [position, setPosition] = useState({ top: 0, right: 0 });
+
+    useEffect(() => {
+      if (isOpen && avatarRef.current) {
+        const rect = avatarRef.current.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + 12,
+          right: window.innerWidth - rect.right
+        });
+      }
+    }, [isOpen, avatarRef]);
+
+    useEffect(() => {
+      function handleClickOutside(e) {
+        if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+          if (avatarRef.current && !avatarRef.current.contains(e.target)) {
+            onClose();
+          }
+        }
+      }
+      if (isOpen) {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }
+    }, [isOpen, onClose, avatarRef]);
+
+    if (!isOpen) return null;
+
+    const name = user?.user_metadata?.full_name || user?.email || 'User';
+
+    return (
+      <div className="dB-profile-dropdown" ref={dropdownRef} style={{ position: 'fixed', top: `${position.top}px`, right: `${position.right}px`, zIndex: 1001, background: 'var(--ink-2)', border: '1px solid var(--line-2)', borderRadius: '12px', padding: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.4)', minWidth: '220px' }}>
+        <div className="dB-profile-header" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+          <div className="dB-profile-avatar-large" style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--violet)', display: 'grid', placeItems: 'center', fontWeight: 'bold', color: 'white' }}>{name[0].toUpperCase()}</div>
+          <div style={{ minWidth: 0 }}>
+            <div className="dB-profile-name" style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--bone)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+            <div className="dB-profile-tier" style={{ fontSize: '11px', color: 'var(--mute)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
+          </div>
+        </div>
+        <div className="dB-profile-divider" style={{ height: '1px', background: 'var(--line)', margin: '0 -16px 12px' }}></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <button className="dB-dropdown-item" style={{ background: 'transparent', border: '0', textAlign: 'left', padding: '8px 12px', borderRadius: '6px', color: 'var(--bone)', cursor: 'pointer', fontSize: '13px' }} onClick={() => { onOpenProfile('profile'); onClose(); }}>Profile</button>
+          <button className="dB-dropdown-item" style={{ background: 'transparent', border: '0', textAlign: 'left', padding: '8px 12px', borderRadius: '6px', color: 'var(--bone)', cursor: 'pointer', fontSize: '13px' }} onClick={() => { onOpenProfile('listings'); onClose(); }}>My Listings</button>
+          <button className="dB-dropdown-item" style={{ background: 'transparent', border: '0', textAlign: 'left', padding: '8px 12px', borderRadius: '6px', color: 'var(--bone)', cursor: 'pointer', fontSize: '13px' }} onClick={() => { onOpenProfile('security'); onClose(); }}>Security & MFA</button>
+          <div className="dB-profile-divider" style={{ height: '1px', background: 'var(--line)', margin: '4px -16px' }}></div>
+          <button className="dB-dropdown-item dB-dropdown-danger" style={{ background: 'transparent', border: '0', textAlign: 'left', padding: '8px 12px', borderRadius: '6px', color: '#FF5C5C', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }} onClick={() => { onOpenProfile('signout'); onClose(); }}>Sign out</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Professional Profile Page with sidebar
+  function ProfilePage({ onClose, user, initialSection = 'overview' }) {
+    const [activeSection, setActiveSection] = useState(initialSection);
+    const email = user?.email || 'user@itara.ai';
+    const name = user?.user_metadata?.full_name || 'User';
+
+    const sections = [
+      { id: 'overview', label: 'Overview' },
+      { id: 'listings', label: 'My Listings' },
+      { id: 'security', label: 'Security & MFA' },
+    ];
+
+    if (activeSection === 'signout') {
+      (async () => {
+        if (window.supabase) {
+          const { error } = await window.supabase.auth.signOut();
+          window.location.href = '/index.html';
+        }
+      })();
+      return null;
+    }
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={onClose}>
+        <div style={{ background: 'var(--ink)', border: '1px solid var(--line-2)', borderRadius: '24px', width: '100%', maxWidth: '1000px', height: '80vh', display: 'flex', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} onClick={e => e.stopPropagation()}>
+          {/* Left Sidebar */}
+          <div style={{ width: '260px', background: 'var(--ink-2)', borderRight: '1px solid var(--line)', padding: '40px 0', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '0 32px', marginBottom: '40px', textAlign: 'center' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--violet) 0%, var(--pink) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '32px', color: 'white', fontWeight: 'bold' }}>{name[0].toUpperCase()}</div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--bone)', marginBottom: '4px' }}>{name}</div>
+              <div style={{ fontSize: '12px', color: 'var(--mute)', wordBreak: 'break-all' }}>{email}</div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {sections.map(section => (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 32px',
+                    textAlign: 'left',
+                    border: 'none',
+                    background: activeSection === section.id ? 'rgba(108, 92, 231, 0.1)' : 'transparent',
+                    color: activeSection === section.id ? 'var(--violet)' : 'var(--mute)',
+                    fontWeight: activeSection === section.id ? 'bold' : '500',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    borderLeft: `3px solid ${activeSection === section.id ? 'var(--violet)' : 'transparent'}`,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {section.label}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setActiveSection('signout')}
+              style={{
+                marginTop: 'auto',
+                width: '100%',
+                padding: '12px 32px',
+                textAlign: 'left',
+                border: 'none',
+                background: 'transparent',
+                color: '#FF5C5C',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Sign out
+            </button>
+          </div>
+
+          {/* Main Content */}
+          <div style={{ flex: 1, padding: '48px', overflowY: 'auto', color: 'var(--bone)' }}>
+            <button onClick={onClose} style={{ position: 'absolute', top: '24px', right: '24px', background: 'transparent', border: '1px solid var(--line)', color: 'var(--mute)', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>✕ CLOSE</button>
+            
+            {activeSection === 'overview' && (
+              <div>
+                <h2 style={{ fontSize: '32px', marginBottom: '32px', fontWeight: 'bold', letterSpacing: '-0.02em' }}>Profile Overview</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
+                  <div style={{ background: 'var(--ink-2)', padding: '24px', borderRadius: '16px', border: '1px solid var(--line)' }}>
+                    <div style={{ color: 'var(--mute)', fontSize: '10px', fontWeight: 'bold', letterSpacing: '0.1em', marginBottom: '8px' }}>MEMBERSHIP</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--violet)' }}>FREE PLAN</div>
+                  </div>
+                  <div style={{ background: 'var(--ink-2)', padding: '24px', borderRadius: '16px', border: '1px solid var(--line)' }}>
+                    <div style={{ color: 'var(--mute)', fontSize: '10px', fontWeight: 'bold', letterSpacing: '0.1em', marginBottom: '8px' }}>MEMBER SINCE</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold' }}>APR 2026</div>
+                  </div>
+                </div>
+                <div style={{ background: 'var(--ink-2)', padding: '32px', borderRadius: '16px', border: '1px solid var(--line)' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Personal Info</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div>
+                      <div style={{ color: 'var(--mute)', fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>FULL NAME</div>
+                      <div style={{ fontSize: '14px' }}>{name}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--mute)', fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>EMAIL ADDRESS</div>
+                      <div style={{ fontSize: '14px' }}>{email}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'listings' && (
+              <div>
+                <h2 style={{ fontSize: '32px', marginBottom: '32px', fontWeight: 'bold', letterSpacing: '-0.02em' }}>My Listings</h2>
+                <div style={{ background: 'var(--ink-2)', padding: '48px', borderRadius: '16px', border: '1px solid var(--line)', textAlign: 'center' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
+                  <div style={{ color: 'var(--bone)', fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>No active listings</div>
+                  <div style={{ color: 'var(--mute)', fontSize: '14px', marginBottom: '24px' }}>Start selling your AI models, agents, or compute.</div>
+                  <button onClick={() => { onClose(); if(window.openListingModal) window.openListingModal(); }} style={{ background: 'var(--violet)', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' }}>+ CREATE LISTING</button>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'security' && (
+              <div>
+                <h2 style={{ fontSize: '32px', marginBottom: '32px', fontWeight: 'bold', letterSpacing: '-0.02em' }}>Security & MFA</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div style={{ background: 'var(--ink-2)', padding: '24px', borderRadius: '16px', border: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Two-Factor Authentication</div>
+                      <div style={{ fontSize: '13px', color: 'var(--mute)' }}>Add an extra layer of security to your account.</div>
+                    </div>
+                    <button style={{ background: 'transparent', border: '1px solid var(--line)', color: 'var(--bone)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>ENABLE</button>
+                  </div>
+                  <div style={{ background: 'var(--ink-2)', padding: '24px', borderRadius: '16px', border: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Passkeys</div>
+                      <div style={{ fontSize: '13px', color: 'var(--mute)' }}>Login using biometrics or security keys.</div>
+                    </div>
+                    <button style={{ background: 'transparent', border: '1px solid var(--line)', color: 'var(--bone)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>ADD KEY</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ---- Product card (square, hover chart) ----
   const KIND_COLOR = {
     LLM: '#6C5CE7', AGENT: '#FF6AC7', VISION: '#4A7BFF', AUDIO: '#FFD84D',

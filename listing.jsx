@@ -214,6 +214,7 @@
         }
 
         alert('Listing posted successfully!');
+        if (window.refreshMarketplaceData) window.refreshMarketplaceData();
         onClose();
         setStep(1);
         setImages([]);
