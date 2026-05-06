@@ -1481,40 +1481,30 @@ function confirmRental() {
   }, 800);
 }
 
-// Wire up button handlers
-document.addEventListener('DOMContentLoaded', () => {
-  // Hero RENT button
-  const heroBtn = document.querySelector('.cp-btn-primary');
-  if (heroBtn && heroBtn.textContent.includes('RENT')) {
-    heroBtn.onclick = (e) => { e.preventDefault(); openRentalModal(); };
-  }
+// Duration button handlers (set up after React mounts)
+function setupDurationButtons() {
+  ['1h', '6h', '24h', '1w'].forEach((label, idx) => {
+    const btn = document.getElementById(`duration-${label}`);
+    if (btn) {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const durations = [
+          { value: 1, unit: 'hour' },
+          { value: 6, unit: 'hour' },
+          { value: 24, unit: 'hour' },
+          { value: 1, unit: 'week' }
+        ];
+        currentRentalState.duration = durations[idx].value;
+        currentRentalState.unit = durations[idx].unit;
+        updateRentalModal();
 
-  // Duration button handlers (for use after boot)
-  function setupDurationButtons() {
-    ['1h', '6h', '24h', '1w'].forEach((label, idx) => {
-      const btn = document.getElementById(`duration-${label}`);
-      if (btn) {
-        btn.onclick = (e) => {
-          e.preventDefault();
-          const durations = [
-            { value: 1, unit: 'hour' },
-            { value: 6, unit: 'hour' },
-            { value: 24, unit: 'hour' },
-            { value: 1, unit: 'week' }
-          ];
-          currentRentalState.duration = durations[idx].value;
-          currentRentalState.unit = durations[idx].unit;
-          updateRentalModal();
-
-          // Visual feedback - update active state
-          document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        };
-      }
-    });
-  }
-  setupDurationButtons();
-});
+        // Visual feedback - update active state
+        document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      };
+    }
+  });
+}
 
 async function boot() {
   if (!window.Wordmark) return setTimeout(boot, 80);
@@ -1526,8 +1516,21 @@ async function boot() {
   mountWordmark();
   mountPage(session.user);
 
-  // Wire up RENT buttons in GPU table
+  // Wire up RENT buttons in GPU table and other interactive elements
   setTimeout(() => {
+    // Wire up hero "RENT A GPU NOW" button
+    const heroBtns = Array.from(document.querySelectorAll('.cp-hero-actions button'));
+    const heroRentBtn = heroBtns.find(btn => btn.textContent.includes('RENT'));
+    if (heroRentBtn) {
+      heroRentBtn.onclick = (e) => {
+        e.preventDefault();
+        currentRentalState.duration = 1;
+        currentRentalState.unit = 'hour';
+        openRentalModal();
+      };
+    }
+
+    // Wire up RENT buttons in GPU table
     document.querySelectorAll('.cp-rent-btn').forEach((btn, idx) => {
       btn.onclick = () => {
         const gpu = GPUS_CATALOG[idx] || GPUS_CATALOG[0];
