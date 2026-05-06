@@ -191,5 +191,65 @@ window.ITARA_MARKET = (() => {
   // Build a quick lookup
   const byId = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 
+  // Add realistic image mapping
+  const IMG_MAP = {
+    llm: [
+      'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800', // AI brain abstract
+      'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800', // Neural net
+      'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800', // Cyber security code
+    ],
+    agent: [
+      'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&q=80&w=800', // Robot eye
+      'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800', // Robot hands
+    ],
+    vision: [
+      'https://images.unsplash.com/photo-1527430253228-e63688615b11?auto=format&fit=crop&q=80&w=800', // Camera lens
+      'https://images.unsplash.com/photo-1477285445529-676239f6040a?auto=format&fit=crop&q=80&w=800', // Night street AR feel
+    ],
+    audio: [
+      'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800', // Studio mic
+      'https://images.unsplash.com/photo-1558403135-c5e4e569518d?auto=format&fit=crop&q=80&w=800', // Soundboard
+    ],
+    code: [
+      'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&q=80&w=800', // Code on screen
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800', // IDE
+    ],
+    gpu: [
+      'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=800', // GPU inside PC
+      'https://images.unsplash.com/photo-1640622300473-977435c38c04?auto=format&fit=crop&q=80&w=800', // Graphics card close up
+    ],
+    hardware: [
+      'https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&q=80&w=800', // Modern laptop/desktop
+      'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&q=80&w=800', // Clean desk setup
+    ],
+    server: [
+      'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=800', // Server rack
+      'https://images.unsplash.com/photo-1597733336794-12d05021d510?auto=format&fit=crop&q=80&w=800', // Data center cables
+    ],
+    compute: [
+      'https://images.unsplash.com/photo-1597733336794-12d05021d510?auto=format&fit=crop&q=80&w=800', // Data center
+      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800', // Earth lights from space
+    ],
+    credits: [
+      'https://images.unsplash.com/photo-1518186239751-2467ef7f1947?auto=format&fit=crop&q=80&w=800', // Abstract coin glow
+    ],
+    api: [
+      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800', // Network nodes
+    ],
+    cloud: [
+      'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=800', // Server room
+    ]
+  };
+
+  ITEMS.forEach((it, idx) => {
+    const list = IMG_MAP[it.cat] || IMG_MAP.llm;
+    it.imageUrl = list[idx % list.length];
+  });
+
+  FEATURED.forEach((f) => {
+    const it = byId[f.id];
+    if (it) f.imageUrl = it.imageUrl;
+  });
+
   return { CATS, FEATURED, ITEMS, COLLECTIONS, RECENT, CREATORS, byId };
 })();

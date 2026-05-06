@@ -168,6 +168,14 @@
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-3px); }
 }
+.mkt-card-img {
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+.mkt-card-overlay {
+  pointer-events: none;
+}
 .mkt-card-kind {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; font-weight: 700; letter-spacing: 0.15em;

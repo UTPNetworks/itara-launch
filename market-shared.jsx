@@ -130,6 +130,25 @@
 
     // Render type-specific visual elements
     const renderArtVisual = () => {
+      if (item.imageUrl) {
+        return (
+          <img
+            src={item.imageUrl}
+            alt={item.name}
+            className="mkt-card-img"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transition: 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)',
+              transform: hover ? 'scale(1.1)' : 'scale(1)',
+            }}
+          />
+        );
+      }
+
       const seed = item.name.length * 7;
       const rng = (() => { let s = seed; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; })();
 
@@ -216,13 +235,22 @@
       >
         <div className="mkt-card-art" style={{ background: `linear-gradient(135deg, ${c}22, ${c}66)`, position: 'relative', overflow: 'hidden' }}>
           {renderArtVisual()}
-          <div className="mkt-card-kind" style={{ color: c, position: 'relative', zIndex: 2 }}>{item.kind}</div>
-          <div className="mkt-card-sigil" style={{ color: c, position: 'relative', zIndex: 2, fontSize: '3em' }}>
-            {item.kind === 'LLM' ? '◈' : item.kind === 'AGENT' ? '◉' : item.kind === 'VISION' ? '◆' :
-             item.kind === 'AUDIO' ? '♪' : item.kind === 'CODE' ? '§' : item.kind === 'GPU' ? '▣' :
-             item.kind === 'CREDITS' ? '¢' : item.kind === 'API' ? '⎔' : item.kind.includes('SERVER') ? '▤' :
-             item.kind === 'GPU RENT' ? '⏱' : '◧'}
-          </div>
+          <div className="mkt-card-overlay" style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, transparent 40%, rgba(10, 10, 12, 0.7) 100%)',
+            opacity: item.imageUrl ? 1 : 0,
+            transition: 'opacity 0.3s ease'
+          }} />
+          <div className="mkt-card-kind" style={{ color: item.imageUrl ? '#FFFFFF' : c, position: 'relative', zIndex: 2, textShadow: item.imageUrl ? '0 1px 4px rgba(0,0,0,0.4)' : 'none' }}>{item.kind}</div>
+          {!item.imageUrl && (
+            <div className="mkt-card-sigil" style={{ color: c, position: 'relative', zIndex: 2, fontSize: '3em' }}>
+              {item.kind === 'LLM' ? '◈' : item.kind === 'AGENT' ? '◉' : item.kind === 'VISION' ? '◆' :
+               item.kind === 'AUDIO' ? '♪' : item.kind === 'CODE' ? '§' : item.kind === 'GPU' ? '▣' :
+               item.kind === 'CREDITS' ? '¢' : item.kind === 'API' ? '⎔' : item.kind.includes('SERVER') ? '▤' :
+               item.kind === 'GPU RENT' ? '⏱' : '◧'}
+            </div>
+          )}
           {item.tag && <span className="mkt-card-tag" style={{ background: c, color: c === '#FFD84D' ? '#0A0A0C' : '#F4F2EC', position: 'relative', zIndex: 2 }}>{item.tag}</span>}
           {hover && <div className="mkt-card-chart"><MiniChart seed={item.name.length * 3} color={c} bias={item.delta / 20} w={220} h={80} /></div>}
         </div>
@@ -288,11 +316,26 @@
           <button className="mkt-detail-close" onClick={onClose}>✕ CLOSE</button>
 
           <div className="mkt-detail-hero">
-            <div className="mkt-detail-art" style={{ background: `linear-gradient(135deg, ${c}33, ${c}88, ${c}33)` }}>
-              <div className="mkt-detail-sigil" style={{ color: c }}>
-                {item.kind === 'LLM' ? '◈' : item.kind === 'AGENT' ? '◉' : item.kind === 'GPU' ? '▣' : '◆'}
-              </div>
-              <div className="mkt-detail-kind" style={{ color: c }}>{item.kind}</div>
+            <div className="mkt-detail-art" style={{ background: `linear-gradient(135deg, ${c}33, ${c}88, ${c}33)`, position: 'relative', overflow: 'hidden' }}>
+              {item.imageUrl && (
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              )}
+              <div className="mkt-card-overlay" style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(to bottom, transparent 30%, rgba(10, 10, 12, 0.8) 100%)',
+                opacity: item.imageUrl ? 1 : 0
+              }} />
+              {!item.imageUrl && (
+                <div className="mkt-detail-sigil" style={{ color: c, position: 'relative', zIndex: 2 }}>
+                  {item.kind === 'LLM' ? '◈' : item.kind === 'AGENT' ? '◉' : item.kind === 'GPU' ? '▣' : '◆'}
+                </div>
+              )}
+              <div className="mkt-detail-kind" style={{ color: item.imageUrl ? '#FFFFFF' : c, position: 'relative', zIndex: 2, textShadow: item.imageUrl ? '0 1px 8px rgba(0,0,0,0.5)' : 'none' }}>{item.kind}</div>
             </div>
             <div className="mkt-detail-meta">
               <div className="mkt-eyebrow">§ {item.creator}</div>
